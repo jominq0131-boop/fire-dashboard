@@ -1755,10 +1755,10 @@ form .account-actions {
   min-width: 0;
   position: relative;
 }
-.financial-plot .recharts-wrapper,
-.financial-plot .recharts-surface {
-  /* Constrain the previous measured width until ResizeObserver commits the next size. */
-  max-width: 100%;
+.financial-plot {
+  /* Keep stale resize frames inside the plot without changing Recharts' measured coordinates. */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 .chart-loading {
   min-height: 350px;

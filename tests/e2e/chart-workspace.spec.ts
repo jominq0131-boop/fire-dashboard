@@ -100,6 +100,9 @@ test("professional workspace: composite series, exact tooltip, zoom, cash flow a
   await touchPlot.tap({ position: { x: bounds.width - 30, y: 150 } });
   await expect(chart.locator(".financial-tooltip")).toContainText("198,000 円");
   await expect(chart.locator(".financial-tooltip")).toContainText("2026-09");
+  const tipBounds = (await chart.locator(".financial-tooltip").boundingBox())!;
+  expect(tipBounds.x).toBeGreaterThanOrEqual(bounds.x);
+  expect(tipBounds.x + tipBounds.width).toBeLessThanOrEqual(bounds.x + bounds.width);
   await chart.screenshot({ path: "test-results/pro-cash-mobile.png" });
 });
 
