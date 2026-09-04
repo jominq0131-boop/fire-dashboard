@@ -18,7 +18,8 @@ test("inspect history with keyboard and pointer, filter, drill down and guarded 
   await expect(detail).toContainText("2026-09 の記録");
   await expect(detail.locator("dd")).toHaveText(["100 円", "20 円", "30 円"]);
   await expect(detail).toContainText("20 円");
-  await expect(overview.locator("svg path")).toHaveCount(1);
+  await expect(overview.locator(".recharts-line-curve")).toHaveCount(1);
+  await expect(overview.locator(".recharts-area-area")).toHaveCount(1);
   const slider = overview.getByRole("slider", { name: "月別資産チャートの選択位置" });
   await slider.focus();
   await page.keyboard.press("ArrowLeft");
@@ -74,7 +75,7 @@ test("forecast and comparison line toggles, horizon and year inspection", async 
   await chart.getByRole("slider").fill("10");
   await expect(chart.locator(".chart-inspector")).toContainText("12,000 円");
   await chart.getByRole("button", { name: "今回の試算 目標（破線）" }).click();
-  await expect(chart.locator("svg path")).toHaveCount(1);
+  await expect(chart.locator(".recharts-line-curve")).toHaveCount(1);
   await chart.getByLabel("予測グラフの期間").selectOption("100");
   await expect(chart.getByRole("slider")).toHaveAttribute("max", "100");
   await fire.getByRole("button", { name: "この結果を比較に追加" }).click();
@@ -86,7 +87,7 @@ test("forecast and comparison line toggles, horizon and year inspection", async 
   await comparison.getByRole("slider").fill("10");
   await expect(comparison.locator(".chart-inspector")).toContainText("12,000 円");
   await expect(comparison.locator(".chart-inspector")).toContainText("24,000 円");
-  await expect(comparison.locator("svg path")).toHaveCount(4);
+  await expect(comparison.locator(".recharts-line-curve")).toHaveCount(4);
   await comparison.screenshot({ path: "test-results/forecast-interactive-desktop.png" });
   await page.setViewportSize({ width: 320, height: 844 });
   await expect

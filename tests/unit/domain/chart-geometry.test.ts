@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { linePaths } from "../../../src/features/charts/line-geometry";
+import { linePaths, seriesSegments } from "../../../src/features/charts/line-geometry";
 it("connects adjacent observations and preserves missing gaps", () => {
   expect(linePaths([10, 20, null, 30], 30)).toHaveLength(2);
   expect(linePaths([10, 20], 20)[0]).toContain(" L");
@@ -14,4 +14,19 @@ it("breaks lines when aggregate account coverage changes", () => {
 it("plots zero, single points and maximum yen without non-finite coordinates", () => {
   expect(linePaths([0], 0)).toEqual(["M64,220"]);
   expect(linePaths([Number.MAX_SAFE_INTEGER], Number.MAX_SAFE_INTEGER)).toEqual(["M64,40"]);
+});
+it("retains both edge observations while separating noncomparable coverage", () => {
+  expect(
+    seriesSegments([0, 20, 30, null, Number.MAX_SAFE_INTEGER], [false, true, false, false, false]),
+  ).toEqual([
+    [0, 1],
+    [2, 2],
+    [4, 4],
+  ]);
+  expect(seriesSegments([null, null])).toEqual([]);
+  expect(seriesSegments([0])).toEqual([[0, 0]]);
+  expect(seriesSegments([10, null, 20, 30])).toEqual([
+    [0, 0],
+    [2, 3],
+  ]);
 });

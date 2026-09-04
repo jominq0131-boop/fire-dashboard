@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { InteractiveLineChart } from "../charts/InteractiveLineChart";
+import { InteractiveLineChart, type ChartSeries } from "../charts/InteractiveLineChart";
 import { monthlyMetrics, type MetricAmount } from "../../domain/metrics";
 import { monthChange, type PortfolioOverview } from "../../domain/portfolio";
 import { observationStatus, localDate } from "../../domain/observations";
@@ -19,6 +19,7 @@ export function HistoryExplorer({
   onForecast: (value: number, source: string) => void;
 }) {
   const [account, setAccount] = useState(""),
+    [view, setView] = useState("assets"),
     [period, setPeriod] = useState(12),
     [selected, setSelected] = useState(11);
   const months = data.months.slice(-period);
@@ -33,13 +34,93 @@ export function HistoryExplorer({
     return typeof n === "number" ? n : null;
   });
   const change = monthChange(months[index - 1], row.source);
+  const investmentValues = rows.map(({ source }) => {
+    const ids = new Set(
+      source.accounts
+        .filter((a) => ["nisa_tsumitate", "nisa_growth", "taxable"].includes(a.category))
+        .map((a) => a.id),
+    );
+    return monthlyMetrics({
+      ...source,
+      records: {
+        ...source.records,
+        balances: source.records.balances.filter((b) => ids.has(b.accountId)),
+      },
+    }).assets;
+  });
+  const hasInvestments = data.current.accounts.some((a) =>
+    ["nisa_tsumitate", "nisa_growth", "taxable"].includes(a.category),
+  );
+  const assetSeries: ChartSeries[] = [
+    {
+      id: account || "total",
+      label: chosen?.name ?? "記録した資産合計",
+      values,
+      kind: "area",
+      connect: rows.map((r, i) =>
+        account ? true : monthChange(months[i - 1], r.source).delta !== null,
+      ),
+      hollow: rows.map((r) => !account && r.metrics.recordedAccounts !== r.metrics.totalAccounts),
+      missing: rows.map((r) => (r.metrics.assets === "overflow" ? "計算範囲超過" : "残高未記録")),
+    },
+  ];
+  if (!account && hasInvestments)
+    assetSeries.push({
+      id: "investments",
+      label: "うちNISA・課税投資",
+      kind: "bar",
+      values: investmentValues.map((n) => (typeof n === "number" ? n : null)),
+      missing: investmentValues.map((n) =>
+        n === "overflow" ? "計算範囲超過" : "投資口座の残高未記録",
+      ),
+    });
+  const cashSeries: ChartSeries[] = [
+    { id: "income", label: "収入", values: rows.map((r) => r.metrics.income), kind: "bar" },
+    {
+      id: "expenses",
+      label: "消費支出",
+      values: rows.map((r) => r.metrics.expenses),
+      kind: "bar",
+      color: "#ff94b5",
+    },
+    {
+      id: "contribution",
+      label: "投資への拠出",
+      values: rows.map((r) => r.metrics.investmentContribution),
+      kind: "line",
+      color: "#ffc779",
+    },
+  ];
   const balances = row.source.records.balances.filter((b) => !account || b.accountId === account);
   return (
     <div className="history-explorer">
+      <div className="analysis-heading">
+        <div>
+          <span className="analysis-eyebrow">HISTORY & CASH FLOW</span>
+          <h3>資産の動きを、ひとつの画面で。</h3>
+          <p>残高の推移と毎月の収支を切り替え、気になる月を詳しく確認。</p>
+        </div>
+      </div>
+      <div className="analysis-tabs" role="group" aria-label="分析の表示">
+        <button type="button" aria-pressed={view === "assets"} onClick={() => setView("assets")}>
+          資産推移
+        </button>
+        <button
+          type="button"
+          aria-pressed={view === "cash"}
+          onClick={() => {
+            setView("cash");
+            setAccount("");
+          }}
+        >
+          収支・投資比較
+        </button>
+      </div>
       <div className="chart-controls">
         <label>
           表示する口座
           <select
+            disabled={view === "cash"}
             aria-label="表示する口座"
             value={account}
             onChange={(e) => setAccount(e.target.value)}
@@ -67,25 +148,42 @@ export function HistoryExplorer({
           </select>
         </label>
       </div>
+      <div className="analysis-summary">
+        <div>
+          <span>{row.source.month} · 記録した資産合計</span>
+          <strong>{yen(row.metrics.assets)}</strong>
+        </div>
+        <div>
+          <span>同じ口座の前月差</span>
+          <strong>{yen(change.delta)}</strong>
+          <small>
+            {change.percent === null
+              ? "比較可能な連続月が必要です"
+              : `${change.percent > 0 ? "+" : ""}${change.percent.toLocaleString("ja-JP")}%`}
+          </small>
+        </div>
+        <div>
+          <span>この月の記録状況</span>
+          <strong>
+            {row.metrics.recordedAccounts} / {row.metrics.totalAccounts}
+            <small>口座</small>
+          </strong>
+          <small>月中の確認額を含みます</small>
+        </div>
+      </div>
       <InteractiveLineChart
-        title="月別資産チャート"
+        key={`${period}-${view}-${account}`}
+        title={view === "assets" ? "月別資産チャート" : "月別収支チャート"}
         labels={rows.map((r) => r.source.month)}
         selected={index}
         onSelect={setSelected}
-        series={[
-          {
-            id: account || "total",
-            label: chosen?.name ?? "記録した資産合計",
-            values,
-            connect: rows.map((r, i) =>
-              account ? true : monthChange(months[i - 1], r.source).delta !== null,
-            ),
-            hollow: rows.map(
-              (r) => !account && r.metrics.recordedAccounts !== r.metrics.totalAccounts,
-            ),
-          },
-        ]}
+        series={view === "assets" ? assetSeries : cashSeries}
       />
+      <p className="field-hint">
+        {view === "assets"
+          ? "面は記録した残高、棒はそのうち現在の口座分類がNISA・課税投資の残高です。未記録や口座の組み合わせが変わる区間はつなぎません。"
+          : "収支は月全体の金額です。投資への拠出は消費支出に含みません。資産の増減には入出金も含まれ、運用損益ではありません。"}
+      </p>
       <section className="month-inspector" aria-label="選択月の詳細">
         <h3>{row.source.month} の記録を確認</h3>
         <p>
