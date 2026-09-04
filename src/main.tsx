@@ -1,3 +1,4 @@
+import { IndexedDbPortfolioRepository } from "./infrastructure/indexeddb-portfolio";
 import { IndexedDbMonthlyRepository } from "./infrastructure/indexeddb-monthly";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -7,9 +8,15 @@ import "./app/styles.css";
 
 const accountRepository = new IndexedDbAccountRepository();
 const monthlyRepository = new IndexedDbMonthlyRepository();
+const portfolioRepository = new IndexedDbPortfolioRepository();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App accountRepository={accountRepository} monthlyRepository={monthlyRepository} />
+    <App
+      accountRepository={accountRepository}
+      monthlyRepository={monthlyRepository}
+      portfolioRepository={portfolioRepository}
+      backupRepository={portfolioRepository}
+    />
   </StrictMode>,
 );

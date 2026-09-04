@@ -1,3 +1,9 @@
+## Milestone 7 bounded history and JSON
+
+Overview uses a 12-month index range, at most1200 balances, a separate latest month up to100, and accounts up to100 after global counts. All totals are derived; no unbounded history render or automatic whole-backup read occurs on startup.
+
+Explicit backup/export and restore use the existing100/3600/360000 record caps and a32 MiB UTF-8 document/combined-data cap. File size is checked before text loading, bytes before parsing, then fields/references/duplicates. Export cursors check each record and growing serialized size and reject oversized data without truncating/deleting it. Both current and incoming bounded snapshots plus parsing/canonicalization can coexist in memory;32 MiB is not a browser RAM guarantee. Data exceeding this version capability stays intact but cannot be fully exported/imported by this UI; streaming/larger-scale recovery is a future design.
+
 # 자원 안전 정책
 
 계좌 저장은 localStorage/sessionStorage가 아닌 IndexedDB다. 저장 공간과 JS 메모리는 다른 자원이며 IndexedDB도 객체를 읽을 때 메모리를 사용한다. [MDN getAll](https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore/getAll)은 결과 복제와 count 제한을 설명한다.

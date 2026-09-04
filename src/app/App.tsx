@@ -1,20 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import type { MonthlyRepository } from "../domain/monthly";
 import { MonthlyManager } from "../features/monthly/MonthlyManager";
 import type { AccountRepository } from "../domain/accounts";
 import { AccountManager } from "../features/accounts/AccountManager";
 import type { MetricsSource } from "../domain/metrics";
 import { MonthlyOverview } from "../features/monthly/MonthlyOverview";
+import { AssetOverview } from "../features/monthly/AssetOverview";
+import { BackupManager } from "../features/backup/BackupManager";
+import type { PortfolioRepository } from "../domain/portfolio";
+import type { BackupRepository } from "../domain/backup";
 import { Icon } from "./Icon";
 
 export function App({
   accountRepository,
   monthlyRepository,
+  portfolioRepository,
+  backupRepository,
 }: {
   accountRepository: AccountRepository;
   monthlyRepository: MonthlyRepository;
+  portfolioRepository: PortfolioRepository;
+  backupRepository: BackupRepository;
 }) {
   const [summary, setSummary] = useState<MetricsSource | null>(null);
+  const [revision, setRevision] = useState(0);
+  const [importRevision, setImportRevision] = useState(0);
+  const navigationRef = useRef<{ openMonth: (month: string) => void }>(null);
+  const refresh = useCallback(() => setRevision((n) => n + 1), []);
+  const publish = useCallback((source: MetricsSource | null) => {
+    setSummary(source);
+    if (source) setRevision((n) => n + 1);
+  }, []);
   const [active, setActive] = useState(() => window.location.hash || "#overview");
   useEffect(() => {
     const update = () => setActive(window.location.hash || "#overview");
@@ -49,6 +65,10 @@ export function App({
             <Icon name="wallet" />
             口座管理
           </a>
+          <a href="#backup" aria-current={active === "#backup" ? "location" : undefined}>
+            <Icon name="lock" />
+            バックアップ
+          </a>
         </nav>
         <div className="sidebar-bottom">
           <Icon name="lock" />
@@ -79,7 +99,14 @@ export function App({
             </a>
           </div>
           <div className="overview-grid">
-            <MonthlyOverview source={summary} />
+            <AssetOverview
+              repository={portfolioRepository}
+              revision={revision}
+              onSelectMonth={(month) => {
+                navigationRef.current?.openMonth(month);
+                window.location.hash = "monthly";
+              }}
+            />
             <article className="start-card">
               <span className="step-indicator">小さく続ける、資産管理</span>
               <h2 aria-label="金融記録を月ごとに残しましょう">
@@ -94,7 +121,7 @@ export function App({
               <a className="primary-link" href="#monthly">
                 月別記録をはじめる <Icon name="arrow" />
               </a>
-              <span className="start-footnote">チャート・FIRE予測は今後追加予定</span>
+              <span className="start-footnote">FIRE予測は今後追加予定</span>
             </article>
           </div>
         </section>
@@ -104,22 +131,35 @@ export function App({
         </div>
         <div className="workspace-grid">
           <div id="monthly">
+            <MonthlyOverview source={summary} />
             <MonthlyManager
               repository={monthlyRepository}
               accountsRepository={accountRepository}
-              onSummary={setSummary}
+              onSummary={publish}
+              navigationRef={navigationRef}
             />
           </div>
           <div id="accounts">
-            <AccountManager repository={accountRepository} />
+            <AccountManager
+              repository={accountRepository}
+              onChanged={refresh}
+              revision={importRevision}
+            />
           </div>
         </div>
+        <BackupManager
+          repository={backupRepository}
+          onImported={() => {
+            refresh();
+            setImportRevision((n) => n + 1);
+          }}
+        />
         <footer id="storage-info" className="page-footer">
           <Icon name="lock" />
           <div>
             <strong>あなたの記録は、この端末に。</strong>
             <p>
-              同期・バックアップはまだありません。ブラウザーのデータを削除すると記録も失われます。現在は試用版としてお使いください。
+              自動同期はありません。ブラウザーのデータを削除すると記録も失われます。JSONバックアップを定期的に保存してください。
             </p>
           </div>
           <span>FIRE / PERSONAL FINANCE</span>

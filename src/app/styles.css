@@ -1214,3 +1214,98 @@ form .account-actions {
 .asset-card > .field-hint {
   margin: 12px 0;
 }
+
+.asset-history {
+  min-width: 0;
+  display: grid;
+  gap: 20px;
+}
+.overview-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.asset-history .section-heading {
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.trend-card svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 20px 0;
+}
+.history-table {
+  overflow-x: auto;
+}
+.history-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.history-table th,
+.history-table td {
+  text-align: left;
+  padding: 12px 6px;
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+.history-table button {
+  padding: 8px;
+  white-space: nowrap;
+}
+.backup-panel {
+  margin-top: 28px;
+  display: grid;
+  gap: 20px;
+}
+.backup-panel input {
+  max-width: 100%;
+}
+.backup-panel .field-hint {
+  margin: 0;
+}
+.backup-preview {
+  display: grid;
+  gap: 12px;
+}
+#monthly > .asset-card {
+  margin-bottom: 20px;
+}
+@media (max-width: 560px) {
+  .history-table {
+    font-size: 11px;
+  }
+  .history-table button {
+    font-size: 11px;
+    padding: 5px;
+  }
+}
+
+.asset-history button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #edf4ff;
+  color: #246bce;
+  font-size: 12px;
+  font-weight: 600;
+}
+.asset-history button:hover {
+  background: #dceaff;
+}
+.asset-history label {
+  display: grid;
+  gap: 8px;
+  color: #748091;
+  font-size: 12px;
+}
+.asset-history input {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  color: #303b4a;
+  background: #f3f5f8;
+  max-width: 100%;
+}
+.asset-history .history-table button {
+  padding: 7px;
+}
