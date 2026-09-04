@@ -34,4 +34,4 @@ GitHub main `6a01ff1`의 최근 변경(PR #2 도메인, #4 LF 수정, #6 빈 대
 - 첫 샌드박스 E2E 실행은 종료가 지연되어 중단했고 통과로 계산하지 않았다. 승인 후 같은 테스트를 샌드박스 밖에서 재실행해 정상 종료를 확인했다. 테스트를 삭제하거나 타임아웃을 늘려 우회하지 않았다.
 - 개발 서버 기반 UI/IndexedDB 통합 검증이며, 실제 Pages 배포 검증을 의미하지 않는다. 프로덕션 산출물은 별도 빌드로 확인했다.
 
-main 병합·GitHub Pages 배포는 아직 확인하지 않았다. 월별 입력, JSON 백업/복원, FIRE 계산은 미구현이며 다음 작업으로 분리한다. GitHub CI의 최종 결과와 PR 검토 상태는 PR에서 확인한다.
+[PR #12](https://github.com/jominq0131-boop/fire-dashboard/pull/12)를 생성해 검토를 요청하는 상태다. main 병합·GitHub Pages 배포는 수행하지 않았다. 월별 입력, JSON 백업/복원, FIRE 계산은 미구현이며 다음 작업으로 분리한다. GitHub CI의 최종 결과와 PR 검토 상태는 PR에서 확인한다.

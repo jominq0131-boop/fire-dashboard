@@ -25,9 +25,9 @@
 
 현재 배포 화면은 대시보드의 레이아웃·지표 자리표시자·빈 상태만 제공한다. 실제 계좌, 월별 기록, IndexedDB 저장, JSON import/export, FIRE 계산은 아직 구현되지 않았다.
 
-### Milestone 4 — 작업 브랜치 구현, 병합·배포 확인 전
+### Milestone 4 — 로컬 검증 완료, PR 검토 중
 
-[Issue #11](https://github.com/jominq0131-boop/fire-dashboard/issues/11), `feat/account-storage`: 저장소 인터페이스, IndexedDB v1 초기 마이그레이션, 계좌 등록·수정·휴지·재개 및 복원을 구현한다. 실제 브라우저 저장소 보존·실패·충돌 테스트를 추가한다. 새 의존성은 없으며 월별 기록·FIRE·JSON 백업은 포함하지 않는다. 위의 배포 상태와 이 브랜치의 구현 상태는 별개다. 검증·운영 기록은 `docs/work-log.md`를 따른다.
+[Issue #11](https://github.com/jominq0131-boop/fire-dashboard/issues/11), [PR #12](https://github.com/jominq0131-boop/fire-dashboard/pull/12), `feat/account-storage`: 저장소 인터페이스, IndexedDB v1 초기 마이그레이션, 계좌 등록·수정·휴지·재개 및 복원을 구현했다. 단위 23개·Chromium 13개와 정적 검사/빌드가 로컬에서 통과했다. 새 의존성은 없으며 월별 기록·FIRE·JSON 백업은 포함하지 않는다. PR은 검토 중이며 main 병합·배포는 수행하지 않았다. 위의 배포 상태와 이 브랜치의 구현 상태는 별개다. GitHub CI 최종 상태는 PR에서 확인하고 검증·운영 기록은 `docs/work-log.md`를 따른다.
 
 ## Confirmed architecture decisions
 
