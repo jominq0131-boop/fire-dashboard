@@ -1,3 +1,4 @@
+import { isObservationDate } from "./observations";
 import type { MonthlyCashFlowRecord, AccountBalanceSnapshot } from "./models";
 import { isMonthKey, isIsoDateTime, isNonNegativeYen } from "./validation";
 export const MAX_MONTHS = 3600;
@@ -57,7 +58,7 @@ export function isMonthlyRecord(
         "createdAt",
         "updatedAt",
       ]
-    : ["id", "month", "accountId", "balance", "createdAt", "updatedAt"];
+    : ["id", "month", "accountId", "balance", "asOfDate", "createdAt", "updatedAt"];
   if (
     !Object.keys(r).every((k) => keys.includes(k)) ||
     !validId(r.id) ||
@@ -69,7 +70,13 @@ export function isMonthlyRecord(
   try {
     assertMonth(r.month);
     if (cash) validateCash(r as unknown as CashDetails);
-    else if (!validId(r.accountId) || !isNonNegativeYen(r.balance)) return false;
+    else if (
+      !validId(r.accountId) ||
+      !isNonNegativeYen(r.balance) ||
+      (r.asOfDate !== undefined &&
+        (!isObservationDate(r.asOfDate) || r.asOfDate.slice(0, 7) !== r.month))
+    )
+      return false;
     return true;
   } catch {
     return false;
@@ -99,5 +106,6 @@ export interface MonthlyRepository {
     accountId: string,
     balance: number,
     expected: AccountBalanceSnapshot | null,
+    asOfDate?: string,
   ): Promise<AccountBalanceSnapshot>;
 }

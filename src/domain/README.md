@@ -1,3 +1,7 @@
+## Observation semantics
+
+observations.ts provides real calendar date validation, month-end lookup, last-known total and freshness labels. asOfDate is optional for legacy records only; migration does not infer it from write timestamps. Backup normalization upgrades v1→v2 deterministically. v3 storage plan adds an index, not replacement records.
+
 ## Milestone 7
 
 portfolio.ts defines calendar windows, overview contract and comparable-month changes. backup.ts defines JSON v1, deterministic normalization, strict bounds/reference validation and additive conflict-safe merge. Derived metrics and backup format do not change persisted v2 records.

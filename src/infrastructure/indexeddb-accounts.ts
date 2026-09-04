@@ -46,7 +46,9 @@ export function openAccountDatabase(name = DATABASE_NAME): Promise<IDBDatabase> 
       }
       try {
         for (const step of storageMigrationPlan(event.oldVersion)) {
-          const store = request.result.createObjectStore(step.store, { keyPath: step.keyPath });
+          const store = step.existingStore
+            ? request.transaction!.objectStore(step.store)
+            : request.result.createObjectStore(step.store, { keyPath: step.keyPath });
           for (const index of step.indexes ?? [])
             store.createIndex(index.name, index.keyPath, { unique: index.unique });
         }

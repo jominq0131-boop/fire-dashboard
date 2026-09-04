@@ -1,4 +1,4 @@
-export const DATABASE_VERSION = 2;
+export const DATABASE_VERSION = 3;
 export const ACCOUNT_STORE = "accounts";
 export const CASH_STORE = "monthlyCashFlows";
 export const BALANCE_STORE = "accountBalanceSnapshots";
@@ -6,6 +6,7 @@ interface MigrationStep {
   version: number;
   store: string;
   keyPath: string;
+  existingStore?: boolean;
   indexes?: { name: string; keyPath: string | string[]; unique: boolean }[];
 }
 /** Pure ordered schema additions; existing records are never read or rewritten. */
@@ -39,5 +40,13 @@ export function storageMigrationPlan(from: number, to: number = DATABASE_VERSION
         ],
       },
     );
+  if (from < 3 && to >= 3)
+    steps.push({
+      version: 3,
+      store: BALANCE_STORE,
+      keyPath: "id",
+      existingStore: true,
+      indexes: [{ name: "accountMonth", keyPath: ["accountId", "month"], unique: true }],
+    });
   return steps;
 }

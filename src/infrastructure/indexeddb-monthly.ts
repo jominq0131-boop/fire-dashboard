@@ -131,6 +131,7 @@ export class IndexedDbMonthlyRepository implements MonthlyRepository {
     accountId: string,
     balance: number,
     expected: AccountBalanceSnapshot | null,
+    asOfDate?: string,
   ): Promise<AccountBalanceSnapshot> {
     assertMonth(month);
     if (!validId(accountId) || !isNonNegativeYen(balance))
@@ -138,14 +139,22 @@ export class IndexedDbMonthlyRepository implements MonthlyRepository {
     return this.save(
       month,
       false,
-      { accountId, balance },
+      {
+        accountId,
+        balance,
+        ...(asOfDate === undefined
+          ? expected?.asOfDate
+            ? { asOfDate: expected.asOfDate }
+            : {}
+          : { asOfDate }),
+      },
       expected,
     ) as Promise<AccountBalanceSnapshot>;
   }
   private save(
     month: string,
     cash: boolean,
-    details: CashDetails | { accountId: string; balance: number },
+    details: CashDetails | { accountId: string; balance: number; asOfDate?: string },
     expected: RecordValue | null,
   ): Promise<RecordValue> {
     if (

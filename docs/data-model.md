@@ -1,3 +1,13 @@
+## Dated balance observations / DB v3 / JSON v2
+
+AccountBalanceSnapshot adds optional asOfDate (YYYY-MM-DD, real date in the same month). Absence means legacy month-end input with observation date unknown. createdAt/updatedAt remain write timestamps and are never used as balance observation dates. No guessed date is attached to old records. Each account/month still has exactly one representative record. New UI observations require dates; legacy records may retain unknown dates. The UI restricts confirmed dates to today or earlier; imported future-dated records are preserved but excluded from current totals until that date.
+
+DB v2→v3 adds unique accountMonth index [accountId, month] to the existing balance store. IndexedDB builds the index transactionally; no application-level record transformation occurs. Failure rolls back to v2 with all original records. Existing v0/v1/v2 plans are preserved. Old tabs close on versionchange, and unsupported future versions are rejected.
+
+JSON v2 supports asOfDate. normalizeBackup accepts v1/v2, rejects dated fields tagged as v1, validates originals and deterministically emits v2 without adding observation dates. It preserves IDs/amounts/notes/timestamps. Additive restore/conflicts/32 MiB limits remain.
+
+Current total selects one last-known record per account at or before the cutoff, includes inactive accounts, and displays each source date or unknown-date month. Dates can differ across accounts; this is last-known value, not live valuation. Monthly history retains each month observed records without carry-forward and labels the change as difference between recorded values, not month-end performance.
+
 ## Milestone 7 JSON v1 and derived history
 
 IndexedDB remains v2. JSON first-format version 1 contains exactly schemaVersion, accounts, monthlyCashFlows and accountBalanceSnapshots. Existing record fields and validation are unchanged, including IDs, timestamps, optional notes, inactive accounts, zero yen and future months. Top-level/record extra fields, duplicate IDs/natural keys, broken references, unsupported versions and unsafe values are rejected. normalizeBackup performs deterministic v1-to-v1 canonical ordering; there is no released older JSON format to migrate. Versions 0/future are rejected instead of inventing conversion. Domain tests cover normalization/round-trip/version refusal and DB v1→v2 migration tests remain intact.

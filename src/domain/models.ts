@@ -42,12 +42,13 @@ export interface MonthlyCashFlowRecord {
   updatedAt: string;
 }
 
-/** A month-end balance for one account; it is not a cash-flow transaction. */
+/** One representative observation per account/month; absent asOfDate is legacy month-end input. */
 export interface AccountBalanceSnapshot {
   id: string;
   month: MonthKey;
   accountId: string;
   balance: NonNegativeYen;
+  asOfDate?: string;
   createdAt: string;
   updatedAt: string;
 }

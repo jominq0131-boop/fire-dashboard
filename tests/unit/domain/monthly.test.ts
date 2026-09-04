@@ -104,15 +104,15 @@ describe("bounded monthly domain", () => {
     expect(sameRecord({ a: 1 }, { a: 2 })).toBe(false);
   });
   it("adds deterministic empty stores and unique keys, preserves v1 plan", () => {
-    const v2 = storageMigrationPlan(1);
+    const v2 = storageMigrationPlan(1, 2);
     expect(v2.map((s) => s.store)).toEqual(["monthlyCashFlows", "accountBalanceSnapshots"]);
     expect(v2[0].indexes).toEqual([{ name: "month", keyPath: "month", unique: true }]);
     expect(v2[1].indexes).toEqual([
       { name: "monthAccount", keyPath: ["month", "accountId"], unique: true },
       { name: "month", keyPath: "month", unique: false },
     ]);
-    expect(storageMigrationPlan(0)).toEqual([...storageMigrationPlan(0, 1), ...v2]);
-    expect(storageMigrationPlan(2)).toEqual([]);
-    expect(storageMigrationPlan(1)).toEqual(v2);
+    expect(storageMigrationPlan(0, 2)).toEqual([...storageMigrationPlan(0, 1), ...v2]);
+    expect(storageMigrationPlan(2, 2)).toEqual([]);
+    expect(storageMigrationPlan(1, 2)).toEqual(v2);
   });
 });

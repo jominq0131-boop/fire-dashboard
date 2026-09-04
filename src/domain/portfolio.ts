@@ -1,3 +1,4 @@
+import type { CurrentAssets } from "./observations";
 import { assertMonth } from "./monthly";
 import { monthlyMetrics, type MetricsSource, type MetricAmount } from "./metrics";
 
@@ -23,11 +24,12 @@ export function historyMonths(end: string) {
   return months;
 }
 export interface PortfolioOverview {
+  current: CurrentAssets;
   latest: MetricsSource | null;
   months: MetricsSource[];
 }
 export interface PortfolioRepository {
-  readOverview(asOf: string, end?: string): Promise<PortfolioOverview>;
+  readOverview(asOf: string, end?: string, today?: string): Promise<PortfolioOverview>;
 }
 export function monthChange(
   previous: MetricsSource | undefined,

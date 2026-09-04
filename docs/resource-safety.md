@@ -1,3 +1,7 @@
+## Current-account lookup in v3
+
+Overview retains account100/range1200/latest-month100 limits and adds at most100 current balances via per-account reverse accountMonth cursor. It visits no more than2 rows per account, with no full-history scan. JSON remains32 MiB and existing record caps. IndexedDB builds the new index during transactional upgrade; this can require time/storage proportional to existing records and is not claimed to have zero resource cost. No record deletion/repair/guessing is performed.
+
 ## Milestone 7 bounded history and JSON
 
 Overview uses a 12-month index range, at most1200 balances, a separate latest month up to100, and accounts up to100 after global counts. All totals are derived; no unbounded history render or automatic whole-backup read occurs on startup.

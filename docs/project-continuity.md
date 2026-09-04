@@ -1,3 +1,9 @@
+## Current work — Everyday recording / Issue #25
+
+사용자가 월말 잔액을 잊으면 기록할 수 없는 문제와 실제 사용자 중심 개선을 요청했다. 시작 main26e01d0(PR #24), clean 및 원격 일치를 확인했다. 오늘 확인 잔액/확인일 입력, 계좌별 마지막 금액과 확인 상태, 잔액 우선 입력 흐름을 구현한다. FIRE 기능을 추가하기보다 기록 지속성과 의미를 먼저 개선한다.
+
+DB v3는 기존 balance store의 accountMonth 인덱스 추가만 수행한다. 기존 날짜를 추정해 쓰지 않는다. JSON v1→v2는 날짜 미상을 보존하며 새 asOfDate는 실제 달력 날짜/대상 월 일치를 검증한다. [계약](everyday-recording-plan.md)과 Issue #25 연결 PR에서 검증/출시 상태를 확인한다. 외부 연동·자동 동기화·일별 이력은 범위 밖이다.
+
 ## Current work — Milestone 7 / Issue #23 / 2026-09-04
 
 사용자가 전체 자산 우선 → 월별 그래프/상세 보강과 다음 마일스톤까지 구현·배포를 요청했다. 시작 main은 1edd378(PR #22)이며 로컬 clean, 최신 원격 일치와 열린 issue/PR 부재를 확인했다. Milestone 6 main CI 33867721976 및 Pages 33867722049 성공과 실제 JS/CSS 일치는 PR #22 릴리스 댓글에 기록되어 있다. 아래 과거 상태는 당시 이력이다.

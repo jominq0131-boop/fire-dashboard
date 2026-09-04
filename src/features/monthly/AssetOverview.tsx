@@ -1,3 +1,4 @@
+import { currentTotal, localDate, observationStatus } from "../../domain/observations";
 import { useEffect, useState } from "react";
 import { monthlyMetrics, type MetricAmount } from "../../domain/metrics";
 import {
@@ -17,10 +18,12 @@ export function AssetOverview({
   repository,
   revision,
   onSelectMonth,
+  onRecordToday,
 }: {
   repository: PortfolioRepository;
   revision: number;
   onSelectMonth: (month: string) => void;
+  onRecordToday: (accountId?: string) => void;
 }) {
   const [data, setData] = useState<PortfolioOverview | null>(null);
   const [end, setEnd] = useState<string>();
@@ -30,7 +33,7 @@ export function AssetOverview({
   useEffect(() => {
     let cancelled = false;
     repository
-      .readOverview(localMonth(), end)
+      .readOverview(localMonth(), end, localDate())
       .then((value) => {
         if (!cancelled) {
           setData(value);
@@ -50,7 +53,8 @@ export function AssetOverview({
     };
   }, [repository, revision, end, refresh]);
   const latest = data?.latest;
-  const latestMetrics = latest ? monthlyMetrics(latest) : null;
+  const current = data?.current;
+  const total = current ? currentTotal(current) : null;
   const rows =
     data?.months.map((source, index) => ({
       source,
@@ -70,6 +74,9 @@ export function AssetOverview({
       <article className="asset-card">
         <div className="section-heading">
           <h2>総金融資産</h2>
+          <button type="button" onClick={() => onRecordToday()}>
+            今日の残高を記録
+          </button>
           <button
             type="button"
             onClick={() => {
@@ -86,21 +93,45 @@ export function AssetOverview({
           <p>資産を読み込んでいます…</p>
         ) : (
           <>
-            <p>{latest ? `${latest.month} 月末 · 最新の記録` : "今月以前の残高はまだありません"}</p>
+            <p>各口座の最後に確認した残高 · {localDate()} 時点の記録</p>
             <div className="asset-value">
-              <strong aria-label={!latest ? "総金融資産: データなし" : undefined}>
-                {latestMetrics ? yen(latestMetrics.assets) : "—"}
+              <strong aria-label={!current?.balances.length ? "総金融資産: データなし" : undefined}>
+                {current?.balances.length ? yen(total) : "—"}
               </strong>
             </div>
-            {latestMetrics && (
+            {current && (
               <p>
-                残高入力 {latestMetrics.recordedAccounts} / {latestMetrics.totalAccounts}{" "}
-                口座（休止中を含む）
+                残高入力 {current.balances.length} / {current.accounts.length} 口座（休止中を含む）
               </p>
             )}
             <p className="field-hint">
-              最新の記録月の残高を合計しています。実時間の残高ではありません。未入力の口座や過去の残高は補完せず、未来の月は除きます。負債を引いた純資産ではありません。
+              口座ごとに最後の記録を合計しています。確認日は口座によって異なり、現在の評価額を保証するものではありません。未記録の口座は合計に含めません。
             </p>
+            {current && (
+              <details className="freshness-list" open>
+                <summary>口座ごとの確認状況</summary>
+                {current.accounts.length === 0 ? (
+                  <p>口座を登録すると、今日の残高から記録できます。</p>
+                ) : (
+                  current.accounts.map((a) => {
+                    const b = current.balances.find((b) => b.accountId === a.id);
+                    return (
+                      <div key={a.id}>
+                        <strong>
+                          {a.name}
+                          {!a.isActive ? "（休止中）" : ""}
+                        </strong>
+                        <span>{yen(b?.balance ?? null)}</span>
+                        <small>{observationStatus(b, localDate())}</small>
+                        <button type="button" onClick={() => onRecordToday(a.id)}>
+                          {a.name}を更新
+                        </button>
+                      </div>
+                    );
+                  })
+                )}
+              </details>
+            )}
             {latest && (
               <button type="button" onClick={() => onSelectMonth(latest.month)}>
                 この月の詳細を見る
@@ -129,14 +160,14 @@ export function AssetOverview({
           </label>
         </div>
         <p className="field-hint">
-          最大12か月。記録なしは空白、口座の一部のみの月は白抜きです。同じ口座が記録された連続月だけ増減を表示します。増減は運用益とは限りません。
+          上の合計は口座別の最終確認残高、グラフは各月に記録した金額です。最大12か月。記録なしは空白、口座の一部のみの月は白抜きです。各月に保存した確認残高を表示します。月中確認は月末評価ではありません。同じ口座の連続月だけ記録額の差を表示し、運用益とは区別します。
         </p>
         {!error && !busy && (
           <>
             <svg
               viewBox="0 0 736 230"
               role="img"
-              aria-label="月末金融資産の推移。正確な金額と増減は下の表に表示しています。"
+              aria-label="月内に確認した金融資産の推移。正確な金額と増減は下の表に表示しています。"
             >
               <line x1="48" y1="190" x2="688" y2="190" stroke="#a2a9b3" />
               <text x="48" y="24" fontSize="12">
@@ -190,13 +221,13 @@ export function AssetOverview({
             </svg>
             <div className="history-table">
               <table>
-                <caption>月別の資産と前月比</caption>
+                <caption>月別の記録額と比較</caption>
                 <thead>
                   <tr>
                     <th>月</th>
                     <th>残高合計</th>
                     <th>口座数</th>
-                    <th>前月比</th>
+                    <th>記録額の差</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -207,7 +238,14 @@ export function AssetOverview({
                           {r.source.month}
                         </button>
                       </td>
-                      <td>{yen(r.metrics.assets)}</td>
+                      <td>
+                        {yen(r.metrics.assets)}
+                        <small className="record-basis">
+                          {r.source.records.balances.some((b) => b.asOfDate)
+                            ? "確認日付きの記録"
+                            : "月末入力・確認日未記録"}
+                        </small>
+                      </td>
                       <td>
                         {r.metrics.recordedAccounts}/{r.metrics.totalAccounts}
                       </td>
