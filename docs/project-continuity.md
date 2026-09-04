@@ -5,6 +5,7 @@
 - `docs/architecture.md`
 - `docs/data-model.md`
 - `docs/testing.md`
+- `docs/proposal-alignment.md` — 최초 제안과 현재 범위·번호의 대응, 미완료 MVP 요구사항
 
 ## Product purpose
 

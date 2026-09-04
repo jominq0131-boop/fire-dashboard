@@ -39,3 +39,5 @@ npm run test:e2e
 자세한 내용은 [아키텍처 문서](docs/architecture.md)와 [데이터 모델 원칙](docs/data-model.md)을 참고하세요.
 
 새 대화나 새 작업을 시작할 때는 [프로젝트 컨텍스트 문서](docs/project-continuity.md)부터 읽으세요.
+
+최초 계획과 현재 진행의 차이는 [최초 제안 대비 점검](docs/proposal-alignment.md)에 정리했습니다. 마일스톤 번호가 최초 제안과 달라졌으며, JSON 백업·복원까지 갖추기 전에는 장기 실사용 준비 완료가 아닙니다.
