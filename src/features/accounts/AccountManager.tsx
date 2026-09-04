@@ -1,0 +1,210 @@
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { AccountError, type AccountRepository } from "../../domain/accounts";
+import { accountCategories, type AccountCategory, type AssetAccount } from "../../domain/models";
+
+const labels: Record<AccountCategory, string> = {
+  cash: "現金・預金",
+  nisa_tsumitate: "NISA つみたて投資枠",
+  nisa_growth: "NISA 成長投資枠",
+  taxable: "課税口座",
+  other: "その他",
+};
+const errorMessage = (error: unknown) =>
+  error instanceof AccountError
+    ? error.message
+    : "保存処理を完了できませんでした。入力内容を控えて、再読み込みしてください。";
+
+export function AccountManager({ repository }: { repository: AccountRepository }) {
+  const [accounts, setAccounts] = useState<AssetAccount[]>([]);
+  const [ready, setReady] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [editing, setEditing] = useState<AssetAccount | null>(null);
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState<AccountCategory>("cash");
+  const saving = useRef(false);
+  const nameInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    repository
+      .list()
+      .then((items) => {
+        if (!cancelled) {
+          setAccounts(items);
+          setReady(true);
+        }
+      })
+      .catch((failure: unknown) => {
+        if (!cancelled) setError(errorMessage(failure));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [repository]);
+
+  function resetForm() {
+    setEditing(null);
+    setName("");
+    setCategory("cash");
+  }
+
+  async function save(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (saving.current || !ready) return;
+    saving.current = true;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const details = { name, category, isActive: editing?.isActive ?? true };
+      const saved = editing
+        ? await repository.update(editing, details)
+        : await repository.create(details);
+      setAccounts((items) =>
+        editing ? items.map((item) => (item.id === saved.id ? saved : item)) : [...items, saved],
+      );
+      resetForm();
+      setNotice("口座をこの端末に保存しました。");
+    } catch (failure) {
+      setError(errorMessage(failure));
+    } finally {
+      saving.current = false;
+      setBusy(false);
+    }
+  }
+
+  async function toggle(account: AssetAccount) {
+    if (saving.current || !ready) return;
+    saving.current = true;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const saved = await repository.update(account, { ...account, isActive: !account.isActive });
+      setAccounts((items) => items.map((item) => (item.id === saved.id ? saved : item)));
+      setNotice(
+        saved.isActive ? "口座を再開しました。" : "口座を休止しました。データは保持されています。",
+      );
+    } catch (failure) {
+      setError(errorMessage(failure));
+    } finally {
+      saving.current = false;
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="account-panel" aria-labelledby="accounts-heading" aria-busy={busy}>
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">ACCOUNTS</p>
+          <h2 id="accounts-heading">口座を管理</h2>
+        </div>
+        <span>
+          {error && !ready
+            ? "読み込み不可"
+            : ready
+              ? `${accounts.filter((account) => account.isActive).length} 件の利用中口座`
+              : "読み込み中"}
+        </span>
+      </div>
+      <p className="storage-note">
+        このブラウザーにのみ保存されます。同期・バックアップはまだありません。ブラウザーのデータ削除で記録が失われるため、現段階では試用としてお使いください。口座番号は入力しないでください。
+      </p>
+      {error && (
+        <p role="alert" className="error-message">
+          {error}
+        </p>
+      )}
+      <p role="status" className="save-notice">
+        {notice}
+      </p>
+      {!ready && !error && <p>保存済みの口座を読み込んでいます…</p>}
+      <form onSubmit={(event) => void save(event)}>
+        <fieldset disabled={!ready || busy}>
+          <legend>{editing ? "口座を編集" : "口座を追加"}</legend>
+          <div className="account-fields">
+            <label htmlFor="account-name">
+              口座名
+              <input
+                id="account-name"
+                ref={nameInput}
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                maxLength={100}
+                required
+                autoComplete="off"
+              />
+            </label>
+            <label htmlFor="account-category">
+              口座の種類
+              <select
+                id="account-category"
+                value={category}
+                onChange={(event) => setCategory(event.target.value as AccountCategory)}
+              >
+                {accountCategories.map((value) => (
+                  <option key={value} value={value}>
+                    {labels[value]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="account-actions">
+            <button type="submit">
+              {busy ? "保存中…" : editing ? "変更を保存" : "口座を追加"}
+            </button>
+            {editing && (
+              <button className="secondary" type="button" onClick={resetForm}>
+                編集をやめる
+              </button>
+            )}
+          </div>
+        </fieldset>
+      </form>
+      {ready && accounts.length === 0 && <p>口座はまだ登録されていません。</p>}
+      <ul className="account-list">
+        {accounts.map((account) => (
+          <li key={account.id}>
+            <div>
+              <strong>{account.name}</strong>
+              <p>
+                {labels[account.category]} · {account.isActive ? "利用中" : "休止中"}
+              </p>
+            </div>
+            <div className="account-actions">
+              <button
+                className="secondary"
+                type="button"
+                disabled={busy || editing !== null}
+                aria-label={`${account.name}を編集`}
+                onClick={() => {
+                  setEditing(account);
+                  setName(account.name);
+                  setCategory(account.category);
+                  setError("");
+                  setNotice("");
+                  nameInput.current?.focus();
+                }}
+              >
+                編集
+              </button>
+              <button
+                className="secondary"
+                type="button"
+                disabled={busy || editing !== null}
+                aria-label={`${account.name}を${account.isActive ? "休止" : "再開"}`}
+                onClick={() => void toggle(account)}
+              >
+                {account.isActive ? "休止" : "再開"}
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}

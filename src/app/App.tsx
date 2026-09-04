@@ -1,3 +1,6 @@
+import type { AccountRepository } from "../domain/accounts";
+import { AccountManager } from "../features/accounts/AccountManager";
+
 const summaryMetrics = [
   { label: "金融資産", description: "すべての口座残高の合計" },
   { label: "現金", description: "現金・預金の残高" },
@@ -7,7 +10,7 @@ const summaryMetrics = [
   { label: "FIRE達成度", description: "設定したFIRE目標に対する進捗" },
 ];
 
-export function App() {
+export function App({ accountRepository }: { accountRepository: AccountRepository }) {
   return (
     <main className="dashboard-shell">
       <header className="dashboard-header">
@@ -16,8 +19,10 @@ export function App() {
           <h1>FIRE Dashboard</h1>
           <p className="subtitle">資産の変化と、FIREまでの道のりを見える化します。</p>
         </div>
-        <span className="status-badge">準備中</span>
+        <span className="status-badge">端末内保存・試用版</span>
       </header>
+
+      <AccountManager repository={accountRepository} />
 
       <section aria-labelledby="summary-heading">
         <div className="section-heading">
@@ -46,7 +51,7 @@ export function App() {
           <p className="eyebrow">FIRST STEP</p>
           <h2 id="start-heading">まだ金融記録がありません</h2>
           <p>
-            次のマイルストーンで口座と月ごとの記録を追加できるようになります。実際のデータを入力すると、資産推移とFIRE進捗がこの画面に反映されます。
+            まず口座を登録できます。月ごとの現金収支・残高入力は次のマイルストーンで追加します。口座の登録だけでは資産額は表示されません。
           </p>
         </div>
       </section>

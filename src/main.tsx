@@ -1,10 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./app/App";
+import { IndexedDbAccountRepository } from "./infrastructure/indexeddb-accounts";
 import "./app/styles.css";
+
+const accountRepository = new IndexedDbAccountRepository();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <App accountRepository={accountRepository} />
   </StrictMode>,
 );
