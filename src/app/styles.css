@@ -15,6 +15,117 @@
 * {
   box-sizing: border-box;
 }
+.account-panel {
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+  border: 1px solid #c8e6d4;
+  border-radius: 1rem;
+  background: #fff;
+}
+.storage-note {
+  color: #53645d;
+  line-height: 1.65;
+}
+.account-panel fieldset {
+  min-width: 0;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  border: 0;
+}
+.account-panel legend {
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+.account-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.account-fields label {
+  display: grid;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+.account-fields input,
+.account-fields select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem;
+  border: 1px solid #8c9f94;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #1d2939;
+  font: inherit;
+}
+.account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+form .account-actions {
+  margin-top: 1rem;
+}
+.account-panel button {
+  padding: 0.65rem 1rem;
+  border: 1px solid #176a47;
+  border-radius: 0.5rem;
+  background: #176a47;
+  color: white;
+  font: inherit;
+  cursor: pointer;
+}
+.account-panel button.secondary {
+  background: white;
+  color: #176a47;
+}
+.account-panel button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.account-panel :focus-visible {
+  outline: 3px solid #176a47;
+  outline-offset: 3px;
+}
+.error-message {
+  color: #a42222;
+  line-height: 1.6;
+}
+.save-notice {
+  color: #176a47;
+}
+.save-notice:empty {
+  margin: 0;
+}
+.account-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.account-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid #dde6e0;
+}
+.account-list strong {
+  overflow-wrap: anywhere;
+}
+.account-list p {
+  margin: 0.4rem 0 0;
+  color: #53645d;
+  font-size: 0.875rem;
+}
+@media (max-width: 600px) {
+  .account-fields {
+    grid-template-columns: 1fr;
+  }
+  .account-list li {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
 body {
   margin: 0;
   min-width: 320px;
