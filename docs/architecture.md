@@ -1,3 +1,7 @@
+## Milestone 8 — scenario boundary
+
+FirePlanner receives PortfolioRepository and reads only on explicit user action, reusing bounded overview queries. It writes no data. React state holds assumptions and results; no localStorage or new persistence adapter is used. Edits clear the previous result; a failed read preserves input and shows the error. domain/fire.ts is a pure bounded projection with BigInt monthly arithmetic. No new dependency, service, or storage architecture change.
+
 ## Everyday balance recording
 
 CurrentAssets is separate from the single-month MetricsSource. Overview reads each account through the new accountMonth reverse index and returns at most one current balance per account. Account/date provenance travels with the amount. Its combined read stays in the overview transaction. At most two index cursor rows per account are examined: a future day in the cutoff month may require skipping to the previous month. Calendar validation ensures earlier months cannot also exceed the cutoff.

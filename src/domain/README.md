@@ -24,3 +24,7 @@ Milestone 2 defines the financial models in `models.ts` and primitive validation
 Milestone 4 adds account validation and the repository contract in `accounts.ts`, and the deterministic initial storage plan in `storage-migrations.ts`. Account IDs are stable; deactivation does not delete history. Monthly records and FIRE calculations are not implemented yet.
 
 Milestone 5 adds monthly.ts: supported calendar months, integer-yen parsing, bounded record validation, comparison and MonthlyRepository. storage-migrations.ts retains the v1 plan and adds deterministic v2 stores/indexes without touching records.
+
+## FIRE scenarios
+
+fire.ts validates explicit yen/basis-point assumptions and computes up to1200 monthly steps with BigInt and safe-integer output. No storage, UI, inferred default return or withdrawal rule. The target inflates, contributions stay nominal, and results expose first arrival and overflow separately.

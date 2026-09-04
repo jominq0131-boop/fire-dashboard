@@ -21,3 +21,7 @@ Milestone 4 adds `accounts/AccountManager.tsx`: account creation, editing, deact
 Milestone 5 adds monthly/MonthlyManager.tsx with injected monthly/account contracts. It explicitly loads one selected month, saves cash flow and each balance separately, and retains failed drafts. It warns before discarding edits and renders at most 100 account balance forms. Aggregates and charts remain unimplemented.
 
 UI refresh (Issue #19) changes presentation only: account guidance disclosure, account identity rows, month selection empty state, grouped input fields and save-state styling. Repository calls and validation/draft preservation remain unchanged. Navigation is provided by App and does not unmount these features.
+
+## FIRE planner
+
+fire/FirePlanner.tsx owns temporary assumptions, explicit recorded-assets loading and bounded annual results. It clears stale output on edits and labels provenance, non-persistence, calculation limits and excluded risks. It receives the repository contract and never writes balances or settings.

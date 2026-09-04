@@ -1,3 +1,7 @@
+## Milestone 8 — FIRE verification
+
+Unit tests cover exact zero-rate arrival, already reached, no arrival, 1200-month boundary, monthly rounding and contribution order, inflation, first-crossing semantics, invalid money/rates and overflow. Browser tests cover explicit last-known asset loading, no mutation of source amounts, missing data, invalidation on edits, validation errors, reset, session-only values and 390px overflow. Existing financial/storage/migration tests remain. Actual execution results are recorded in work-log and Issue #27 PR.
+
 ## Everyday observation verification
 
 Date tests cover leap years/century rules, month mismatch, missing/unknown dates and freshness thresholds. JSON tests cover deterministic v1→v2 and dated v2 round-trip; v3 tests retain earlier migration plans and verify index-only addition. Browser tests seed actual v2 data, force index creation failure, confirm rollback then successful upgrade and exact export preservation; today-recording tests cover last-known accounts, date defaults, focus, failed saves and reload. Existing migration/unknown-version regression fixtures now explicitly target v2 or the new v3/future-v4 as appropriate; their assertions remain. Execution results belong in work-log and Issue #25 PR.
