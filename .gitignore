@@ -1,0 +1,24 @@
+node_modules/
+.npm-cache/
+.playwright-browsers/
+dist/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.*
+!.env.example
+*.local
+
+# Personal financial data and local exports must never be committed.
+data/
+*.fire-backup.json
+*.private.json
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
