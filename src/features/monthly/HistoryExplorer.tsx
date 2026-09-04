@@ -34,20 +34,21 @@ export function HistoryExplorer({
     return typeof n === "number" ? n : null;
   });
   const change = monthChange(months[index - 1], row.source);
-  const investmentValues = rows.map(({ source }) => {
+  const investmentSources = rows.map(({ source }) => {
     const ids = new Set(
       source.accounts
         .filter((a) => ["nisa_tsumitate", "nisa_growth", "taxable"].includes(a.category))
         .map((a) => a.id),
     );
-    return monthlyMetrics({
+    return {
       ...source,
       records: {
         ...source.records,
         balances: source.records.balances.filter((b) => ids.has(b.accountId)),
       },
-    }).assets;
+    };
   });
+  const investmentValues = investmentSources.map((source) => monthlyMetrics(source).assets);
   const hasInvestments = data.current.accounts.some((a) =>
     ["nisa_tsumitate", "nisa_growth", "taxable"].includes(a.category),
   );
@@ -69,6 +70,9 @@ export function HistoryExplorer({
       id: "investments",
       label: "うちNISA・課税投資",
       kind: "bar",
+      connect: investmentSources.map(
+        (source, i) => monthChange(investmentSources[i - 1], source).delta !== null,
+      ),
       values: investmentValues.map((n) => (typeof n === "number" ? n : null)),
       missing: investmentValues.map((n) =>
         n === "overflow" ? "計算範囲超過" : "投資口座の残高未記録",
@@ -181,8 +185,8 @@ export function HistoryExplorer({
       />
       <p className="field-hint">
         {view === "assets"
-          ? "面は記録した残高、棒はそのうち現在の口座分類がNISA・課税投資の残高です。未記録や口座の組み合わせが変わる区間はつなぎません。"
-          : "収支は月全体の金額です。投資への拠出は消費支出に含みません。資産の増減には入出金も含まれ、運用損益ではありません。"}
+          ? "線は記録した残高の推移、面は合計、棒はそのうちNISA・課税投資の残高です。破線は未記録の月や口座構成の変更をまたぐ参考線です。中間の金額は未確定です。"
+          : "収支は月全体の金額です。棒と線で金額と推移を比較できます。破線の中間は未記録です。投資への拠出は消費支出に含まず、資産の増減は運用損益ではありません。"}
       </p>
       <section className="month-inspector" aria-label="選択月の詳細">
         <h3>{row.source.month} の記録を確認</h3>

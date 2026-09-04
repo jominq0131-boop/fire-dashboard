@@ -1,9 +1,26 @@
 import { expect, it } from "vitest";
-import { linePaths, seriesSegments } from "../../../src/features/charts/line-geometry";
+import {
+  linePaths,
+  observationBridges,
+  seriesSegments,
+} from "../../../src/features/charts/line-geometry";
 it("connects adjacent observations and preserves missing gaps", () => {
   expect(linePaths([10, 20, null, 30], 30)).toHaveLength(2);
   expect(linePaths([10, 20], 20)[0]).toContain(" L");
   expect(linePaths([null, null], 0)).toEqual([]);
+});
+it("links successive real observations over gaps and coverage changes without fabricating amounts", () => {
+  const values = [null, 0, null, 30, 20, null, Number.MAX_SAFE_INTEGER];
+  const original = [...values];
+  expect(observationBridges(values, [false, false, false, false, false])).toEqual([
+    [1, 3],
+    [3, 4],
+    [4, 6],
+  ]);
+  expect(values).toEqual(original);
+  expect(observationBridges([0, 10, 5])).toEqual([]);
+  expect(observationBridges([null, 0, null])).toEqual([]);
+  expect(observationBridges([null, null])).toEqual([]);
 });
 it("breaks lines when aggregate account coverage changes", () => {
   const segments = linePaths([10, 20, 30], 30, [false, true, false]);

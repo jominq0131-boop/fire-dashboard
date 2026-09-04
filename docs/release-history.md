@@ -13,4 +13,7 @@
 | 기록 개선   | 확인일/계좌별 마지막 잔액  | [#26](https://github.com/jominq0131-boop/fire-dashboard/pull/26)                                                                   |
 | Milestone8  | FIRE 가정/예측             | [#28](https://github.com/jominq0131-boop/fire-dashboard/pull/28)                                                                   |
 | Milestone9  | 비교/레이아웃 안정화       | [#30](https://github.com/jominq0131-boop/fire-dashboard/pull/30)                                                                   |
-| Milestone10 | 대화형 이력/예측·문서 정리 | [Issue #31 연결 PR](https://github.com/jominq0131-boop/fire-dashboard/issues/31), 최종 검증 기록은 연결 PR 참조                    |
+| Milestone10 | 대화형 이력/예측·문서 정리 | [#32](https://github.com/jominq0131-boop/fire-dashboard/pull/32)                                                                   |
+| Milestone11 | 복합 차트·툴팁·확대        | [#34](https://github.com/jominq0131-boop/fire-dashboard/pull/34)                                                                   |
+
+Milestone12의 구현·검증·병합·배포 상태는 [Issue #35 연결 PR](https://github.com/jominq0131-boop/fire-dashboard/issues/35)의 릴리스 기록을 따릅니다.

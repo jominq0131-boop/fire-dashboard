@@ -1,4 +1,16 @@
 export const chartColors = ["#67dfbe", "#b59aff", "#73cfff", "#ffc779", "#ff94b5", "#c4d0e2"];
+/** Visual guides between real observations; never create values for the intervening dates. */
+export function observationBridges(values: (number | null)[], connect?: boolean[]) {
+  const bridges: [number, number][] = [];
+  let previous: number | null = null;
+  values.forEach((value, i) => {
+    if (value === null) return;
+    if (previous !== null && (i > previous + 1 || connect?.[i] === false))
+      bridges.push([previous, i]);
+    previous = i;
+  });
+  return bridges;
+}
 /** Inclusive segments: keep observations on both sides of an incomparable edge. */
 export function seriesSegments(values: (number | null)[], connect?: boolean[]) {
   const segments: [number, number][] = [];

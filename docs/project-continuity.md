@@ -4,13 +4,13 @@
 
 실제 체크아웃은 `C:\Users\MINGYU\Documents\Codex\2026-09-04\fire-dashboard-next`입니다. 이전 사본 `files-pasted-by-the-user-fire`는 수정하지 않습니다. 저장소는 `jominq0131-boop/fire-dashboard`, 배포는 GitHub Pages입니다.
 
-이번 작업은 배포된 main `0d49f272c36841965785aa98f2288464201bc676`에서 시작했습니다. 최신 원격 일치·clean·열린 PR/issue 부재를 확인한 뒤 Issue #33과 `feat/professional-chart-workspace`를 만들었습니다.
+이번 작업은 배포된 main `232496d17fed7665114a727b81263de01026ad14`에서 시작했습니다. 최신 원격 일치·clean·열린 PR/issue 부재를 확인한 뒤 Issue #35와 `feat/connected-trends-unified-design`를 만들었습니다.
 
-## 현재 범위 — Milestone 11
+## 현재 범위 — Milestone 12
 
-사용자는 기존 차트 수준이 기대에 미치지 못한다고 지적하고 financial-os를 참고로 제공했습니다. 구독형 서비스 수준의 사용성을 목표로 Recharts 복합 차트, 툴팁·확대·월 수입/지출 비교와 예측 시나리오 표현을 개선합니다. [구체적 계약](milestone-11-plan.md)을 따릅니다.
+사용자는 기록들이 점으로만 떨어져 보이는 문제와 차트/다른 화면의 디자인 불일치를 지적했습니다. 관측 시점 간 실선/점선 추세 연결, 막대의 추세선, 전체 다크 디자인을 구현합니다. [구체적 계약](milestone-12-plan.md)을 따릅니다. 이후 UI도 공통 토큰과 다월/모바일/극단값/오류 검증을 사용하도록 AGENTS.md에 기준을 반영했습니다.
 
-로컬 구현, 검증, PR 검토, main 병합, 실제 배포는 별도 단계입니다. 최종 상태는 Issue #33 연결 PR과 [작업 기록](work-log.md)의 증거를 확인합니다. Milestone10 배포는 PR #32 릴리스 댓글에서 확인했습니다. 이전 출시 근거는 [출시 이력](release-history.md)에 있습니다.
+로컬 구현, 검증, PR 검토, main 병합, 실제 배포는 별도 단계입니다. 최종 상태는 Issue #35 연결 PR과 [작업 기록](work-log.md)의 증거를 확인합니다. Milestone11 배포는 PR #34 릴리스 댓글에서 확인했습니다. 이전 출시 근거는 [출시 이력](release-history.md)에 있습니다.
 
 ## 작업 시작 순서
 

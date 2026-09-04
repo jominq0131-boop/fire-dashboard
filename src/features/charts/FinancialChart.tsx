@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { chartColors, seriesSegments } from "./line-geometry";
+import { chartColors, observationBridges, seriesSegments } from "./line-geometry";
 
 export interface ChartSeries {
   id: string;
@@ -50,6 +50,9 @@ export default function FinancialChart({
   const color = (s: ChartSeries) => s.color ?? chartColors[series.indexOf(s) % chartColors.length];
   const data = labels.slice(start, end + 1).map((label, i) => ({ label, index: start + i }));
   const hasValues = visible.some((s) => s.values.slice(start, end + 1).some((n) => n !== null));
+  const hasSingleObservation =
+    hasValues &&
+    visible.every((s) => s.values.slice(start, end + 1).filter((n) => n !== null).length <= 1);
   const amount = (s: ChartSeries, i: number) =>
     s.values[i] == null
       ? (s.missing?.[i] ?? "記録なし・計算範囲外")
@@ -166,56 +169,78 @@ export default function FinancialChart({
                   maxBarSize={38}
                   isAnimationActive={false}
                 />
-              ) : (
-                seriesSegments(s.values, s.connect).map(([from, to], segment) => {
-                  const key = (d: { index: number }) =>
-                    d.index >= from && d.index <= to ? s.values[d.index] : null;
-                  return (
-                    <Fragment key={`${s.id}-${segment}`}>
-                      {s.kind === "area" && (
-                        <Area
-                          dataKey={key}
-                          baseValue={0}
-                          type="linear"
-                          stroke="none"
-                          fill={`url(#${uid}-fill-${series.indexOf(s)})`}
-                          connectNulls={false}
-                          isAnimationActive={false}
-                          tooltipType="none"
-                        />
-                      )}
-                      <Line
+              ) : null,
+            )}
+            {visible.flatMap((s) =>
+              seriesSegments(s.values, s.connect).map(([from, to], segment) => {
+                const key = (d: { index: number }) =>
+                  d.index >= from && d.index <= to ? s.values[d.index] : null;
+                return (
+                  <Fragment key={`${s.id}-${segment}`}>
+                    {s.kind === "area" && (
+                      <Area
                         dataKey={key}
-                        name={s.label}
+                        baseValue={0}
                         type="linear"
+                        stroke="none"
+                        fill={`url(#${uid}-fill-${series.indexOf(s)})`}
                         connectNulls={false}
-                        stroke={color(s)}
-                        strokeWidth={s.dashed ? 1.8 : 2.6}
-                        strokeDasharray={s.dashed ? "6 5" : undefined}
                         isAnimationActive={false}
-                        activeDot={false}
-                        dot={(props) => {
-                          const { cx, cy, payload, value } = props;
-                          if (value == null || cx == null || cy == null)
-                            return <g key={payload.index} />;
-                          const k = payload.index;
-                          return (
-                            <circle
-                              key={k}
-                              cx={cx}
-                              cy={cy}
-                              r={k === index ? 5 : labels.length > 15 && from !== to ? 0 : 3}
-                              fill={s.hollow?.[k] ? "#101c2b" : color(s)}
-                              stroke={color(s)}
-                              strokeWidth={2}
-                            />
-                          );
-                        }}
+                        tooltipType="none"
                       />
-                    </Fragment>
-                  );
-                })
-              ),
+                    )}
+                    <Line
+                      className="observed-trend"
+                      dataKey={key}
+                      name={s.label}
+                      type="linear"
+                      connectNulls={false}
+                      stroke={color(s)}
+                      strokeWidth={s.dashed ? 1.8 : 2.6}
+                      strokeDasharray={s.dashed ? "6 5" : undefined}
+                      isAnimationActive={false}
+                      activeDot={false}
+                      dot={(props) => {
+                        const { cx, cy, payload, value } = props;
+                        if (value == null || cx == null || cy == null)
+                          return <g key={payload.index} />;
+                        const k = payload.index;
+                        return (
+                          <circle
+                            key={k}
+                            cx={cx}
+                            cy={cy}
+                            r={k === index ? 5 : labels.length > 15 && from !== to ? 0 : 3}
+                            fill={s.hollow?.[k] ? "#101c2b" : color(s)}
+                            stroke={color(s)}
+                            strokeWidth={2}
+                          />
+                        );
+                      }}
+                    />
+                  </Fragment>
+                );
+              }),
+            )}
+            {visible.flatMap((s) =>
+              observationBridges(s.values, s.connect).map(([from, to]) => (
+                <Line
+                  key={`${s.id}-bridge-${from}-${to}`}
+                  className="observation-bridge"
+                  dataKey={(d: { index: number }) =>
+                    d.index === from || d.index === to ? s.values[d.index] : null
+                  }
+                  type="linear"
+                  connectNulls
+                  stroke={color(s)}
+                  strokeWidth={2.4}
+                  strokeDasharray="6 4"
+                  dot={false}
+                  activeDot={false}
+                  isAnimationActive={false}
+                  tooltipType="none"
+                />
+              )),
             )}
             <ReferenceLine x={index} stroke="#aebfd0" strokeDasharray="3 5" />
           </ComposedChart>
@@ -226,6 +251,11 @@ export default function FinancialChart({
           </div>
         )}
       </div>
+      {hasSingleObservation && (
+        <p className="chart-help">
+          この範囲では推移を比較できません。同じ項目の2時点以上の値があると、点が線でつながります。
+        </p>
+      )}
       <div className="chart-range" aria-label={`${title}の拡大範囲`}>
         <label>
           開始
