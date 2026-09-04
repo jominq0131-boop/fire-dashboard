@@ -1,6 +1,6 @@
 # FIRE Dashboard
 
-계좌 자원 안전 보강(Issue #15): 저장소는 localStorage가 아닌 IndexedDB입니다. 휴지 포함 100개 상한, 제한 조회와 기존 초과 데이터 보존을 추가했습니다. 병합·배포 여부는 연결 PR에서 확인하세요. [자원 안전 정책](docs/resource-safety.md)을 참고하세요.
+계좌 자원 안전 보강([PR #16](https://github.com/jominq0131-boop/fire-dashboard/pull/16), main 병합): 저장소는 localStorage가 아닌 IndexedDB입니다. 휴지 포함 100개 상한, 제한 조회와 기존 초과 데이터 보존을 추가했습니다. 배포 여부는 연결 PR과 Actions에서 확인하세요. [자원 안전 정책](docs/resource-safety.md)을 참고하세요.
 
 일본 거주자를 위한 장기 개인 FIRE Dashboard입니다. 이 저장소에는 소스 코드, 테스트, 문서 및 익명화된 예제 데이터만 둡니다. 실제 금융 데이터와 백업 파일은 절대 커밋하지 않습니다.
 
@@ -10,7 +10,7 @@
 - Milestone 2 완료: 금융 도메인 모델과 순수 검증 규칙을 정의했습니다.
 - Milestone 3 완료: 실제 데이터 없이 대시보드 레이아웃과 빈 상태를 제공합니다.
 - Milestone 4 완료: IndexedDB 계좌 저장과 등록·수정·비활성화·재활성화 화면을 제공합니다. [PR #12](https://github.com/jominq0131-boop/fire-dashboard/pull/12)가 main에 병합되었습니다.
-- Milestone 5 로컬 구현: 월별 현금흐름·계좌별 월말 잔액 입력과 IndexedDB v2 저장을 제공합니다. main 병합·배포는 아직 하지 않았습니다. FIRE 계산과 JSON 백업 UI는 미구현입니다.
+- Milestone 5 구현: 월별 현금흐름·계좌별 월말 잔액 입력과 IndexedDB v2 저장을 제공합니다. [PR #18](https://github.com/jominq0131-boop/fire-dashboard/pull/18)에 병합·배포 검증 결과를 기록합니다. FIRE 계산과 JSON 백업 UI는 미구현입니다.
 
 승인된 [월별 입력 설계](docs/milestone-5-plan.md)에 따라 대상 월(1900-01~2199-12)을 읽고 수입·소비 지출·투자 납입과 계좌별 잔액을 별도 저장합니다. 빈칸은 미입력, 0은 0엔입니다. 정수 엔만 허용하며 월별 최대 100개 계좌를 처리합니다. 계좌 추가 후 월별 기록을 다시 읽으면 새 계좌가 표시됩니다.
 
@@ -24,11 +24,13 @@
 
 배포 주소: [FIRE Dashboard](https://jominq0131-boop.github.io/fire-dashboard/). 계좌 관리 시험판이며 전체 MVP 완성이나 백업 가능 상태를 의미하지 않습니다.
 
+최초 준비 또는 의존성/lockfile 변경 시 `npm ci`로 고정 의존성을 준비합니다. `npm run dev`는 개발 화면이 필요할 때 별도 터미널에서 계속 실행하는 서버이며, 검사 전에 매번 순서대로 실행하는 명령이 아닙니다.
+
+일상 수정은 관련 단위 테스트/타입 검사부터 실행하고, 문서만 바꾸면 `npm run format`과 `git diff --check`를 확인합니다. PR 전에는 아래 전체 검증을 수행하되 동일 코드에서 이미 통과한 로컬 검증을 불필요하게 반복하지 않습니다. GitHub 최종 CI와 실제 배포 확인은 유지합니다.
+
 ```bash
-npm install
-npm run dev
-npm run lint
 npm run format
+npm run lint
 npm run typecheck
 npm test
 npm run build

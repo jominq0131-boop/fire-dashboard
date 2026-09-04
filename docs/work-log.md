@@ -1,5 +1,12 @@
 # Work log
 
+## 2026-09-04 — 사용자 승인 릴리스 준비와 반복 검증 비용 정리
+
+- 사용자가 PR 병합·실제 배포를 승인했다. PR #16의 최종 CI 성공 확인 후 f21c8731335b3bd581b5dd4b7c7886f8ed218744로 squash merge했다. PR #18을 main으로 전환했다.
+- origin/main의 파일 내용이 #16 head 92f09af와 동일함을 확인했다. squash 이력 때문에 발생한 문서와 자원 테스트 충돌은 v2 변경을 보존해 해결했다. 통합 후 제품/테스트 트리는 로컬 및 원격 CI를 통과한 5dcc3cb와 동일하다.
+- 반복 개발은 의존성 설치/dev 실행/검증을 분리하며, 문서만 달라지면 로컬 전체 검증을 중복하지 않는다. 최종 GitHub CI와 실제 배포 확인은 유지한다. AGENTS/README/연속성/검증 문서에 반영했으며 워크플로와 테스트는 변경하지 않았다.
+- 아래 구현 이력의 미병합 표기는 당시 상태다. 최종 병합 SHA, main CI/Pages 결과, 실제 URL/앱 파일 검증은 [PR #18](https://github.com/jominq0131-boop/fire-dashboard/pull/18)의 릴리스 기록에 확인 후 추가한다. 배포 전 이 문서에서 완료를 선언하지 않는다.
+
 ## 2026-09-04 — Milestone 5 / Issue #17 구현
 
 - [Draft PR #18](https://github.com/jominq0131-boop/fire-dashboard/pull/18)을 생성했다. GitHub CI 최종 상태는 PR에서 확인한다. main 병합·배포는 수행하지 않았다.
