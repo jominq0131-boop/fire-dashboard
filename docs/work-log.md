@@ -1,12 +1,22 @@
 # Work log
 
+## 2026-09-04 — Milestone 4 출시 상태 문서 / Issue #13
+
+- PR #10과 #12 병합 완료, 연결 issue #9/#11 닫힘 확인.
+- 계좌 기능 릴리스 커밋: `817ad451c4c901e3e3c4b0d670f937e184c06058`.
+- [main CI](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/33849362398) 및 [GitHub Pages 배포](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/33849362394) 성공.
+- [실제 배포](https://jominq0131-boop.github.io/fire-dashboard/)의 HTML과 `/fire-dashboard/assets/index-BiOXOyk8.js`가 HTTP 200이며, 앱 파일 SHA-256이 검증한 로컬 Pages 빌드와 일치함을 확인했다. 사용자 저장소를 변경하지 않는 읽기 전용 배포 확인이다. 실제 주소에서 계좌 등록·삭제를 실행한 검증은 아니다.
+- 이번 문서 변경은 README의 작업 브랜치 표현, 연속성 문서의 검토 중/미배포 표현을 실제 출시 상태로 갱신하고 테스트 문서에 확인 범위를 남긴다. 과거 기록은 당시 시점의 이력으로 보존한다.
+- 제품 코드·데이터 스키마·의존성·워크플로에는 변경이 없다. 최초 제안 점검 결과와 다음 마일스톤은 `docs/proposal-alignment.md`와 `docs/project-continuity.md`에 기록했다.
+- format/lint/typecheck, 단위 23개, build, Chromium 13개를 재실행해 모두 통과했다(E2E 4.2초). 문서 전용 PR의 최종 CI·병합 상태는 해당 PR을 따른다. 이후 문서 커밋의 Actions 상태는 별도 실행 이력이며 위 링크는 계좌 기능 릴리스의 확인된 결과다.
+
 ## 2026-09-04 — 병합·배포 승인 및 최초 제안 점검
 
 사용자가 PR #10/#12 병합과 배포를 승인했다. 두 PR head의 CI 성공을 확인한 뒤 #10을 먼저 squash merge했다(`8198d04`). #12에 최신 main을 합치는 과정의 README 충돌은 #10의 완료 표기와 #12의 계좌 안내를 모두 보존하여 해결했다. 제품 코드 변경은 없다.
 
 최초 제안 대비 `docs/proposal-alignment.md`를 추가했다. 아키텍처 방향은 일치하지만 빈 대시보드를 먼저 만들면서 마일스톤 번호/순서가 달라졌고, 계좌 저장만 완성됐으며 월별 저장·계산·JSON 백업·PWA는 미구현이다. 백업의 실사용 전 필수 조건과 날짜 검증 등 후속 검토 항목을 기록했다. 점검에 따라 기능·의존성·배포 구조를 임의로 변경하지 않았다.
 
-충돌 해결·문서 변경 후 format/lint/typecheck, 단위 23개, 빌드, Pages 하위 경로 Chromium 13개(4.1초)를 다시 통과했다. PR CI를 다시 확인한 뒤 #12를 병합한다. 병합·배포의 실제 결과는 확인 후 기록한다. 아래 첫 구현 기록은 당시 시점의 이력이다.
+충돌 해결·문서 변경 후 format/lint/typecheck, 단위 23개, 빌드, Pages 하위 경로 Chromium 13개(4.1초)를 다시 통과했다. [최종 PR CI](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/33848831253) 성공 후 #12를 `817ad451c4c901e3e3c4b0d670f937e184c06058`로 squash merge했다. #10/#12 단기 브랜치는 GitHub가 자동 삭제했다. 복구할 head는 각각 `a265fe53d970d8007dca5b74ee64f399ede5f6f4`, `f5c22a38f8bf878628dd451bf2fa69d48c317ff4`이며 PR 이력은 보존됐다. 아래 첫 구현 기록은 당시 시점의 이력이다.
 
 ## 2026-09-04 — Milestone 4 / Issue #11
 

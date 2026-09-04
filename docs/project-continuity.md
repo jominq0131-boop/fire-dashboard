@@ -24,11 +24,13 @@
 | CI repair | LF 줄바꿈 정책과 CI 포맷 안정화                                                            | [PR #4](https://github.com/jominq0131-boop/fire-dashboard/pull/4) |
 | 3         | 데이터 없는 반응형 대시보드 빈 상태                                                        | [PR #6](https://github.com/jominq0131-boop/fire-dashboard/pull/6) |
 
-현재 배포 화면은 대시보드의 레이아웃·지표 자리표시자·빈 상태만 제공한다. 실제 계좌, 월별 기록, IndexedDB 저장, JSON import/export, FIRE 계산은 아직 구현되지 않았다.
+현재 구현은 계좌 등록·수정·비활성화·재활성화와 IndexedDB 저장/복원을 제공한다. 금융 지표는 여전히 빈 상태이며 월별 기록, JSON import/export, FIRE 계산은 아직 구현되지 않았다. 전체 MVP나 장기 실사용 준비 완료가 아니다.
 
-### Milestone 4 — 로컬 검증 완료, PR 검토 중
+### Milestone 4 — main 병합·배포 완료
 
-[Issue #11](https://github.com/jominq0131-boop/fire-dashboard/issues/11), [PR #12](https://github.com/jominq0131-boop/fire-dashboard/pull/12), `feat/account-storage`: 저장소 인터페이스, IndexedDB v1 초기 마이그레이션, 계좌 등록·수정·휴지·재개 및 복원을 구현했다. 단위 23개·Chromium 13개와 정적 검사/빌드가 로컬에서 통과했다. 새 의존성은 없으며 월별 기록·FIRE·JSON 백업은 포함하지 않는다. PR은 검토 중이며 main 병합·배포는 수행하지 않았다. 위의 배포 상태와 이 브랜치의 구현 상태는 별개다. GitHub CI 최종 상태는 PR에서 확인하고 검증·운영 기록은 `docs/work-log.md`를 따른다.
+[PR #10](https://github.com/jominq0131-boop/fire-dashboard/pull/10)(`8198d04`)과 [PR #12](https://github.com/jominq0131-boop/fire-dashboard/pull/12)(`817ad45`)를 사용자 승인 후 squash merge했다. README 충돌을 두 변경 모두 보존해 해결하고 최종 PR CI를 다시 통과했다. 계좌 저장 계약·IndexedDB v1·계좌 관리가 구현됐으며 단위 23개·Chromium 13개가 통과했다. 새 의존성·외부 서비스는 없다. 두 단기 브랜치는 자동 삭제됐다. 배포 검증 근거는 `docs/work-log.md`를 따른다.
+
+`817ad45`의 [main CI](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/33849362398)와 [Pages 배포](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/33849362394)가 성공했다. [배포 주소](https://jominq0131-boop.github.io/fire-dashboard/)의 HTML/앱 파일 HTTP 200과 검증 빌드의 앱 파일 SHA-256 일치를 확인했다. 실제 사용자 브라우저에 테스트 계좌를 만들지는 않았다.
 
 ## Confirmed architecture decisions
 
@@ -37,7 +39,7 @@
 - JSON은 주 데이터베이스가 아니라, 버전이 있는 export/import/backup/restore 형식이다.
 - 자동 기기 동기화와 인증은 MVP 범위 밖이다. 실제 필요성이 확인된 뒤 별도 설계·승인을 거쳐 도입한다.
 - `src/domain`은 React, IndexedDB, 네트워크, UI에 의존하지 않는다.
-- `src/infrastructure`는 향후 IndexedDB와 외부 서비스 어댑터를 둔다.
+- `src/infrastructure`는 IndexedDB 계좌 어댑터를 두며, 승인된 경우에만 미래 외부 서비스 어댑터를 추가한다.
 - `src/features`는 기능별 UI·오케스트레이션을 둔다.
 
 ## Financial model invariants
@@ -91,11 +93,11 @@
 - GitHub Settings → General → Pull Requests의 **Automatically delete head branches**를 활성화
 - PR·커밋·이슈 이력은 브랜치를 지워도 유지되므로 학습 기록은 사라지지 않음
 
-사용자가 자동 삭제 설정 활성화와 기존 불필요 브랜치 정리를 승인했다(2026-09-04). PR #2/#4/#6/#8의 병합 여부와 head SHA를 대조한 뒤 해당 브랜치 4개를 삭제했다. 열린 PR #10의 `docs/mark-milestone-3-complete`는 보존했다. main과 열린 PR, 병합 후 추가 변경이 있는 브랜치는 삭제하지 않는다. 복구용 SHA는 `docs/work-log.md`에 기록한다.
+사용자가 자동 삭제 설정 활성화와 기존 불필요 브랜치 정리를 승인했다(2026-09-04). PR #2/#4/#6/#8 브랜치 4개는 head 확인 후 정리했다. 이후 PR #10/#12도 승인·병합되어 두 브랜치가 자동 삭제됐음을 확인했다. main과 열린 PR, 병합 후 추가 변경이 있는 브랜치는 삭제하지 않는다. 복구용 SHA는 `docs/work-log.md`에 기록한다.
 
 ## Next recommended milestone
 
-**Milestone 4를 검토·병합한 다음 Milestone 5: 월별 현금흐름과 계좌별 월말 잔액 입력**으로 진행한다.
+**다음은 Milestone 5: 월별 현금흐름과 계좌별 월말 잔액 입력**이다.
 
 Milestone 5는 기존 월별 현금흐름·잔액 모델에 맞춘 입력/수정, 월 키·정수 엔 검증, 계좌와 월의 중복/참조 정책, 저장소 마이그레이션과 보존 테스트를 작은 issue로 나눈다. 스키마를 확장하기 전에 설계·승인을 확인한다. FIRE 예측·자동 동기화는 포함하지 않는다. 백업이 없으므로 실제 장기 기록용 사용은 아직 권장하지 않는다.
 
@@ -112,4 +114,4 @@ Milestone 5는 기존 월별 현금흐름·잔액 모델에 맞춘 입력/수정
 
 새 대화의 첫 요청 예시는 다음과 같다.
 
-> `docs/project-continuity.md`와 `AGENTS.md`, `docs/work-log.md`를 읽고, GitHub에서 Milestone 4의 병합·배포 상태를 확인한 뒤 다음 미완료 작업을 이어가 줘.
+> `docs/project-continuity.md`와 `AGENTS.md`, `docs/proposal-alignment.md`를 읽고, 최신 GitHub 상태를 확인한 뒤 Milestone 5의 작은 작업 단위를 정리해 줘.

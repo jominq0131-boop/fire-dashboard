@@ -7,7 +7,7 @@
 - Milestone 1 완료: React/TypeScript 기반, 테스트, CI, GitHub Pages 배포 기반을 구성했습니다.
 - Milestone 2 완료: 금융 도메인 모델과 순수 검증 규칙을 정의했습니다.
 - Milestone 3 완료: 실제 데이터 없이 대시보드 레이아웃과 빈 상태를 제공합니다.
-- Milestone 4 구현: IndexedDB 계좌 저장과 등록·수정·휴지·재개 화면을 제공합니다. 이 작업 브랜치의 기능이며, main 병합과 배포 확인은 별도입니다.
+- Milestone 4 완료: IndexedDB 계좌 저장과 등록·수정·비활성화·재활성화 화면을 제공합니다. [PR #12](https://github.com/jominq0131-boop/fire-dashboard/pull/12)가 main에 병합되었습니다.
 - 다음 단계: Milestone 5 월별 현금흐름·계좌 잔액 입력. FIRE 계산과 JSON 백업 UI는 아직 구현하지 않았습니다.
 
 ## 계좌 관리와 저장 주의사항
@@ -17,6 +17,8 @@
 데이터는 해당 사이트의 브라우저 IndexedDB에만 저장됩니다. 다른 기기·브라우저·출처(로컬 미리보기와 GitHub Pages 포함)로 자동 이동하지 않습니다. 아직 백업 기능이 없으며 브라우저 데이터 삭제나 저장소 정리로 소실될 수 있습니다. 저장 실패와 다른 탭의 변경 충돌은 화면에 표시하고, 입력을 유지합니다. 금융 지표는 월별 잔액이 없으므로 계속 빈 상태입니다.
 
 ## 개발 명령
+
+배포 주소: [FIRE Dashboard](https://jominq0131-boop.github.io/fire-dashboard/). 계좌 관리 시험판이며 전체 MVP 완성이나 백업 가능 상태를 의미하지 않습니다.
 
 ```bash
 npm install
