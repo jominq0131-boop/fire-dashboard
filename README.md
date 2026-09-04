@@ -1,3 +1,7 @@
+## Milestone 6 — 월별 대시보드 지표
+
+Issue #21에서 선택 월의 저장된 금융자산 합계, 수입/소비 지출/투자 납입, 소비 후 잉여와 투자 후 현금 잉여를 구현했다. 월별 기록의 대상 월을 읽으면 요약이 갱신되며 저장 전 입력은 반영하지 않는다. 부분 잔액 입력은 입력 계좌 수로 표시하고 휴지 계좌도 포함한다. 로컬 검증과 실제 배포 상태는 docs/work-log.md 및 연결 PR을 따른다. UI 밝기 재검토는 기능 완성 후로 보류한다.
+
 # FIRE Dashboard
 
 계좌 자원 안전 보강([PR #16](https://github.com/jominq0131-boop/fire-dashboard/pull/16), main 병합): 저장소는 localStorage가 아닌 IndexedDB입니다. 휴지 포함 100개 상한, 제한 조회와 기존 초과 데이터 보존을 추가했습니다. 배포 여부는 연결 PR과 Actions에서 확인하세요. [자원 안전 정책](docs/resource-safety.md)을 참고하세요.

@@ -1,3 +1,7 @@
+## Milestone 6
+
+metrics.ts provides pure bounded monthly aggregation, reference/month validation, missing-value semantics and exact integer intermediate arithmetic with explicit overflow results. No persisted model or migration changes.
+
 # Domain boundary
 
 Account capacity is 100 including inactive accounts. Raw names and stored IDs are limited to 100 UTF-16 code units. Stored records must have exactly the five account fields. Invalid records are rejected, never repaired or deleted.

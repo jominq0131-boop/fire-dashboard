@@ -1,3 +1,9 @@
+## Current milestone — 2026-09-04 / Issue #21
+
+실제 main은 95eddb4이며 Milestone 5(PR #18)와 UI 변경(PR #20)이 병합됐다. PR #20 main CI 33865786104와 Pages 33865786122 성공을 이번 작업에서 확인했다. 열린 issue/PR은 없었다. 다음 로드맵의 대시보드 지표를 Milestone 6으로 구현하며 사용자가 구현부터 배포까지 요청했다. feat/monthly-dashboard-metrics의 구현/검증/배포 결과는 work-log.md와 Issue #21 연결 PR에 기록한다. 아래의 오래된 미구현/별도 결정 문구는 당시 기록이다.
+
+Milestone 6은 기존 월별 읽기 결과에서 계산하는 저장값 요약이다. DB v2, 저장 계약과 상한을 유지한다. 로컬 재읽기와 저장 성공 후만 반영하며 월 전환/읽기 실패는 이전 요약을 숨긴다. 스키마 변경은 없어 마이그레이션 추가가 필요하지 않다. 다음 권장 범위는 버전 있는 JSON 백업/복원 설계이며 파일 크기, 건수, 미리보기, 원자적 복원, 실패 보존을 정한 뒤 승인받아 구현한다. 차트/FIRE보다 데이터 이식성과 복원 검증을 우선 권장한다. 밝기/UI 검토는 기능 완성 후로 보류한다.
+
 # Project continuity guide
 
 ## Safety prerequisite — Issue #15

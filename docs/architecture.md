@@ -1,3 +1,7 @@
+## Milestone 6 derived dashboard
+
+MonthlyManager publishes only its loaded month, bounded account list and committed monthly records through an injected callback. App passes that snapshot to MonthlyOverview; no additional history queries, storage writes or adapter dependencies are introduced. Month changes and failed reads invalidate the summary; failed writes retain the last committed values. Account changes and other tabs require explicit rereading, as stated in the UI. metrics.ts computes derived values without persistence.
+
 # Architecture
 
 계좌 목록/생성은 같은 트랜잭션에서 count를 검사한 뒤 `getAll(undefined, 100)`으로 제한 조회한다. 생성까지 같은 readwrite 트랜잭션이므로 동시 등록도 상한을 지킨다. 초과 저장소는 전체 객체를 읽지 않고 오류로 중단·보존한다. 앱 생성 객체는 길이가 제한된 5필드이고 UI도 100건 이내다. 후속 월별 조회는 기간/인덱스 기반으로 별도 설계한다. [자원 안전 정책](resource-safety.md)을 따른다.
