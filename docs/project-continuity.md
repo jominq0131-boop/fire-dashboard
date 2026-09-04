@@ -4,13 +4,13 @@
 
 실제 체크아웃은 `C:\Users\MINGYU\Documents\Codex\2026-09-04\fire-dashboard-next`입니다. 이전 사본 `files-pasted-by-the-user-fire`는 수정하지 않습니다. 저장소는 `jominq0131-boop/fire-dashboard`, 배포는 GitHub Pages입니다.
 
-이번 작업은 배포된 main `8a929338f4861a30ea503b281b735ff8cc64febf`에서 시작했습니다. 최신 원격 일치·clean·열린 PR/issue 부재를 확인한 뒤 Issue #31과 `feat/interactive-financial-charts`를 만들었습니다.
+이번 작업은 배포된 main `0d49f272c36841965785aa98f2288464201bc676`에서 시작했습니다. 최신 원격 일치·clean·열린 PR/issue 부재를 확인한 뒤 Issue #33과 `feat/professional-chart-workspace`를 만들었습니다.
 
-## 현재 범위 — Milestone 10
+## 현재 범위 — Milestone 11
 
-사용자는 문서 순서 정리와 값 선택·비교·예측이 연결된 고기능 그래프, 다음 마일스톤 배포를 요청했습니다. 월별 선택/내역/계좌 필터/예측 연결과 FIRE 자산·목표·시나리오 비교 선 그래프를 구현합니다. [구체적 계약](milestone-10-plan.md)을 따릅니다.
+사용자는 기존 차트 수준이 기대에 미치지 못한다고 지적하고 financial-os를 참고로 제공했습니다. 구독형 서비스 수준의 사용성을 목표로 Recharts 복합 차트, 툴팁·확대·월 수입/지출 비교와 예측 시나리오 표현을 개선합니다. [구체적 계약](milestone-11-plan.md)을 따릅니다.
 
-로컬 구현, 검증, PR 검토, main 병합, 실제 배포는 별도 단계입니다. 최종 상태는 Issue #31 연결 PR과 [작업 기록](work-log.md)의 증거를 확인합니다. 이전 출시 근거는 [출시 이력](release-history.md)에 있습니다.
+로컬 구현, 검증, PR 검토, main 병합, 실제 배포는 별도 단계입니다. 최종 상태는 Issue #33 연결 PR과 [작업 기록](work-log.md)의 증거를 확인합니다. Milestone10 배포는 PR #32 릴리스 댓글에서 확인했습니다. 이전 출시 근거는 [출시 이력](release-history.md)에 있습니다.
 
 ## 작업 시작 순서
 

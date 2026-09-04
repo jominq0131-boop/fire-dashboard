@@ -45,7 +45,7 @@ test("automatic latest assets, bounded chart, missing months, future exclusion a
   await expect(overview.locator("tbody tr").last()).toContainText("2025-12");
   await expect(overview.locator("tbody")).not.toContainText("120 円");
   await expect(overview.locator(".asset-value")).toHaveText("120 円");
-  await expect(overview.locator("svg")).toContainText("残高の記録はありません");
+  await expect(overview.locator(".chart-empty")).toContainText("表示できる記録はありません");
   await overview.getByLabel("グラフの終了月").fill("2026-09");
   await expect(overview.locator("tbody tr").last()).toContainText("2026-09");
   await page.screenshot({ path: "test-results/portfolio-desktop.png", fullPage: true });
