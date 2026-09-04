@@ -1755,6 +1755,11 @@ form .account-actions {
   min-width: 0;
   position: relative;
 }
+.financial-plot .recharts-wrapper,
+.financial-plot .recharts-surface {
+  /* Constrain the previous measured width until ResizeObserver commits the next size. */
+  max-width: 100%;
+}
 .chart-loading {
   min-height: 350px;
   display: grid;
