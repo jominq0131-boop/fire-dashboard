@@ -106,7 +106,7 @@ test("professional workspace: composite series, exact tooltip, zoom, cash flow a
   await chart.screenshot({ path: "test-results/pro-cash-mobile.png" });
 });
 
-test("maximum yen tooltip stays exact; coverage change keeps disconnected observations", async ({
+test("maximum yen stays exact; changed coverage uses a guide instead of a comparable segment", async ({
   page,
 }) => {
   await page.clock.setFixedTime(new Date("2026-09-04T03:00:00Z"));
@@ -136,13 +136,19 @@ test("maximum yen tooltip stays exact; coverage change keeps disconnected observ
   await page.reload();
   const chart = page.locator(".history-explorer .interactive-chart");
   await expect(chart.locator(".chart-inspector")).toContainText("9,007,199,254,740,991 円");
-  // Different coverage must render two independent Line components, not one bridging edge.
-  await expect(chart.locator(".recharts-line")).toHaveCount(2);
-  await expect(chart.locator(".recharts-line-curve")).toHaveCount(2);
-  for (const path of await chart.locator(".recharts-line-curve").all()) {
+  // Comparable paths stay separate; an explicit dashed guide links the real observations.
+  await expect(chart.locator(".observed-trend")).toHaveCount(3);
+  await expect(chart.locator(".observed-trend .recharts-line-curve")).toHaveCount(3);
+  for (const path of await chart.locator(".observed-trend .recharts-line-curve").all()) {
     expect(await path.getAttribute("d")).not.toMatch(/[LC]/);
   }
-  await expect(chart.locator(".financial-plot circle")).toHaveCount(2);
+  await expect(chart.locator(".observation-bridge .recharts-line-curve")).toHaveCount(1);
+  await expect(chart.locator(".observation-bridge .recharts-line-curve")).toHaveAttribute("d", /L/);
+  await expect(chart.locator(".observation-bridge .recharts-line-curve")).toHaveAttribute(
+    "stroke-dasharray",
+    "6 4",
+  );
+  await expect(chart.locator(".financial-plot circle")).toHaveCount(3);
   await page
     .locator(".history-explorer")
     .getByLabel("表示する口座", { exact: true })

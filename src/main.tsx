@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { App } from "./app/App";
 import { IndexedDbAccountRepository } from "./infrastructure/indexeddb-accounts";
 import "./app/styles.css";
+import "./app/theme.css";
 
 const accountRepository = new IndexedDbAccountRepository();
 const monthlyRepository = new IndexedDbMonthlyRepository();
