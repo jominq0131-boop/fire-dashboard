@@ -1,5 +1,5 @@
 import { MAX_ACCOUNTS, isAssetAccount } from "../domain/accounts";
-import type { AccountBalanceSnapshot } from "../domain/models";
+import type { AccountBalanceSnapshot, MonthlyCashFlowRecord } from "../domain/models";
 import { monthEnd, isObservationDate } from "../domain/observations";
 import {
   assertCapacity,
@@ -119,17 +119,35 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
                 const currentBalances: AccountBalanceSnapshot[] = [];
                 const currentIndex = tx.objectStore(BALANCE_STORE).index("accountMonth");
                 let remaining = accounts.length;
-                const complete = () =>
-                  done({
-                    latest,
-                    months: sources,
-                    current: {
-                      accounts,
-                      balances: currentBalances.sort((a, b) =>
-                        a.accountId < b.accountId ? -1 : 1,
-                      ),
-                    },
+                const complete = () => {
+                  const cashIndex = tx.objectStore(CASH_STORE).index("month");
+                  read(cashIndex.count(range), (count) => {
+                    assertCapacity(count, months.length);
+                    read(cashIndex.getAll(range, months.length), (cashRows) => {
+                      if (
+                        !cashRows.every((c) => isMonthlyRecord(c, true) && months.includes(c.month))
+                      )
+                        throw new Error("収支を読み込めません。");
+                      for (const source of sources) {
+                        source.records.cash =
+                          (cashRows as MonthlyCashFlowRecord[]).find(
+                            (c) => c.month === source.month,
+                          ) ?? null;
+                        monthlyMetrics(source);
+                      }
+                      done({
+                        latest,
+                        months: sources,
+                        current: {
+                          accounts,
+                          balances: currentBalances.sort((a, b) =>
+                            a.accountId < b.accountId ? -1 : 1,
+                          ),
+                        },
+                      });
+                    });
                   });
+                };
                 if (!remaining) {
                   complete();
                   return;

@@ -1,23 +1,11 @@
-## v3 observation support
+# Infrastructure
 
-Account database upgrades create the accountMonth index on the existing balance store in the upgrade transaction. Monthly saves persist optional validated asOfDate while preserving existing CAS/commit behavior. Portfolio overview uses bounded per-account reverse cursors; backup snapshots emit v2 and accept validated v1 via normalization. No user data is rewritten during upgrade.
+IndexedDB 어댑터만 구현합니다. DB는 fire-dashboard v3이며 domain의 저장소 계약을 따릅니다.
 
-## Milestone 7
+- indexeddb-accounts:공통 열기/마이그레이션, count 후 제한 조회, 계좌 생성/수정.
+- indexeddb-monthly:월 인덱스 조회, 참조/중복/이전 값 비교, commit 이후 성공.
+- indexeddb-portfolio:한 트랜잭션의 제한 잔액/현금흐름 이력·현재 잔액 읽기, JSONv2 내보내기와 v1/v2 추가 복원.
 
-IndexedDbPortfolioRepository implements coherent bounded overview reads plus explicit JSON snapshots/import against existing v2 stores/indexes. Count checks precede materialization, export uses size-checked cursors, and import merges within one readwrite transaction with add-only writes. Request/validation/quota failures abort all changes and close the connection; success resolves only after commit.
+완료·실패·versionchange 때 연결을 닫습니다. 초과/손상/알 수 없는 버전은 삭제하거나 복구 값을 추정하지 않습니다. 사용자 데이터 clear/delete와 자동 동기화는 제공하지 않습니다. 차트 선택/예측은 이 계층에 새 쓰기를 추가하지 않습니다.
 
-# Infrastructure boundary
-
-List/create count before a bounded getAll in the same transaction. Oversized stores are rejected without materializing all records. Concurrent creates enforce the 100-account limit. Updates persist explicit schema fields; see docs/resource-safety.md.
-
-Storage and external-service adapters belong here.
-
-- UI and domain code must not call IndexedDB or future cloud APIs directly.
-- MVP persistence will be an IndexedDB adapter behind a small repository interface.
-- JSON is a versioned import/export and backup format, not the primary store.
-
-Milestone 4 implements `IndexedDbAccountRepository` in `indexeddb-accounts.ts` using the browser's native IndexedDB API, without another dependency. Each operation closes its database connection after transaction completion/abort. Writes resolve only after commit. Updates compare the expected record inside the write transaction to reject stale edits. A blocked upgrade, unknown database version or malformed record is never fixed by deleting user data.
-
-The database is `fire-dashboard` v1 with the `accounts` store (`id` keyPath); the domain migration plan describes initial creation. Native browser tests cover persistence, concurrent operations and rollback. Monthly records, backup/restore and synchronization are out of scope.
-
-Milestone 5 adds indexeddb-monthly.ts. The shared opener applies v2 schema additions; monthly operations use bounded month-index reads, transaction-scoped counts/references/expected-value checks and commit-only success. No delete, whole-history read or automatic repair API is exposed.
+[자원 정책](../../docs/resource-safety.md) · [아키텍처](../../docs/architecture.md)

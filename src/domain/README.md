@@ -1,30 +1,13 @@
-## Observation semantics
+# Domain
 
-observations.ts provides real calendar date validation, month-end lookup, last-known total and freshness labels. asOfDate is optional for legacy records only; migration does not infer it from write timestamps. Backup normalization upgrades v1→v2 deterministically. v3 storage plan adds an index, not replacement records.
+금융 모델·검증·계산과 저장소 계약을 정의합니다. React, IndexedDB, 네트워크나 UI를 import하지 않습니다.
 
-## Milestone 7
+- accounts:100계좌/이름/필드 검증, 계좌 저장소 계약.
+- monthly:1900-01~2199-12, 정수 엔, 레코드/참조/상한·월별 저장소 계약.
+- observations:실제 확인 날짜, 마지막 잔액 합계와 확인 상태.
+- metrics/portfolio:월별 지표,12개월 창, 비교 가능한 월의 차이.
+- backup:JSONv1/v2 검증, 결정론적 v2 정규화, 추가 복원 충돌 규칙.
+- fire:명시적 가정,BigInt 월별 반올림,1200개월 상한과 overflow.
+- storage-migrations:DBv1→v2→v3 결정론적 추가 계획.
 
-portfolio.ts defines calendar windows, overview contract and comparable-month changes. backup.ts defines JSON v1, deterministic normalization, strict bounds/reference validation and additive conflict-safe merge. Derived metrics and backup format do not change persisted v2 records.
-
-## Milestone 6
-
-metrics.ts provides pure bounded monthly aggregation, reference/month validation, missing-value semantics and exact integer intermediate arithmetic with explicit overflow results. No persisted model or migration changes.
-
-# Domain boundary
-
-Account capacity is 100 including inactive accounts. Raw names and stored IDs are limited to 100 UTF-16 code units. Stored records must have exactly the five account fields. Invalid records are rejected, never repaired or deleted.
-
-Financial concepts, calculations, validation, and schema migrations belong here.
-
-- Must not import React, IndexedDB, network clients, or browser UI modules.
-- Monetary values will be represented as integer Japanese yen, not floating-point values.
-- Every data-schema change must include a deterministic migration and tests.
-
-Milestone 2 defines the financial models in `models.ts` and primitive validation in `validation.ts`.
-Milestone 4 adds account validation and the repository contract in `accounts.ts`, and the deterministic initial storage plan in `storage-migrations.ts`. Account IDs are stable; deactivation does not delete history. Monthly records and FIRE calculations are not implemented yet.
-
-Milestone 5 adds monthly.ts: supported calendar months, integer-yen parsing, bounded record validation, comparison and MonthlyRepository. storage-migrations.ts retains the v1 plan and adds deterministic v2 stores/indexes without touching records.
-
-## FIRE scenarios
-
-fire.ts validates explicit yen/basis-point assumptions and computes up to1200 monthly steps with BigInt and safe-integer output. No storage, UI, inferred default return or withdrawal rule. The target inflates, contributions stay nominal, and results expose first arrival and overflow separately.
+차트 좌표·선 연결의 표시 처리는 features/charts에 있으며 금융 값을 바꾸지 않습니다. 세부 계약은 [데이터 모델](../../docs/data-model.md)을 따릅니다.

@@ -24,6 +24,7 @@ export function App({
   backupRepository: BackupRepository;
 }) {
   const [summary, setSummary] = useState<MetricsSource | null>(null);
+  const fireRef = useRef<{ useAssets: (value: number, source: string) => boolean }>(null);
   const [revision, setRevision] = useState(0);
   const [importRevision, setImportRevision] = useState(0);
   const navigationRef = useRef<{
@@ -107,6 +108,9 @@ export function App({
           </div>
           <div className="overview-grid">
             <AssetOverview
+              onForecast={(value, source) => {
+                if (fireRef.current?.useAssets(value, source)) window.location.hash = "fire";
+              }}
               onRecordToday={(accountId) => {
                 navigationRef.current?.openToday(accountId);
                 window.location.hash = "monthly";
@@ -160,7 +164,7 @@ export function App({
             />
           </div>
         </div>
-        <FirePlanner repository={portfolioRepository} />
+        <FirePlanner repository={portfolioRepository} navigationRef={fireRef} />
         <BackupManager
           repository={backupRepository}
           onImported={() => {
