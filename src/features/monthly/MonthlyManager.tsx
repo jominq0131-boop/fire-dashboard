@@ -121,11 +121,15 @@ export function MonthlyManager({
   }
   return (
     <section className="account-panel monthly-panel" aria-labelledby="monthly-heading">
-      <h2 id="monthly-heading">月別記録</h2>
-      <p className="storage-note">
-        収入・消費支出・投資への拠出と、口座ごとの月末残高を別々に記録します。空欄は未入力、0は0円です。対象月だけを読み込みます。同期・バックアップはまだありません。
-      </p>
-      <div className="account-actions">
+      <div className="section-heading">
+        <div>
+          <p className="section-kicker">MONTHLY NOTE</p>
+          <h2 id="monthly-heading">月別記録</h2>
+        </div>
+        <span className="subtle-badge">{loaded === month ? "編集中の月" : "月を選択"}</span>
+      </div>
+      <p className="storage-note">収支と残高を、ひと月ずつ。空欄は未入力、0は0円です。</p>
+      <div className="month-toolbar">
         <label>
           対象月
           <input
@@ -155,6 +159,21 @@ export function MonthlyManager({
         </p>
       )}
       {message && <p role="status">{message}</p>}
+      {loaded !== month && (
+        <div className="month-empty">
+          <div className="calendar-art" aria-hidden="true">
+            <span>MONTHLY NOTE</span>
+            <strong>{month.slice(-2) || "—"}</strong>
+            <i />
+          </div>
+          <h3>ひと月の記録をひらく</h3>
+          <p>
+            対象月を選んで「記録を読み込む」を押すと、
+            <br />
+            収支と口座ごとの残高を入力できます。
+          </p>
+        </div>
+      )}
       {loaded === month && (
         <>
           <form
@@ -165,7 +184,8 @@ export function MonthlyManager({
           >
             <fieldset disabled={busy}>
               <legend>月の現金収支（円）</legend>
-              <div className="account-fields">
+              <p className="field-hint">投資への拠出は、消費支出と分けて記録します。</p>
+              <div className="account-fields cash-fields">
                 {(
                   [
                     ["income", "収入"],
@@ -176,6 +196,7 @@ export function MonthlyManager({
                   <label key={key}>
                     {label}
                     <input
+                      placeholder="未入力"
                       inputMode="numeric"
                       maxLength={16}
                       required
@@ -187,9 +208,11 @@ export function MonthlyManager({
                     />
                   </label>
                 ))}
-                <label>
+                <label className="note-field">
                   メモ
                   <textarea
+                    placeholder="今月、残しておきたいこと（任意）"
+                    rows={2}
                     maxLength={1000}
                     value={cash.note}
                     onChange={(e) => {
@@ -202,9 +225,12 @@ export function MonthlyManager({
               <button type="submit">現金収支を保存</button>
             </fieldset>
           </form>
-          <h3>月末残高（円）</h3>
-          <p>
-            口座ごとに保存してください。休止中の口座も過去の記録を修正できます。口座を追加した後は「記録を読み込む」で更新してください。
+          <div className="balance-heading">
+            <h3>月末残高（円）</h3>
+            <span>口座ごとに保存</span>
+          </div>
+          <p className="field-hint">
+            休止中の口座も編集できます。追加した口座は再読み込みで表示されます。
           </p>
           {accounts.length === 0 && <p>先に口座を登録してください。</p>}
           <div className="monthly-balances">
@@ -224,6 +250,7 @@ export function MonthlyManager({
                   <label>
                     {account.name}の月末残高
                     <input
+                      placeholder="未入力"
                       inputMode="numeric"
                       maxLength={16}
                       required

@@ -261,12 +261,14 @@ test("monthly UI saves separate amounts, zero balances and restores after reload
   await expect(panel.getByLabel("消費支出", { exact: true })).toHaveValue("20");
   await expect(panel.getByLabel("投資への拠出", { exact: true })).toHaveValue("30");
   await expect(panel.getByLabel("合成月末口座の月末残高")).toHaveValue("0");
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.screenshot({ path: "test-results/monthly-desktop.png", fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(panel.getByLabel("合成月末口座の月末残高")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.screenshot({ path: "test-results/monthly-mobile.png", fullPage: true });
   await panel.getByLabel("収入", { exact: true }).fill("1e3");
   await panel.getByRole("button", { name: "現金収支を保存" }).click();
