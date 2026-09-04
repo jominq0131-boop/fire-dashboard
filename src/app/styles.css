@@ -295,7 +295,7 @@ h2 {
   border-radius: 999px;
   color: #7f8e86;
   background: #fff;
-  content: "記録を追加すると推移を表示します";
+  content: "資産推移チャートは今後追加します";
   font-size: 0.78rem;
   text-align: center;
   white-space: nowrap;
@@ -343,4 +343,54 @@ h2 {
   .chart-grid::after {
     white-space: normal;
   }
+}
+
+.monthly-panel {
+  margin: 2rem 0;
+  padding: 1.4rem;
+  border: 1px solid #dde6e0;
+  border-radius: 1rem;
+  background: white;
+}
+.monthly-panel fieldset {
+  display: grid;
+  gap: 0.8rem;
+  min-width: 0;
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #dde6e0;
+  border-radius: 0.6rem;
+}
+.monthly-panel label {
+  display: grid;
+  gap: 0.4rem;
+}
+.monthly-panel input,
+.monthly-panel textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 0.6rem;
+  border: 1px solid #bacac1;
+  border-radius: 0.4rem;
+  font: inherit;
+}
+.monthly-panel button {
+  padding: 0.65rem;
+  border: 1px solid #b9dcca;
+  border-radius: 0.4rem;
+  background: #e8f6ed;
+  color: #176a47;
+  cursor: pointer;
+}
+.monthly-panel button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.monthly-balances {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 1rem;
+}
+.monthly-panel legend {
+  overflow-wrap: anywhere;
 }

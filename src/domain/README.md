@@ -10,3 +10,5 @@ Financial concepts, calculations, validation, and schema migrations belong here.
 
 Milestone 2 defines the financial models in `models.ts` and primitive validation in `validation.ts`.
 Milestone 4 adds account validation and the repository contract in `accounts.ts`, and the deterministic initial storage plan in `storage-migrations.ts`. Account IDs are stable; deactivation does not delete history. Monthly records and FIRE calculations are not implemented yet.
+
+Milestone 5 adds monthly.ts: supported calendar months, integer-yen parsing, bounded record validation, comparison and MonthlyRepository. storage-migrations.ts retains the v1 plan and adds deterministic v2 stores/indexes without touching records.

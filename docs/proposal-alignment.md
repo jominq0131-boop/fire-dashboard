@@ -1,3 +1,5 @@
+> 2026-09-04 후속: 아래는 PR #12 시점 점검 이력이다. 현재 작업 브랜치는 승인된 Milestone 5 월별 입력/잔액 및 v2 저장을 구현·로컬 검증했다. 날짜 검증도 정확한 4자리 월과 UTC ISO로 강화했다. main 병합·배포는 아직이며 최신 상태는 project-continuity.md와 milestone-5-plan.md를 따른다.
+
 # 최초 제안 대비 진행 점검
 
 Milestone 5 전에 Issue #15에서 계좌 조회·입력·테스트 동시성 상한을 보강한다. 기존 IndexedDB 방향을 유지하는 안전 작업이며 월별 기록/JSON 백업 완성을 뜻하지 않는다. [자원 안전 정책](resource-safety.md)을 후속 설계에도 적용한다.

@@ -1,3 +1,5 @@
+import type { MonthlyRepository } from "../domain/monthly";
+import { MonthlyManager } from "../features/monthly/MonthlyManager";
 import type { AccountRepository } from "../domain/accounts";
 import { AccountManager } from "../features/accounts/AccountManager";
 
@@ -10,7 +12,13 @@ const summaryMetrics = [
   { label: "FIRE達成度", description: "設定したFIRE目標に対する進捗" },
 ];
 
-export function App({ accountRepository }: { accountRepository: AccountRepository }) {
+export function App({
+  accountRepository,
+  monthlyRepository,
+}: {
+  accountRepository: AccountRepository;
+  monthlyRepository: MonthlyRepository;
+}) {
   return (
     <main className="dashboard-shell">
       <header className="dashboard-header">
@@ -23,6 +31,7 @@ export function App({ accountRepository }: { accountRepository: AccountRepositor
       </header>
 
       <AccountManager repository={accountRepository} />
+      <MonthlyManager repository={monthlyRepository} accountsRepository={accountRepository} />
 
       <section aria-labelledby="summary-heading">
         <div className="section-heading">
@@ -30,7 +39,7 @@ export function App({ accountRepository }: { accountRepository: AccountRepositor
             <p className="eyebrow">OVERVIEW</p>
             <h2 id="summary-heading">いまの状況</h2>
           </div>
-          <p>記録を追加すると、ここに最新の数字が表示されます。</p>
+          <p>集計・FIRE指標は今後追加します。月別記録は入力欄で確認できます。</p>
         </div>
         <div className="metric-grid">
           {summaryMetrics.map((metric) => (
@@ -49,9 +58,9 @@ export function App({ accountRepository }: { accountRepository: AccountRepositor
         </div>
         <div>
           <p className="eyebrow">FIRST STEP</p>
-          <h2 id="start-heading">まだ金融記録がありません</h2>
+          <h2 id="start-heading">金融記録を月ごとに残しましょう</h2>
           <p>
-            まず口座を登録できます。月ごとの現金収支・残高入力は次のマイルストーンで追加します。口座の登録だけでは資産額は表示されません。
+            口座を登録し、対象月を読み込んで現金収支と月末残高を保存できます。資産集計・チャートはまだ実装していません。
           </p>
         </div>
       </section>
@@ -62,7 +71,7 @@ export function App({ accountRepository }: { accountRepository: AccountRepositor
             <p className="eyebrow">HISTORY</p>
             <h2 id="trend-heading">資産推移</h2>
           </div>
-          <span>データ記録後に表示</span>
+          <span>チャートは今後追加</span>
         </div>
         <div className="chart-grid" aria-label="資産推移チャートはデータ待ちです">
           <span />

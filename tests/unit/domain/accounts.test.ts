@@ -90,16 +90,16 @@ describe("bounded account capacity", () => {
 
 describe("deterministic initial database migration", () => {
   it("creates only an empty accounts store with a stable primary key", () => {
-    expect(storageMigrationPlan(0)).toEqual([{ version: 1, store: "accounts", keyPath: "id" }]);
-    expect(storageMigrationPlan(0)).toEqual(storageMigrationPlan(0));
+    expect(storageMigrationPlan(0, 1)).toEqual([{ version: 1, store: "accounts", keyPath: "id" }]);
+    expect(storageMigrationPlan(0, 1)).toEqual(storageMigrationPlan(0, 1));
   });
   it("does nothing when reopening version 1", () => {
-    expect(storageMigrationPlan(1)).toEqual([]);
+    expect(storageMigrationPlan(1, 1)).toEqual([]);
   });
-  it.each([-1, 0.5, 2, NaN])("rejects unsupported source version %s", (version) => {
+  it.each([-1, 0.5, 3, NaN])("rejects unsupported source version %s", (version) => {
     expect(() => storageMigrationPlan(version)).toThrow();
   });
   it("rejects unknown target versions", () => {
-    expect(() => storageMigrationPlan(1, 2)).toThrow();
+    expect(() => storageMigrationPlan(1, 3)).toThrow();
   });
 });
