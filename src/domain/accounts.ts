@@ -1,6 +1,11 @@
 import type { AccountCategory, AssetAccount } from "./models";
 import { isAccountCategory } from "./validation";
 
+/** Includes inactive accounts; this is an application guard, not a browser quota. */
+export const MAX_ACCOUNTS = 100;
+export const MAX_ACCOUNT_NAME_LENGTH = 100;
+export const MAX_ACCOUNT_ID_LENGTH = 100;
+
 export interface AccountDetails {
   name: string;
   category: AccountCategory;
@@ -15,7 +20,11 @@ export class AccountError extends Error {
 }
 
 export function validateAccountDetails(value: AccountDetails): AccountDetails {
-  if (typeof value.name !== "string" || !value.name.trim() || value.name.trim().length > 100) {
+  if (
+    typeof value.name !== "string" ||
+    value.name.length > MAX_ACCOUNT_NAME_LENGTH ||
+    !value.name.trim()
+  ) {
     throw new AccountError("口座名は空白以外の1〜100文字で入力してください。");
   }
   if (!isAccountCategory(value.category) || typeof value.isActive !== "boolean") {
@@ -24,16 +33,27 @@ export function validateAccountDetails(value: AccountDetails): AccountDetails {
   return { name: value.name.trim(), category: value.category, isActive: value.isActive };
 }
 
+export function assertAccountCapacity(count: number, adding = false): void {
+  if (!Number.isSafeInteger(count) || count < 0) throw new AccountError("口座数を確認できません。");
+  if (count > MAX_ACCOUNTS || (adding && count === MAX_ACCOUNTS)) {
+    throw new AccountError(
+      `安全に処理できる口座は休止中を含め${MAX_ACCOUNTS}件までです。保存済みデータは削除していません。追加せず、対応を依頼してください。`,
+    );
+  }
+}
+
 export function isAssetAccount(value: unknown): value is AssetAccount {
   if (typeof value !== "object" || value === null) return false;
   const account = value as Partial<AssetAccount>;
   return (
+    Object.keys(account).length === 5 &&
     typeof account.id === "string" &&
+    account.id.length <= MAX_ACCOUNT_ID_LENGTH &&
     account.id.trim().length > 0 &&
     typeof account.name === "string" &&
-    account.name === account.name.trim() &&
     account.name.length > 0 &&
-    account.name.length <= 100 &&
+    account.name.length <= MAX_ACCOUNT_NAME_LENGTH &&
+    account.name === account.name.trim() &&
     isAccountCategory(account.category) &&
     typeof account.isActive === "boolean" &&
     typeof account.sortOrder === "number" &&

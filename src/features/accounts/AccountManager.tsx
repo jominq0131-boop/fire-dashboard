@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { AccountError, type AccountRepository } from "../../domain/accounts";
+import {
+  AccountError,
+  MAX_ACCOUNTS,
+  MAX_ACCOUNT_NAME_LENGTH,
+  type AccountRepository,
+} from "../../domain/accounts";
 import { accountCategories, type AccountCategory, type AssetAccount } from "../../domain/models";
 
 const labels: Record<AccountCategory, string> = {
@@ -113,6 +118,10 @@ export function AccountManager({ repository }: { repository: AccountRepository }
       <p className="storage-note">
         このブラウザーにのみ保存されます。同期・バックアップはまだありません。ブラウザーのデータ削除で記録が失われるため、現段階では試用としてお使いください。口座番号は入力しないでください。
       </p>
+      <p className="storage-note">
+        口座は休止中を含め{MAX_ACCOUNTS}
+        件までです。上限に達しても既存の口座は編集できます。データを自動削除することはありません。
+      </p>
       {error && (
         <p role="alert" className="error-message">
           {error}
@@ -133,7 +142,7 @@ export function AccountManager({ repository }: { repository: AccountRepository }
                 ref={nameInput}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                maxLength={100}
+                maxLength={MAX_ACCOUNT_NAME_LENGTH}
                 required
                 autoComplete="off"
               />
@@ -154,7 +163,7 @@ export function AccountManager({ repository }: { repository: AccountRepository }
             </label>
           </div>
           <div className="account-actions">
-            <button type="submit">
+            <button type="submit" disabled={!editing && accounts.length >= MAX_ACCOUNTS}>
               {busy ? "保存中…" : editing ? "変更を保存" : "口座を追加"}
             </button>
             {editing && (

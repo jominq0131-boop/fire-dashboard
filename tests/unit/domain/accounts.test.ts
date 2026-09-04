@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { isAssetAccount, sameAccount, validateAccountDetails } from "../../../src/domain/accounts";
+import {
+  assertAccountCapacity,
+  MAX_ACCOUNTS,
+  isAssetAccount,
+  sameAccount,
+  validateAccountDetails,
+} from "../../../src/domain/accounts";
 import type { AccountDetails } from "../../../src/domain/accounts";
 import { storageMigrationPlan } from "../../../src/domain/storage-migrations";
 
@@ -7,6 +13,11 @@ const details: AccountDetails = { name: "テスト口座", category: "cash", isA
 const account = { ...details, id: "synthetic-account", sortOrder: 0 };
 
 describe("account validation", () => {
+  it("rejects raw oversized input and undeclared or oversized stored fields", () => {
+    expect(() => validateAccountDetails({ ...details, name: " ".repeat(101) + "a" })).toThrow();
+    expect(isAssetAccount({ ...account, id: "a".repeat(101) })).toBe(false);
+    expect(isAssetAccount({ ...account, unexpectedPayload: "not an account field" })).toBe(false);
+  });
   it("trims names without changing the input", () => {
     const input = { ...details, name: "  テスト口座　" };
     expect(validateAccountDetails(input)).toEqual(details);
@@ -57,6 +68,24 @@ describe("account validation", () => {
       expect(sameAccount(account, changed)).toBe(false);
     }
   });
+});
+
+describe("bounded account capacity", () => {
+  it("allows reading the maximum and creating the last available account", () => {
+    expect(() => assertAccountCapacity(MAX_ACCOUNTS)).not.toThrow();
+    expect(() => assertAccountCapacity(MAX_ACCOUNTS - 1, true)).not.toThrow();
+    expect(() => assertAccountCapacity(0, true)).not.toThrow();
+  });
+  it("blocks another creation at capacity and oversized reads", () => {
+    expect(() => assertAccountCapacity(MAX_ACCOUNTS, true)).toThrow("100件");
+    expect(() => assertAccountCapacity(MAX_ACCOUNTS + 1)).toThrow("削除していません");
+  });
+  it.each([-1, 0.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1])(
+    "rejects invalid counts %s",
+    (value) => {
+      expect(() => assertAccountCapacity(value)).toThrow();
+    },
+  );
 });
 
 describe("deterministic initial database migration", () => {

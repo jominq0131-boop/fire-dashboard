@@ -1,5 +1,7 @@
 # Domain boundary
 
+Account capacity is 100 including inactive accounts. Raw names and stored IDs are limited to 100 UTF-16 code units. Stored records must have exactly the five account fields. Invalid records are rejected, never repaired or deleted.
+
 Financial concepts, calculations, validation, and schema migrations belong here.
 
 - Must not import React, IndexedDB, network clients, or browser UI modules.

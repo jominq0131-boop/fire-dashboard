@@ -1,5 +1,7 @@
 import {
   AccountError,
+  MAX_ACCOUNTS,
+  assertAccountCapacity,
   isAssetAccount,
   sameAccount,
   validateAccountDetails,
@@ -68,6 +70,7 @@ export function openAccountDatabase(name = DATABASE_NAME): Promise<IDBDatabase> 
 }
 
 function readAccounts(values: unknown[]): AssetAccount[] {
+  assertAccountCapacity(values.length);
   if (!values.every(isAssetAccount)) {
     throw new AccountError(
       "保存済みの口座データを読み取れません。データは削除せず、復旧を依頼してください。",
@@ -76,6 +79,32 @@ function readAccounts(values: unknown[]): AssetAccount[] {
   return values.sort(
     (a, b) => a.sortOrder - b.sortOrder || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
   );
+}
+
+/** Count and bounded read share the caller's transaction (including create). */
+function readBoundedAccounts(
+  store: IDBObjectStore,
+  adding: boolean,
+  done: (accounts: AssetAccount[]) => void,
+  fail: (error: unknown) => void,
+): void {
+  const count = store.count();
+  count.onsuccess = () => {
+    try {
+      assertAccountCapacity(count.result, adding);
+      // Never materialize an oversized store, even when an older app wrote it.
+      const request = store.getAll(undefined, MAX_ACCOUNTS);
+      request.onsuccess = () => {
+        try {
+          done(readAccounts(request.result));
+        } catch (error) {
+          fail(error);
+        }
+      };
+    } catch (error) {
+      fail(error);
+    }
+  };
 }
 
 export class IndexedDbAccountRepository implements AccountRepository {
@@ -129,34 +158,26 @@ export class IndexedDbAccountRepository implements AccountRepository {
 
   list(): Promise<AssetAccount[]> {
     return this.transaction("readonly", (store, done, fail) => {
-      const request = store.getAll();
-      request.onsuccess = () => {
-        try {
-          done(readAccounts(request.result));
-        } catch (error) {
-          fail(error);
-        }
-      };
+      readBoundedAccounts(store, false, done, fail);
     });
   }
 
   async create(details: AccountDetails): Promise<AssetAccount> {
     const valid = validateAccountDetails(details);
     return this.transaction("readwrite", (store, done, fail) => {
-      const request = store.getAll();
-      request.onsuccess = () => {
-        try {
-          const accounts = readAccounts(request.result);
+      readBoundedAccounts(
+        store,
+        true,
+        (accounts) => {
           const sortOrder = accounts.length ? accounts[accounts.length - 1].sortOrder + 1 : 0;
           if (!Number.isSafeInteger(sortOrder))
             throw new AccountError("口座の表示順が上限に達しました。");
           const account = { ...valid, id: crypto.randomUUID(), sortOrder };
           store.add(account);
           done(account);
-        } catch (error) {
-          fail(error);
-        }
-      };
+        },
+        fail,
+      );
     });
   }
 
@@ -172,7 +193,7 @@ export class IndexedDbAccountRepository implements AccountRepository {
               "口座が別のタブで変更されています。入力内容を控えて再読み込みしてください。",
             );
           }
-          const account = { ...expected, ...valid };
+          const account = { id: expected.id, sortOrder: expected.sortOrder, ...valid };
           store.put(account);
           done(account);
         } catch (error) {
