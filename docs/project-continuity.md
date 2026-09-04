@@ -1,3 +1,7 @@
+## Current work — Milestone 9 / Issue #29
+
+시작 main ae416f3(PR #28)은 배포 완료이며 원격 일치·clean·열린 issue/PR 부재를 확인했다. 사용자 요청으로 데이터 길이에 따른 레이아웃 흔들림을 보강하고 milestone-8-plan의 후속 가정 비교를 구현한다. feat/scenario-comparison-layout에서 최대3개 임시 비교를 제공한다. 가정 영속화·인출 모델·PWA는 미포함이며 DBv3/JSONv2는 그대로다. [계약](milestone-9-plan.md), work-log와 연결 PR에서 로컬/원격/배포 상태를 구분한다. 아래는 과거 이력이다.
+
 ## Current work — Milestone 8 / Issue #27
 
 시작 main6888fa8(PR #26)은 배포 완료이며 최신 원격과 일치하고 열린 PR/issue가 없음을 확인했다. 다음 권장 FIRE 가정/예측을 feat/fire-scenarios에서 구현한다. 이번 범위는 저장 변경 없는 임시 시나리오로, 목표 도달 기간/연별 금액과 명시적 가정 입력을 제공한다. 자동 추천 수익률·인출률은 없다. [계산 계약](milestone-8-plan.md)을 따른다. 설정 영속화는 JSON 포함 정책과 저장 설계 승인 후 후속 구현하며, 이번 단계 완료를 전체 FIRE/은퇴 판단 기능 완료로 간주하지 않는다. 아래 항목은 과거 이력이다.

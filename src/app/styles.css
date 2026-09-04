@@ -1375,3 +1375,211 @@ form .account-actions {
     grid-template-columns: 1fr;
   }
 }
+/* Data-independent layout contract: shrink tracks, wrap prose, preserve numeric columns. */
+.dashboard-shell :is(section, article, form, fieldset, label, .workspace-grid > div) {
+  min-width: 0;
+}
+.dashboard-shell :is(h2, h3, p, legend, label, summary, [role="alert"], [role="status"]) {
+  overflow-wrap: anywhere;
+}
+.dashboard-shell :is(input, select, textarea) {
+  max-width: 100%;
+  min-height: 44px;
+  font-variant-numeric: tabular-nums;
+}
+.dashboard-shell button {
+  min-height: 44px;
+  max-width: 100%;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.section-heading,
+.balance-heading,
+.workspace-heading,
+.month-toolbar {
+  flex-wrap: wrap;
+}
+.month-toolbar label {
+  min-width: 150px;
+}
+.asset-card {
+  container-type: inline-size;
+}
+.asset-value {
+  min-height: 3rem;
+}
+.asset-value strong {
+  font-size: clamp(16px, 5cqi, 36px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.freshness-list > div {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 23ch) 6rem;
+  grid-template-areas: "name amount action" "date date action";
+  align-items: center;
+}
+.freshness-list strong {
+  grid-area: name;
+}
+.freshness-list span {
+  grid-area: amount;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.freshness-list small {
+  grid-area: date;
+  overflow-wrap: anywhere;
+}
+.freshness-list button {
+  grid-area: action;
+  width: 100%;
+}
+.account-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 108px;
+  align-items: start;
+}
+.account-list .account-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}
+.account-list .account-actions button {
+  padding: 8px 4px;
+}
+.monthly-balances legend {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+.monthly-balances label {
+  min-width: 0;
+}
+.monthly-balances .field-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+.metrics-list > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: baseline;
+}
+.metrics-list dd {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.history-table {
+  max-width: 100%;
+  overscroll-behavior-inline: contain;
+}
+.history-table table {
+  table-layout: fixed;
+  min-width: 960px;
+}
+.history-table th,
+.history-table td {
+  vertical-align: top;
+}
+.history-table td {
+  text-align: right;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.history-table th {
+  text-align: right;
+}
+.history-table th:first-child,
+.history-table td:first-child {
+  text-align: left;
+}
+.history-table caption {
+  text-align: left;
+  padding: 12px 0;
+}
+.scenario-comparison {
+  border-top: 1px solid var(--line);
+  margin-top: 24px;
+  padding-top: 24px;
+}
+.comparison-table table {
+  min-width: 960px;
+}
+.comparison-table .comparison-outcome {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.comparison-outcome small {
+  display: block;
+  margin-top: 8px;
+}
+.fire-fields label {
+  align-content: end;
+}
+.fire-planner > form {
+  margin-top: 20px;
+}
+.fire-planner .field-hint {
+  margin: 12px 0;
+}
+.fire-planner [role="status"] {
+  margin: 20px 0;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f3f5f8;
+}
+.fire-planner [role="alert"] {
+  margin: 16px 0;
+  padding: 12px;
+  color: #9b3530;
+  background: #fff3f2;
+  border-radius: 10px;
+}
+@media (max-width: 860px) {
+  .sidebar {
+    height: auto;
+    min-height: 70px;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-block: 12px;
+  }
+  .sidebar nav {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 560px) {
+  .sidebar nav {
+    width: 100%;
+    margin-left: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .sidebar nav a {
+    justify-content: center;
+    min-height: 44px;
+  }
+  .freshness-list > div {
+    grid-template-columns: minmax(0, 1fr) 5rem;
+    grid-template-areas: "name action" "amount action" "date date";
+  }
+  .freshness-list span {
+    text-align: left;
+  }
+  .account-list li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .account-list .account-actions {
+    width: 108px;
+    justify-self: end;
+  }
+  .month-toolbar > button {
+    width: 100%;
+  }
+  .dashboard-header {
+    flex-wrap: wrap;
+  }
+}

@@ -34,13 +34,13 @@ test("automatic latest assets, bounded chart, missing months, future exclusion a
   await overview.getByRole("button", { name: "2026-08", exact: true }).click();
   const monthly = page.getByRole("region", { name: "月別記録" });
   await expect(monthly.getByLabel("対象月")).toHaveValue("2026-08");
-  await expect(monthly.getByLabel("合成資産口座の残高")).toHaveValue("100");
+  await expect(monthly.getByLabel("合成資産口座の残高", { exact: true })).toHaveValue("100");
   await expect(overview.locator(".asset-value")).toHaveText("120 円");
-  await monthly.getByLabel("合成資産口座の残高").fill("999");
+  await monthly.getByLabel("合成資産口座の残高", { exact: true }).fill("999");
   page.once("dialog", (dialog) => dialog.dismiss());
   await overview.getByRole("button", { name: "2026-09", exact: true }).click();
   await expect(monthly.getByLabel("対象月")).toHaveValue("2026-08");
-  await expect(monthly.getByLabel("合成資産口座の残高")).toHaveValue("999");
+  await expect(monthly.getByLabel("合成資産口座の残高", { exact: true })).toHaveValue("999");
   await overview.getByLabel("グラフの終了月").fill("2025-12");
   await expect(overview.locator("tbody tr").last()).toContainText("2025-12");
   await expect(overview.locator("tbody")).not.toContainText("120 円");

@@ -124,3 +124,11 @@ Implemented explicit temporary FIRE assumptions, opt-in recorded-assets input, f
 Unit110 and Chromium32 tests passed; final Chromium run exited0 in44.0s. Format, lint, typecheck, Pages production build and diff checks passed. New tests cover calculation limits/rounding, dates-independent elapsed months, input invalidation/reset, asset loading, session-only state and390px overflow. Initial lint flagged a handler named like a hook; renamed it and lint passed. The initial sandbox browser run did not terminate and was stopped, not counted as passing; isolated rerun with existing browser binaries passed. No user profile or real financial data was used.
 
 Implementation/local verification are complete; PR/main/deployment are pending at this entry. Final release state and verification evidence belong to the Issue #27 linked PR. Persistent assumptions, withdrawal modeling and broader sensitivity analysis remain future scope.
+
+## Milestone 9 / Issue #29 — local verification
+
+Implemented up to3 session-only FIRE comparison snapshots using existing projections and a shared arrival formatter. Added fixed data/action tracks, short accessible account actions, container-scaled totals, numeric alignment,44px control minimums and locally scrollable fixed-column tables. Corrected obsolete account-help text that said backups were unavailable. No financial formula, DBv3/JSONv2, dependencies or services changed.
+
+Local unit110 and Chromium34 tests passed (final browser53.0s); lint/typecheck/build/format/diff checks passed. Desktop/mobile screenshots were inspected with synthetic names and maximum safe-integer amounts. New tests cover320/390/768/1024/1440px,100-character names, zero/missing/max values, card/action/control alignment, total/table clipping, long errors and comparison lifecycle. Initial full browser run had4 selector ambiguities because input labels matched new button aria-labels; selectors were tightened to exact input labels without removing or weakening assertions, then all34 passed. No actual user data, backups or screenshots are included in commits.
+
+Implementation and local verification complete; PR/main/deployment pending at this entry. Final CI and deployed artifact evidence belong to the linked PR. Persistent scenarios, drawdown modeling and full product accessibility certification remain outside this milestone.

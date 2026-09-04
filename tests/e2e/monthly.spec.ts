@@ -250,8 +250,8 @@ test("monthly UI saves separate amounts, zero balances and restores after reload
   await panel.getByLabel("投資への拠出", { exact: true }).fill("30");
   await panel.getByRole("button", { name: "現金収支を保存" }).click();
   await expect(panel.getByRole("status")).toContainText("保存しました");
-  await expect(panel.getByLabel("合成月末口座の残高")).toHaveValue("");
-  await panel.getByLabel("合成月末口座の残高").fill("0");
+  await expect(panel.getByLabel("合成月末口座の残高", { exact: true })).toHaveValue("");
+  await panel.getByLabel("合成月末口座の残高", { exact: true }).fill("0");
   await panel.getByRole("button", { name: "合成月末口座の残高を保存" }).click();
   await expect(panel.getByText("保存済み", { exact: true })).toBeVisible();
   await page.reload();
@@ -260,11 +260,11 @@ test("monthly UI saves separate amounts, zero balances and restores after reload
   await expect(panel.getByLabel("収入", { exact: true })).toHaveValue("100");
   await expect(panel.getByLabel("消費支出", { exact: true })).toHaveValue("20");
   await expect(panel.getByLabel("投資への拠出", { exact: true })).toHaveValue("30");
-  await expect(panel.getByLabel("合成月末口座の残高")).toHaveValue("0");
+  await expect(panel.getByLabel("合成月末口座の残高", { exact: true })).toHaveValue("0");
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.screenshot({ path: "test-results/monthly-desktop.png", fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(panel.getByLabel("合成月末口座の残高")).toBeVisible();
+  await expect(panel.getByLabel("合成月末口座の残高", { exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
@@ -368,7 +368,7 @@ test("100 monthly balance rows remain editable and global capacity blocks only n
   await panel.getByLabel("対象月").fill("2026-09");
   await panel.getByRole("button", { name: "記録を読み込む" }).click();
   await expect(panel.locator(".monthly-balances form")).toHaveCount(100);
-  await panel.getByLabel("合成0の残高").fill("999");
+  await panel.getByLabel("合成0の残高", { exact: true }).fill("999");
   await panel.getByRole("button", { name: "合成0の残高を保存", exact: true }).click();
   await expect(panel.getByRole("status")).toBeVisible();
   const result = await page.evaluate(async () => {

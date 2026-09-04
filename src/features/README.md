@@ -25,3 +25,7 @@ UI refresh (Issue #19) changes presentation only: account guidance disclosure, a
 ## FIRE planner
 
 fire/FirePlanner.tsx owns temporary assumptions, explicit recorded-assets loading and bounded annual results. It clears stale output on edits and labels provenance, non-persistence, calculation limits and excluded risks. It receives the repository contract and never writes balances or settings.
+
+## Milestone 9 comparison and data layout
+
+ScenarioComparison keeps up to3 temporary immutable copies of input assumptions and existing projection results. fire-format.ts shares presentation labels without changing calculation rules. Account-specific accessible labels stay intact while visible controls use short stable text. Common CSS separates values, names and actions and preserves full financial values through local table scrolling.
