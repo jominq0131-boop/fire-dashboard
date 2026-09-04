@@ -4,7 +4,7 @@ import type { AssetAccount, MonthlyCashFlowRecord, AccountBalanceSnapshot } from
 
 export const MAX_BACKUP_BYTES = 32 * 1024 * 1024;
 export interface Backup {
-  schemaVersion: 1;
+  schemaVersion: 1 | 2;
   accounts: AssetAccount[];
   monthlyCashFlows: MonthlyCashFlowRecord[];
   accountBalanceSnapshots: AccountBalanceSnapshot[];
@@ -24,12 +24,12 @@ export function canonical(value: object): string {
 }
 const invalid = () =>
   new Error("バックアップの形式・件数・参照・重複を確認してください。元の記録は変更していません。");
-/** First JSON format: v1 is normalized deterministically; unsupported versions are never guessed. */
+/** v1 to v2 preserves records and unknown observation dates; no inferred dates are added. */
 export function normalizeBackup(value: unknown): Backup {
   if (!value || typeof value !== "object") throw invalid();
   const v = value as Record<string, unknown>;
   if (
-    v.schemaVersion !== 1 ||
+    (v.schemaVersion !== 1 && v.schemaVersion !== 2) ||
     Object.keys(v).length !== 4 ||
     !["schemaVersion", "accounts", "monthlyCashFlows", "accountBalanceSnapshots"].every((k) =>
       Object.hasOwn(v, k),
@@ -45,7 +45,9 @@ export function normalizeBackup(value: unknown): Backup {
   if (
     !accounts.every(isAssetAccount) ||
     !cash.every((c) => isMonthlyRecord(c, true)) ||
-    !balances.every((b) => isMonthlyRecord(b, false))
+    !balances.every(
+      (b) => isMonthlyRecord(b, false) && (v.schemaVersion !== 1 || b.asOfDate === undefined),
+    )
   )
     throw invalid();
   const ids = new Set(accounts.map((a) => a.id));
@@ -61,7 +63,7 @@ export function normalizeBackup(value: unknown): Backup {
   )
     throw invalid();
   const result: Backup = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     accounts: [...accounts].sort((a, b) => compare(a.id, b.id)),
     monthlyCashFlows: [...cash].sort((a, b) => compare(a.month, b.month)),
     accountBalanceSnapshots: [...balances].sort(
@@ -98,7 +100,7 @@ export function mergeBackup(current: Backup, incoming: Backup) {
     return [...map.values()];
   };
   const backup = normalizeBackup({
-    schemaVersion: 1,
+    schemaVersion: 2,
     accounts: merge(left.accounts, right.accounts),
     monthlyCashFlows: merge(left.monthlyCashFlows, right.monthlyCashFlows),
     accountBalanceSnapshots: merge(left.accountBalanceSnapshots, right.accountBalanceSnapshots),

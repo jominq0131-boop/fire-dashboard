@@ -20,7 +20,7 @@ test("summary reflects committed records, separates months and restores zero and
   await expect(summary.locator("dd").first()).toHaveText("未入力");
   await panel.getByRole("button", { name: "現金収支を保存" }).click();
   await expect(summary.locator("dd")).toHaveText(["100 円", "60 円", "50 円", "40 円", "-10 円"]);
-  await panel.getByLabel("合成集計Aの月末残高").fill("0");
+  await panel.getByLabel("合成集計Aの残高").fill("0");
   await panel.getByRole("button", { name: "合成集計Aの残高を保存" }).click();
   await expect(summary.locator(".asset-value")).toHaveText("0 円");
   await expect(summary).toContainText("残高入力 1 / 2");

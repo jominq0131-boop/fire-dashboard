@@ -139,7 +139,7 @@ test("real IndexedDB migration, concurrent creation, reopen and abort preserve r
     };
   });
   expect(result).toEqual({
-    version: 2,
+    version: 3,
     stores: ["accountBalanceSnapshots", "accounts", "monthlyCashFlows"],
     keyPath: "id",
     distinctIds: true,
@@ -153,7 +153,7 @@ test("unknown future schema is rejected without deleting data", async ({ page })
   const result = await page.evaluate(async () => {
     const name = "synthetic-future";
     await new Promise<void>((resolve, reject) => {
-      const request = indexedDB.open(name, 3);
+      const request = indexedDB.open(name, 4);
       request.onupgradeneeded = () => {
         request.result.createObjectStore("future").put("preserve", "key");
       };
@@ -172,7 +172,7 @@ test("unknown future schema is rejected without deleting data", async ({ page })
       rejected = true;
     }
     const value = await new Promise((resolve, reject) => {
-      const request = indexedDB.open(name, 3);
+      const request = indexedDB.open(name, 4);
       request.onsuccess = () => {
         const db = request.result;
         const read = db.transaction("future").objectStore("future").get("key");
@@ -193,7 +193,7 @@ test("invalid stored account is not silently discarded or overwritten", async ({
   await expect(page.getByRole("button", { name: "口座を追加", exact: true })).toBeEnabled();
   await page.evaluate(async () => {
     await new Promise<void>((resolve) => {
-      const request = indexedDB.open("fire-dashboard", 2);
+      const request = indexedDB.open("fire-dashboard", 3);
       request.onsuccess = () => {
         const db = request.result;
         const tx = db.transaction("accounts", "readwrite");
@@ -246,7 +246,7 @@ test("versionchange closes idle connections so a later upgrade is not blocked", 
     const { openAccountDatabase } = await import(modulePath);
     await openAccountDatabase("synthetic-versionchange");
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open("synthetic-versionchange", 3);
+      const request = indexedDB.open("synthetic-versionchange", 4);
       request.onblocked = () => reject(new Error("Upgrade blocked"));
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
@@ -256,7 +256,7 @@ test("versionchange closes idle connections so a later upgrade is not blocked", 
       };
     });
   });
-  expect(result).toBe(3);
+  expect(result).toBe(4);
 });
 
 test("blocked open is surfaced and its late connection is closed", async ({ page }) => {

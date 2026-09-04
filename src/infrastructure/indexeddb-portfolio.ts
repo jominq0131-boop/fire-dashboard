@@ -1,4 +1,6 @@
 import { MAX_ACCOUNTS, isAssetAccount } from "../domain/accounts";
+import type { AccountBalanceSnapshot } from "../domain/models";
+import { monthEnd, isObservationDate } from "../domain/observations";
 import {
   assertCapacity,
   assertMonth,
@@ -87,8 +89,10 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
       }),
     );
   }
-  readOverview(asOf: string, end?: string): Promise<PortfolioOverview> {
+  readOverview(asOf: string, end?: string, today = monthEnd(asOf)): Promise<PortfolioOverview> {
     assertMonth(asOf);
+    if (!isObservationDate(today) || today.slice(0, 7) !== asOf)
+      throw new Error("Invalid as-of date");
     if (end) assertMonth(end);
     return this.run("readonly", (tx, read, done) => {
       read(tx.objectStore(ACCOUNT_STORE).getAll(undefined, MAX_ACCOUNTS), (accounts) => {
@@ -112,7 +116,49 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
               sources.forEach(monthlyMetrics);
               const finish = (latest: MetricsSource | null) => {
                 if (latest) monthlyMetrics(latest);
-                done({ latest, months: sources });
+                const currentBalances: AccountBalanceSnapshot[] = [];
+                const currentIndex = tx.objectStore(BALANCE_STORE).index("accountMonth");
+                let remaining = accounts.length;
+                const complete = () =>
+                  done({
+                    latest,
+                    months: sources,
+                    current: {
+                      accounts,
+                      balances: currentBalances.sort((a, b) =>
+                        a.accountId < b.accountId ? -1 : 1,
+                      ),
+                    },
+                  });
+                if (!remaining) {
+                  complete();
+                  return;
+                }
+                for (const account of accounts) {
+                  let visited = 0;
+                  read(
+                    currentIndex.openCursor(
+                      IDBKeyRange.bound([account.id, "1900-01"], [account.id, asOf]),
+                      "prev",
+                    ),
+                    (cursor) => {
+                      if (!cursor) {
+                        if (--remaining === 0) complete();
+                        return;
+                      }
+                      if (++visited > 2) throw new Error("Unexpected current balance range");
+                      const b = cursor.value as AccountBalanceSnapshot;
+                      if (!isMonthlyRecord(b, false) || b.accountId !== account.id)
+                        throw new Error("Invalid current balance");
+                      if (b.asOfDate && b.asOfDate > today) {
+                        cursor.continue();
+                        return;
+                      }
+                      currentBalances.push(b);
+                      if (--remaining === 0) complete();
+                    },
+                  );
+                }
               };
               if (!latestMonth) {
                 finish(null);
@@ -145,7 +191,7 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
           if (--remaining === 0)
             done(
               normalizeBackup({
-                schemaVersion: 1,
+                schemaVersion: 2,
                 accounts: values[0],
                 monthlyCashFlows: values[1],
                 accountBalanceSnapshots: values[2],

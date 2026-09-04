@@ -1,3 +1,7 @@
+## v3 observation support
+
+Account database upgrades create the accountMonth index on the existing balance store in the upgrade transaction. Monthly saves persist optional validated asOfDate while preserving existing CAS/commit behavior. Portfolio overview uses bounded per-account reverse cursors; backup snapshots emit v2 and accept validated v1 via normalization. No user data is rewritten during upgrade.
+
 ## Milestone 7
 
 IndexedDbPortfolioRepository implements coherent bounded overview reads plus explicit JSON snapshots/import against existing v2 stores/indexes. Count checks precede materialization, export uses size-checked cursors, and import merges within one readwrite transaction with add-only writes. Request/validation/quota failures abort all changes and close the connection; success resolves only after commit.

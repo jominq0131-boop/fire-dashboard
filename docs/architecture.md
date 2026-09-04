@@ -1,3 +1,9 @@
+## Everyday balance recording
+
+CurrentAssets is separate from the single-month MetricsSource. Overview reads each account through the new accountMonth reverse index and returns at most one current balance per account. Account/date provenance travels with the amount. Its combined read stays in the overview transaction. At most two index cursor rows per account are examined: a future day in the cutoff month may require skipping to the previous month. Calendar validation ensures earlier months cannot also exceed the cutoff.
+
+Today navigation defaults observation date to local today, focuses the selected account, and preserves the existing unsaved-draft confirmation. General month navigation restores the recorded date. Balance entry comes before cash flow; the monthly summary no longer precedes the entry form. Commit-only UI updates, conflict protection, failed-draft preservation, backup boundaries and injection remain.
+
 ## Milestone 7 overview and backup
 
 PortfolioRepository and BackupRepository are separate injected contracts. IndexedDbPortfolioRepository reuses the existing DB v2 opener and indexes. Overview counts all stores first, reads at most 100 accounts and 1200 range balances plus a separate latest month of at most 100. The latest month is found with a reverse key cursor bounded by the local current month; one readonly transaction makes each overview consistent. No accumulated balance or implicit carry-forward is computed. AssetOverview loads automatically and refreshes after committed writes/imports; explicit refresh covers other tabs. Monthly selection uses a guarded navigation handle, retaining the existing unsaved-draft confirmation.

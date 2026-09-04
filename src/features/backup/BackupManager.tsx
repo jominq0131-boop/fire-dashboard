@@ -55,7 +55,7 @@ export function BackupManager({
             );
             const link = document.createElement("a");
             link.href = url;
-            link.download = "fire-dashboard-backup-v1.json";
+            link.download = "fire-dashboard-backup-v2.json";
             link.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
             setMessage(

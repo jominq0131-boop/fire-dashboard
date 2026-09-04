@@ -25,7 +25,10 @@ export function App({
   const [summary, setSummary] = useState<MetricsSource | null>(null);
   const [revision, setRevision] = useState(0);
   const [importRevision, setImportRevision] = useState(0);
-  const navigationRef = useRef<{ openMonth: (month: string) => void }>(null);
+  const navigationRef = useRef<{
+    openMonth: (month: string) => void;
+    openToday: (accountId?: string) => void;
+  }>(null);
   const refresh = useCallback(() => setRevision((n) => n + 1), []);
   const publish = useCallback((source: MetricsSource | null) => {
     setSummary(source);
@@ -100,6 +103,10 @@ export function App({
           </div>
           <div className="overview-grid">
             <AssetOverview
+              onRecordToday={(accountId) => {
+                navigationRef.current?.openToday(accountId);
+                window.location.hash = "monthly";
+              }}
               repository={portfolioRepository}
               revision={revision}
               onSelectMonth={(month) => {
@@ -108,18 +115,18 @@ export function App({
               }}
             />
             <article className="start-card">
-              <span className="step-indicator">小さく続ける、資産管理</span>
+              <span className="step-indicator">記録を忘れても、ここから再開</span>
               <h2 aria-label="金融記録を月ごとに残しましょう">
                 <span>金融記録を</span>
                 <span>月ごとに残しましょう</span>
               </h2>
               <p>
-                口座を登録して、ひと月ずつ。
+                過去の残高を思い出せなくても大丈夫。
                 <br />
-                収支と月末残高を分けて記録できます。
+                確認できる日の残高から続けられます。
               </p>
               <a className="primary-link" href="#monthly">
-                月別記録をはじめる <Icon name="arrow" />
+                今日から記録を続ける <Icon name="arrow" />
               </a>
               <span className="start-footnote">FIRE予測は今後追加予定</span>
             </article>
@@ -131,13 +138,13 @@ export function App({
         </div>
         <div className="workspace-grid">
           <div id="monthly">
-            <MonthlyOverview source={summary} />
             <MonthlyManager
               repository={monthlyRepository}
               accountsRepository={accountRepository}
               onSummary={publish}
               navigationRef={navigationRef}
             />
+            <MonthlyOverview source={summary} />
           </div>
           <div id="accounts">
             <AccountManager

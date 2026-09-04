@@ -10,7 +10,7 @@ export function MonthlyOverview({ source }: { source: MetricsSource | null }) {
   if (!source)
     return (
       <article className="asset-card">
-        <h2>金融資産</h2>
+        <h2>この月に記録した資産</h2>
         <p>月別記録で対象月を読み込むと、保存済みの金額を集計します。</p>
         <strong aria-label="金融資産: データなし">—</strong>
       </article>

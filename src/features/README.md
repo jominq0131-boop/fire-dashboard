@@ -1,3 +1,7 @@
+## Everyday flow
+
+AssetOverview displays per-account last-known amounts with provenance and today-update actions. MonthlyManager records actual confirmation dates, defaults today only in the today flow, keeps past unknown inputs empty, focuses the chosen account and renders balances before cash flows. MonthlyOverview and the chart remain explicit per-month recorded values, distinct from the cross-month current total.
+
 ## Milestone 7
 
 AssetOverview automatically loads latest assets and a bounded history window, offers accessible SVG/table and guarded month drilldown. MonthlyManager keeps drafts and per-month summary separate from overall assets. BackupManager handles bounded file selection, preview/cancel, explicit import and JSON download. Successful import refreshes accounts/overview; monthly drafts stay mounted and require an explicit reread. No user file contents are sent to a server.

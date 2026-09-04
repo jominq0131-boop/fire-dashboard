@@ -1,3 +1,4 @@
+import { localDate, monthEnd, observationStatus } from "../../domain/observations";
 import type { MetricsSource } from "../../domain/metrics";
 import { useEffect, useRef, useState, useImperativeHandle, type Ref } from "react";
 import type { AccountRepository } from "../../domain/accounts";
@@ -21,7 +22,10 @@ export function MonthlyManager({
   repository: MonthlyRepository;
   accountsRepository: AccountRepository;
   onSummary: (source: MetricsSource | null) => void;
-  navigationRef?: Ref<{ openMonth: (month: string) => void }>;
+  navigationRef?: Ref<{
+    openMonth: (month: string) => void;
+    openToday: (accountId?: string) => void;
+  }>;
 }) {
   const [month, setMonth] = useState(initialMonth);
   const [loaded, setLoaded] = useState<string | null>(null);
@@ -33,6 +37,7 @@ export function MonthlyManager({
     investmentContribution: "",
     note: "",
   });
+  const [dates, setDates] = useState<Record<string, string>>({});
   const [balances, setBalances] = useState<Record<string, string>>({});
   const [dirtyCash, setDirtyCash] = useState(false);
   const [dirtyBalances, setDirtyBalances] = useState<Set<string>>(new Set());
@@ -53,11 +58,17 @@ export function MonthlyManager({
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
   useImperativeHandle(navigationRef, () => ({
+    openToday: (accountId?: string) => {
+      void load(localDate().slice(0, 7), true).then((ok) => {
+        if (ok && accountId)
+          setTimeout(() => document.getElementById("balance-" + accountId)?.focus(), 0);
+      });
+    },
     openMonth: (next: string) => {
       void load(next);
     },
   }));
-  async function load(targetMonth = month) {
+  async function load(targetMonth = month, recordToday = false) {
     if (running.current) return;
     if (dirty && !window.confirm("未保存の入力を破棄して読み込みますか？")) return;
     running.current = true;
@@ -79,9 +90,24 @@ export function MonthlyManager({
         investmentContribution: next.cash ? String(next.cash.investmentContribution) : "",
         note: next.cash?.note ?? "",
       });
+      setDates(
+        Object.fromEntries(
+          nextAccounts.map((a) => {
+            const saved = next.balances.find((b) => b.accountId === a.id);
+            return [
+              a.id,
+              recordToday
+                ? localDate()
+                : (saved?.asOfDate ??
+                  (saved ? "" : targetMonth === localDate().slice(0, 7) ? localDate() : "")),
+            ];
+          }),
+        ),
+      );
       setBalances(Object.fromEntries(next.balances.map((b) => [b.accountId, String(b.balance)])));
       setDirtyCash(false);
       setDirtyBalances(new Set());
+      return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : "読込に失敗しました。");
     } finally {
@@ -115,6 +141,7 @@ export function MonthlyManager({
           target.accountId,
           parseYen(Object.hasOwn(balances, target.accountId) ? balances[target.accountId] : ""),
           records.balances.find((b) => b.accountId === target.accountId) ?? null,
+          dates[target.accountId] || undefined,
         );
         setRecords((previous) => ({
           ...previous,
@@ -143,7 +170,9 @@ export function MonthlyManager({
         </div>
         <span className="subtle-badge">{loaded === month ? "編集中の月" : "月を選択"}</span>
       </div>
-      <p className="storage-note">収支と残高を、ひと月ずつ。空欄は未入力、0は0円です。</p>
+      <p className="storage-note">
+        思い出せない月は空欄のままで大丈夫です。確認できた日の残高から続けましょう。0円と未記録は区別します。
+      </p>
       <div className="month-toolbar">
         <label>
           対象月
@@ -191,6 +220,76 @@ export function MonthlyManager({
       )}
       {loaded === month && (
         <>
+          <div className="balance-heading">
+            <h3>確認した残高（円）</h3>
+            <span>口座ごとに保存</span>
+          </div>
+          <p className="field-hint">
+            銀行・証券アプリで確認した日と金額を入力します。月末を忘れたときは履歴・明細を確認するか、過去は空欄のまま今日から再開できます。1口座につき月1件を保存し、同じ月の再入力は更新になります。
+          </p>
+          {accounts.length === 0 && <p>先に口座を登録してください。</p>}
+          <div className="monthly-balances">
+            {accounts.map((account) => (
+              <form
+                key={account.id}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void save({ kind: "balance", accountId: account.id });
+                }}
+              >
+                <fieldset disabled={busy}>
+                  <legend>
+                    {account.name}
+                    {!account.isActive && "（休止中）"}
+                  </legend>
+                  <label>
+                    {account.name}の残高
+                    <input
+                      id={"balance-" + account.id}
+                      placeholder="未入力"
+                      inputMode="numeric"
+                      maxLength={16}
+                      required
+                      value={Object.hasOwn(balances, account.id) ? balances[account.id] : ""}
+                      onChange={(e) => {
+                        setBalances({ ...balances, [account.id]: e.target.value });
+                        setDirtyBalances((previous) => new Set(previous).add(account.id));
+                      }}
+                    />
+                  </label>
+                  <label>
+                    {account.name}の確認日
+                    <input
+                      type="date"
+                      min={month + "-01"}
+                      max={monthEnd(month) < localDate() ? monthEnd(month) : localDate()}
+                      required={
+                        !records.balances.some((b) => b.accountId === account.id && !b.asOfDate)
+                      }
+                      value={dates[account.id] ?? ""}
+                      onChange={(e) => {
+                        setDates({ ...dates, [account.id]: e.target.value });
+                        setDirtyBalances((previous) => new Set(previous).add(account.id));
+                      }}
+                    />
+                  </label>
+                  <p className="field-hint">
+                    {observationStatus(
+                      records.balances.find((b) => b.accountId === account.id),
+                      localDate(),
+                    )}
+                  </p>
+                  <span>
+                    {records.balances.some((b) => b.accountId === account.id)
+                      ? "保存済み"
+                      : "未記録"}
+                    {dirtyBalances.has(account.id) ? "・未保存の変更" : ""}
+                  </span>
+                  <button type="submit">{account.name}の残高を保存</button>
+                </fieldset>
+              </form>
+            ))}
+          </div>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -240,53 +339,6 @@ export function MonthlyManager({
               <button type="submit">現金収支を保存</button>
             </fieldset>
           </form>
-          <div className="balance-heading">
-            <h3>月末残高（円）</h3>
-            <span>口座ごとに保存</span>
-          </div>
-          <p className="field-hint">
-            休止中の口座も編集できます。追加した口座は再読み込みで表示されます。
-          </p>
-          {accounts.length === 0 && <p>先に口座を登録してください。</p>}
-          <div className="monthly-balances">
-            {accounts.map((account) => (
-              <form
-                key={account.id}
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void save({ kind: "balance", accountId: account.id });
-                }}
-              >
-                <fieldset disabled={busy}>
-                  <legend>
-                    {account.name}
-                    {!account.isActive && "（休止中）"}
-                  </legend>
-                  <label>
-                    {account.name}の月末残高
-                    <input
-                      placeholder="未入力"
-                      inputMode="numeric"
-                      maxLength={16}
-                      required
-                      value={Object.hasOwn(balances, account.id) ? balances[account.id] : ""}
-                      onChange={(e) => {
-                        setBalances({ ...balances, [account.id]: e.target.value });
-                        setDirtyBalances((previous) => new Set(previous).add(account.id));
-                      }}
-                    />
-                  </label>
-                  <span>
-                    {records.balances.some((b) => b.accountId === account.id)
-                      ? "保存済み"
-                      : "未記録"}
-                    {dirtyBalances.has(account.id) ? "・未保存の変更" : ""}
-                  </span>
-                  <button type="submit">{account.name}の残高を保存</button>
-                </fieldset>
-              </form>
-            ))}
-          </div>
         </>
       )}
     </section>
