@@ -35,3 +35,11 @@ CI와 Pages는 현재 main push에서 독립 실행되므로 Pages가 CI 성공�
 ## Milestone 4 release verification — 2026-09-04
 
 PR #10 병합 뒤 README 충돌을 해결한 #12 최종 head의 CI와, squash merge 결과 `817ad45`의 main CI/Pages 배포가 모두 성공했다. 단위 23개와 Chromium 13개 검증을 유지했다. 실제 Pages HTML 및 앱 파일 HTTP 200, 배포 앱 파일 SHA-256과 검증 빌드의 일치를 확인했다. 실행 근거는 `docs/work-log.md`에 연결했다. 공개 사이트에서 실제 계좌를 생성하거나 사용자의 IndexedDB를 변경하지 않았다. 프로덕션 브라우저 종합 E2E나 모바일/접근성 검증 완료로 확대 해석하지 않는다.
+
+## Milestone 5 local verification — 2026-09-04
+
+단위 66개와 Chromium 22개(최종 11.4초)가 통과했다. 기존 계좌 테스트의 현재 DB 버전은 2, 미래 버전은 3으로 이동했고 v1 초기 마이그레이션 검증은 명시적 대상 버전으로 유지했다. 신규 테스트는 날짜/엔/길이/총량 경계, 결정론적 v2, 실제 v1 계좌 보존과 업그레이드 실패 롤백, 동시 중복 등록/오래된 수정 거부, 없는 계좌/휴지 계좌, commit 전 abort, 손상 레코드 보존, 인덱스 제한 조회, UI 재열기/실패 입력 보존/월 전환 경고를 다룬다. 100계좌/100잔액 실제 UI 경계와 가짜 전역 count를 결합해 상한에서 편집 가능·추가 거부를 검증한다.
+
+기본 브라우저 경로 실행은 설치 바이너리가 없어 시작에 실패했다. 기존 files-pasted-by-the-user-fire/.playwright-browsers를 PLAYWRIGHT_BROWSERS_PATH로 명령 프로세스에만 지정해 재사용했다. 샌드박스 실행은 종료 지연으로 중단해 통과로 계산하지 않았다. 같은 격리 테스트를 승인된 샌드박스 밖 실행에서 정상 종료/exit 0으로 확인했다. 새 브라우저 설치·사용자 프로필·전역 환경변수 변경은 없다. 테스트 서버는 전용 4180 포트에서 Playwright가 소유한다.
+
+최종 format/lint/typecheck/build와 git diff --check도 통과했다. 월별 저장 화면은 데스크톱 및 390px 모바일 스크린샷으로 확인했고 모바일 가로 넘침이 없음을 테스트했다. 전체 제품의 접근성/다중 브라우저 인증을 의미하지 않는다.

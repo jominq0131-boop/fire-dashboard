@@ -19,7 +19,7 @@ export function isMonthKey(value: unknown): value is MonthKey {
     return false;
   }
 
-  const match = /^(\d{4,})-(0[1-9]|1[0-2])$/.exec(value);
+  const match = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(value);
   return match !== null && Number(match[1]) > 0;
 }
 
@@ -28,5 +28,10 @@ export function isAccountCategory(value: unknown): value is AccountCategory {
 }
 
 export function isIsoDateTime(value: unknown): value is string {
-  return typeof value === "string" && !Number.isNaN(Date.parse(value));
+  return (
+    typeof value === "string" &&
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value) &&
+    Number.isFinite(Date.parse(value)) &&
+    new Date(value).toISOString() === value
+  );
 }

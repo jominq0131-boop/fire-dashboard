@@ -2,7 +2,7 @@
 
 ## Safety prerequisite — Issue #15
 
-`fix/bounded-account-storage`에서 Milestone 5 이전 안전 보강을 로컬 검증했다. 단위 31개/Chromium 16개, typecheck/lint/build 통과. 병합·배포 완료를 의미하지 않으며 [Issue #15](https://github.com/jominq0131-boop/fire-dashboard/issues/15)의 연결 PR과 최신 Actions를 확인한다. 월별 입력은 아직 미구현이다.
+`fix/bounded-account-storage`에서 Milestone 5 이전 안전 보강을 로컬 검증했다. 당시 단위 31개/Chromium 16개, typecheck/lint/build 통과. 이후 PR #16 CI 성공을 확인했다. 병합·배포 완료를 의미하지 않으며 [Issue #15](https://github.com/jominq0131-boop/fire-dashboard/issues/15)의 연결 PR과 최신 Actions를 확인한다. 월별 입력은 승인 후 feat/monthly-records에서 구현했다.
 
 실제 체크아웃은 `C:\Users\MINGYU\Documents\Codex\2026-09-04\fire-dashboard-next`이다. 이전 사본 `files-pasted-by-the-user-fire`와 혼동하지 않는다. 새 대화에서는 AGENTS.md와 이 문서, resource-safety.md를 읽고 경로·remote·branch·dirty 상태·쓰기 권한을 확인한다. 권한 밖 쓰기는 승인 절차를 따른다. 사용자 Chrome 프로필이나 실제 데이터는 조사/정리 대상으로 삼지 않는다.
 
@@ -30,7 +30,7 @@
 | CI repair | LF 줄바꿈 정책과 CI 포맷 안정화                                                            | [PR #4](https://github.com/jominq0131-boop/fire-dashboard/pull/4) |
 | 3         | 데이터 없는 반응형 대시보드 빈 상태                                                        | [PR #6](https://github.com/jominq0131-boop/fire-dashboard/pull/6) |
 
-현재 구현은 계좌 등록·수정·비활성화·재활성화와 IndexedDB 저장/복원을 제공한다. 금융 지표는 여전히 빈 상태이며 월별 기록, JSON import/export, FIRE 계산은 아직 구현되지 않았다. 전체 MVP나 장기 실사용 준비 완료가 아니다.
+현재 작업 브랜치는 계좌 관리와 월별 현금흐름·계좌별 월말 잔액 입력/수정, IndexedDB v2 저장/복원을 제공한다. main은 아직 계좌 관리 단계이며 금융 지표, JSON import/export, FIRE 계산은 미구현이다. 전체 MVP나 장기 실사용 준비 완료가 아니다.
 
 ### Milestone 4 — main 병합·배포 완료
 
@@ -103,9 +103,11 @@
 
 ## Next recommended milestone
 
-**다음은 Milestone 5: 월별 현금흐름과 계좌별 월말 잔액 입력**이다.
+2026-09-04 사용자가 월별 설계를 승인했다. PR #16의 CI 실행 33859153564 성공을 확인했으나 병합하지 않았다. 선행 변경을 유지하기 위해 `92f09af`에서 `feat/monthly-records`를 분기했고 Issue #17에서 도메인→저장소→UI 순으로 구현했다. PR은 #16 브랜치에 의존하는 후속 PR로 만들며, #16 병합 후 main 기준으로 전환·검증한다. [승인된 설계](milestone-5-plan.md), DB v2, 상한/참조/충돌/보존 테스트를 추가했다. 로컬 단위 66개와 Chromium 22개 통과(최종 11.4초), format/lint/typecheck/build 통과. main 병합·배포는 미완료다.
 
-Milestone 5는 기존 월별 현금흐름·잔액 모델에 맞춘 입력/수정, 월 키·정수 엔 검증, 계좌와 월의 중복/참조 정책, 저장소 마이그레이션과 보존 테스트를 작은 issue로 나눈다. 스키마를 확장하기 전에 설계·승인을 확인한다. FIRE 예측·자동 동기화는 포함하지 않는다. 백업이 없으므로 실제 장기 기록용 사용은 아직 권장하지 않는다.
+**다음은 Milestone 5 구현 PR 검토와 선행 PR #16 통합**이다.
+
+Milestone 5는 승인된 설계에 따라 입력/수정, 월 키·정수 엔 검증, 계좌와 월의 중복/참조 정책, 저장소 마이그레이션과 보존 테스트를 Issue #17에서 구현했다. 후속 스키마 확장에도 설계·승인 규칙을 적용한다. FIRE 예측·자동 동기화는 포함하지 않는다. 백업이 없으므로 실제 장기 기록용 사용은 아직 권장하지 않는다.
 
 ## New-session checklist
 
