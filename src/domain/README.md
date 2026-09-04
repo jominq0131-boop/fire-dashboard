@@ -7,4 +7,3 @@ Financial concepts, calculations, validation, and schema migrations belong here.
 - Every data-schema change must include a deterministic migration and tests.
 
 No financial model has been implemented in Milestone 1.
-

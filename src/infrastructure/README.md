@@ -7,4 +7,3 @@ Storage and external-service adapters belong here.
 - JSON is a versioned import/export and backup format, not the primary store.
 
 No persistence adapter has been implemented in Milestone 1.
-

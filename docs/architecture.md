@@ -18,4 +18,3 @@ src/infrastructure  persistence and external-service adapters
 ## Privacy
 
 GitHub 저장소와 GitHub Pages에는 실제 개인 금융 데이터를 두지 않는다. `.gitignore`는 일반적인 개인 백업·로컬 데이터 경로를 제외하지만, 커밋 전 점검 책임을 대체하지는 않는다.
-

@@ -7,4 +7,3 @@
 - GitHub Actions: lint, formatting, typecheck, unit test, production build 실행
 
 의미 없는 커버리지 목표는 두지 않는다. 금융 계산이나 데이터 보존 관련 버그는 재현 테스트를 추가한 뒤 수정한다.
-
