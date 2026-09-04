@@ -129,7 +129,7 @@ export function AccountManager({
       <details className="storage-details">
         <summary>保存と口座について</summary>
         <p>
-          このブラウザーにのみ保存されます。同期・バックアップはまだありません。口座番号は入力しないでください。口座は休止中を含め
+          このブラウザーにのみ保存されます。自動同期はありません。バックアップ画面でJSONを保存できます。口座番号は入力しないでください。口座は休止中を含め
           {MAX_ACCOUNTS}件まで。上限でも既存の口座は編集でき、自動削除はしません。
         </p>
       </details>

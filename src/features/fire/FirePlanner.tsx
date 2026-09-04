@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { ScenarioComparison } from "./ScenarioComparison";
+import { arrivalText } from "./fire-format";
 import { parseRate, projectFire, type FireProjection } from "../../domain/fire";
 import { parseYen } from "../../domain/monthly";
 import { currentTotal, localDate } from "../../domain/observations";
@@ -115,15 +117,7 @@ export function FirePlanner({ repository }: { repository: PortfolioRepository })
       {error && <p role="alert">{error}</p>}
       {result && (
         <div role="status">
-          <h3>
-            {result.reachedMonth === 0
-              ? "開始時点で目標に到達"
-              : result.reachedMonth !== null
-                ? `最初の目標到達：${Math.floor(result.reachedMonth / 12)}年${result.reachedMonth % 12}か月後`
-                : result.overflowMonth !== null
-                  ? "計算上限のため到達時期を判定できません"
-                  : "この仮定では100年以内に目標に届きません"}
-          </h3>
+          <h3>{arrivalText(result)}</h3>
           <p>
             開始資産 {yen(result.points[0].assets)} ／ 目標 {yen(result.points[0].target)}
           </p>
@@ -134,7 +128,12 @@ export function FirePlanner({ repository }: { repository: PortfolioRepository })
           )}
           <details>
             <summary>年ごとの資産と目標を見る</summary>
-            <div className="history-table">
+            <div
+              className="history-table"
+              role="region"
+              aria-label="年別試算表・横にスクロールできます"
+              tabIndex={0}
+            >
               <table>
                 <caption>積立期間の試算（将来の額面）</caption>
                 <thead>
@@ -158,6 +157,7 @@ export function FirePlanner({ repository }: { repository: PortfolioRepository })
           </details>
         </div>
       )}
+      <ScenarioComparison values={values} result={result} />
       <details>
         <summary>計算方法と結果の読み方</summary>
         <p>

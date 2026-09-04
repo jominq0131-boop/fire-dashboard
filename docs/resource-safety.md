@@ -1,3 +1,7 @@
+## Milestone 9 — comparison cap
+
+Comparison UI retains at most3 existing projection results of at most101 points each and five bounded strings per item. It performs no new history scan, database write or automatic simulation. Tables use local horizontal scrolling instead of forcing the page wider. Tests use synthetic maximum values and existing browser binaries with one worker.
+
 ## Current-account lookup in v3
 
 Overview retains account100/range1200/latest-month100 limits and adds at most100 current balances via per-account reverse accountMonth cursor. It visits no more than2 rows per account, with no full-history scan. JSON remains32 MiB and existing record caps. IndexedDB builds the new index during transactional upgrade; this can require time/storage proportional to existing records and is not claimed to have zero resource cost. No record deletion/repair/guessing is performed.

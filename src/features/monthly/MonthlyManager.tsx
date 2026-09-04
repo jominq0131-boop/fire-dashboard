@@ -243,8 +243,9 @@ export function MonthlyManager({
                     {!account.isActive && "（休止中）"}
                   </legend>
                   <label>
-                    {account.name}の残高
+                    残高
                     <input
+                      aria-label={`${account.name}の残高`}
                       id={"balance-" + account.id}
                       placeholder="未入力"
                       inputMode="numeric"
@@ -258,8 +259,9 @@ export function MonthlyManager({
                     />
                   </label>
                   <label>
-                    {account.name}の確認日
+                    確認日
                     <input
+                      aria-label={`${account.name}の確認日`}
                       type="date"
                       min={month + "-01"}
                       max={monthEnd(month) < localDate() ? monthEnd(month) : localDate()}
@@ -285,7 +287,9 @@ export function MonthlyManager({
                       : "未記録"}
                     {dirtyBalances.has(account.id) ? "・未保存の変更" : ""}
                   </span>
-                  <button type="submit">{account.name}の残高を保存</button>
+                  <button type="submit" aria-label={`${account.name}の残高を保存`}>
+                    残高を保存
+                  </button>
                 </fieldset>
               </form>
             ))}

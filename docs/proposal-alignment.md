@@ -70,3 +70,7 @@ Zod는 최초 권장 스택이지만 현재 계좌 범위는 작은 순수 검�
 6. lockfile과 `npm ci`가 설치 버전을 고정하지만 package.json은 `latest` 범위다. 의존성 갱신은 명시적 변경과 검증을 거쳐야 하며 이번에는 버전을 바꾸지 않는다. 릴리스 태그도 아직 없다.
 
 이번 점검은 문서·출시 상태 확인이며 금융 계산, 날짜 규칙, 의존성, 워크플로를 변경하지 않는다.
+
+## Milestone 9 update
+
+Documented scenario-comparison follow-up and user-requested data-dependent layout stabilization are implemented together. Maximum3 temporary comparisons, tested extreme content and responsive alignment improve practical usability. This is not permanent FIRE settings, drawdown modeling, full accessibility certification or completion of the entire MVP.

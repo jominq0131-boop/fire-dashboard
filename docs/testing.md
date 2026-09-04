@@ -1,3 +1,7 @@
+## Milestone 9 — extreme-content verification
+
+comparison-layout.spec.ts covers stable snapshots, three-item cap, removal, differing arrival periods, unreachable/overflow states, clear versus comparison retention, reload and long synthetic read errors. It seeds100-character names, maximum safe-integer yen, zero and missing accounts. Tests compare empty/filled card widths, action x/width alignment, input/button containment, total and table-cell clipping, and document overflow at320/390/768/1024/1440px. Screenshots use synthetic data in ignored test-results. Existing financial/storage tests remain. Actual results are in work-log and the linked PR.
+
 ## Milestone 8 — FIRE verification
 
 Unit tests cover exact zero-rate arrival, already reached, no arrival, 1200-month boundary, monthly rounding and contribution order, inflation, first-crossing semantics, invalid money/rates and overflow. Browser tests cover explicit last-known asset loading, no mutation of source amounts, missing data, invalidation on edits, validation errors, reset, session-only values and 390px overflow. Existing financial/storage/migration tests remain. Actual execution results are recorded in work-log and Issue #27 PR.

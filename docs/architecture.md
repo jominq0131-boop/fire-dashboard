@@ -1,3 +1,7 @@
+## Milestone 9 — comparison and layout
+
+ScenarioComparison holds at most three immutable assumption/result snapshots from the existing calculation. Parent edits invalidate only the current result; removal affects only a comparison item. No automatic recalculation or storage writes. A shared UI formatter keeps arrival/overflow labels consistent. CSS defines shrinkable tracks, separate account/name/action areas, tabular numeric text, fixed table columns with local keyboard-accessible scrolling, and bounded responsive control dimensions. Text may wrap vertically; values are not truncated or silently hidden to fit a fixed height.
+
 ## Milestone 8 — scenario boundary
 
 FirePlanner receives PortfolioRepository and reads only on explicit user action, reusing bounded overview queries. It writes no data. React state holds assumptions and results; no localStorage or new persistence adapter is used. Edits clear the previous result; a failed read preserves input and shows the error. domain/fire.ts is a pure bounded projection with BigInt monthly arithmetic. No new dependency, service, or storage architecture change.

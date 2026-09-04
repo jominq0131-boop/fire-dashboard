@@ -123,8 +123,12 @@ export function AssetOverview({
                         </strong>
                         <span>{yen(b?.balance ?? null)}</span>
                         <small>{observationStatus(b, localDate())}</small>
-                        <button type="button" onClick={() => onRecordToday(a.id)}>
-                          {a.name}を更新
+                        <button
+                          type="button"
+                          aria-label={`${a.name}を更新`}
+                          onClick={() => onRecordToday(a.id)}
+                        >
+                          更新
                         </button>
                       </div>
                     );
@@ -219,7 +223,12 @@ export function AssetOverview({
                 {rows.at(-1)?.source.month}
               </text>
             </svg>
-            <div className="history-table">
+            <div
+              className="history-table"
+              role="region"
+              aria-label="月別記録表・横にスクロールできます"
+              tabIndex={0}
+            >
               <table>
                 <caption>月別の記録額と比較</caption>
                 <thead>
