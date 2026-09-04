@@ -1,3 +1,7 @@
+## Milestone 7
+
+AssetOverview automatically loads latest assets and a bounded history window, offers accessible SVG/table and guarded month drilldown. MonthlyManager keeps drafts and per-month summary separate from overall assets. BackupManager handles bounded file selection, preview/cancel, explicit import and JSON download. Successful import refreshes accounts/overview; monthly drafts stay mounted and require an explicit reread. No user file contents are sent to a server.
+
 ## Milestone 6
 
 MonthlyOverview presents committed monthly metrics and coverage. MonthlyManager publishes the loaded snapshot to App without exposing unsaved drafts. A failed reread clears the summary; failed saves preserve committed values. Existing repository contracts, bounded queries and draft protections remain.

@@ -1,3 +1,7 @@
+## Milestone 7
+
+portfolio.ts defines calendar windows, overview contract and comparable-month changes. backup.ts defines JSON v1, deterministic normalization, strict bounds/reference validation and additive conflict-safe merge. Derived metrics and backup format do not change persisted v2 records.
+
 ## Milestone 6
 
 metrics.ts provides pure bounded monthly aggregation, reference/month validation, missing-value semantics and exact integer intermediate arithmetic with explicit overflow results. No persisted model or migration changes.

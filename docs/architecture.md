@@ -1,3 +1,9 @@
+## Milestone 7 overview and backup
+
+PortfolioRepository and BackupRepository are separate injected contracts. IndexedDbPortfolioRepository reuses the existing DB v2 opener and indexes. Overview counts all stores first, reads at most 100 accounts and 1200 range balances plus a separate latest month of at most 100. The latest month is found with a reverse key cursor bounded by the local current month; one readonly transaction makes each overview consistent. No accumulated balance or implicit carry-forward is computed. AssetOverview loads automatically and refreshes after committed writes/imports; explicit refresh covers other tabs. Monthly selection uses a guarded navigation handle, retaining the existing unsaved-draft confirmation.
+
+Backup snapshots cursor through the three stores in one transaction with record and UTF-8 byte caps. Import validates before opening a write transaction, reads current records within that transaction, checks conflicts/caps, and adds only missing records. All stores commit or abort together. No clear/delete/put, network upload, new DB version or external dependency is introduced. Export is coherent and import does not overwrite concurrent writes. See milestone-7-plan.md for limits and semantics.
+
 ## Milestone 6 derived dashboard
 
 MonthlyManager publishes only its loaded month, bounded account list and committed monthly records through an injected callback. App passes that snapshot to MonthlyOverview; no additional history queries, storage writes or adapter dependencies are introduced. Month changes and failed reads invalidate the summary; failed writes retain the last committed values. Account changes and other tabs require explicit rereading, as stated in the UI. metrics.ts computes derived values without persistence.

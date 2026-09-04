@@ -1,5 +1,5 @@
 import type { MetricsSource } from "../../domain/metrics";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useImperativeHandle, type Ref } from "react";
 import type { AccountRepository } from "../../domain/accounts";
 import type { AssetAccount } from "../../domain/models";
 import {
@@ -16,10 +16,12 @@ export function MonthlyManager({
   repository,
   accountsRepository,
   onSummary,
+  navigationRef,
 }: {
   repository: MonthlyRepository;
   accountsRepository: AccountRepository;
   onSummary: (source: MetricsSource | null) => void;
+  navigationRef?: Ref<{ openMonth: (month: string) => void }>;
 }) {
   const [month, setMonth] = useState(initialMonth);
   const [loaded, setLoaded] = useState<string | null>(null);
@@ -50,7 +52,12 @@ export function MonthlyManager({
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
-  async function load() {
+  useImperativeHandle(navigationRef, () => ({
+    openMonth: (next: string) => {
+      void load(next);
+    },
+  }));
+  async function load(targetMonth = month) {
     if (running.current) return;
     if (dirty && !window.confirm("未保存の入力を破棄して読み込みますか？")) return;
     running.current = true;
@@ -59,12 +66,13 @@ export function MonthlyManager({
     setMessage("");
     try {
       setLoaded(null);
-      assertMonth(month);
+      assertMonth(targetMonth);
+      setMonth(targetMonth);
       const nextAccounts = await accountsRepository.list();
-      const next = await repository.readMonth(month);
+      const next = await repository.readMonth(targetMonth);
       setAccounts(nextAccounts);
       setRecords(next);
-      setLoaded(month);
+      setLoaded(targetMonth);
       setCash({
         income: next.cash ? String(next.cash.income) : "",
         expenses: next.cash ? String(next.cash.expenses) : "",

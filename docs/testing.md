@@ -1,3 +1,7 @@
+## Milestone 7 verification scope
+
+Unit tests add JSON canonical round-trip, inactive/zero/note preservation, invalid versions/fields/references/duplicates/amounts/dates, UTF-8/size bounds, idempotent merges/conflicts, calendar/year boundaries and monthly increases/decreases/missing/zero-base/overflow. Chromium tests add automatic latest assets, future exclusion, partial coverage, bounded12-month reads, drilldown/draft protection, export download→empty-context restore, preview/cancel, duplicate imports, conflict rejection, failed-write rollback, concurrent import and oversized-store preservation. Existing suites remain. Actual results and final release evidence are in work-log.md and Issue #23 PR.
+
 ## Milestone 6 coverage
 
 metrics.test.ts covers separate investment allocation, negative cash, inactive and partial balances, missing versus zero, exact safe-integer boundaries/overflow, invalid months/references/duplicates and source preservation. metrics.spec.ts covers committed-only updates, failed-write draft preservation, month switching, reload, failed reread invalidation and mobile overflow. Existing suites remain; see work-log.md for actual execution results.

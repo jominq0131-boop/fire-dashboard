@@ -19,7 +19,15 @@ const errorMessage = (error: unknown) =>
     ? error.message
     : "保存処理を完了できませんでした。入力内容を控えて、再読み込みしてください。";
 
-export function AccountManager({ repository }: { repository: AccountRepository }) {
+export function AccountManager({
+  repository,
+  onChanged,
+  revision = 0,
+}: {
+  repository: AccountRepository;
+  onChanged?: () => void;
+  revision?: number;
+}) {
   const [accounts, setAccounts] = useState<AssetAccount[]>([]);
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -47,7 +55,7 @@ export function AccountManager({ repository }: { repository: AccountRepository }
     return () => {
       cancelled = true;
     };
-  }, [repository]);
+  }, [repository, revision]);
 
   function resetForm() {
     setEditing(null);
@@ -70,6 +78,7 @@ export function AccountManager({ repository }: { repository: AccountRepository }
       setAccounts((items) =>
         editing ? items.map((item) => (item.id === saved.id ? saved : item)) : [...items, saved],
       );
+      onChanged?.();
       resetForm();
       setNotice("口座をこの端末に保存しました。");
     } catch (failure) {
@@ -89,6 +98,7 @@ export function AccountManager({ repository }: { repository: AccountRepository }
     try {
       const saved = await repository.update(account, { ...account, isActive: !account.isActive });
       setAccounts((items) => items.map((item) => (item.id === saved.id ? saved : item)));
+      onChanged?.();
       setNotice(
         saved.isActive ? "口座を再開しました。" : "口座を休止しました。データは保持されています。",
       );

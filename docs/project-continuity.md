@@ -1,3 +1,9 @@
+## Current work — Milestone 7 / Issue #23 / 2026-09-04
+
+사용자가 전체 자산 우선 → 월별 그래프/상세 보강과 다음 마일스톤까지 구현·배포를 요청했다. 시작 main은 1edd378(PR #22)이며 로컬 clean, 최신 원격 일치와 열린 issue/PR 부재를 확인했다. Milestone 6 main CI 33867721976 및 Pages 33867722049 성공과 실제 JS/CSS 일치는 PR #22 릴리스 댓글에 기록되어 있다. 아래 과거 상태는 당시 이력이다.
+
+feat/asset-history-backup에서 전체 자산 자동 읽기, 12개월 추이/상세 이동, JSON v1 백업과 원자적 추가 복원을 구현한다. [Milestone 7 계약](milestone-7-plan.md)을 따른다. DB v2와 기존 저장 필드는 유지하며 새 의존성/외부 서비스/동기화는 없다. 구현·검증·배포 상태는 work-log.md와 Issue #23 연결 PR을 확인한다. 복원은 덮어쓰기가 아니며 충돌한 파일의 전체 복원에는 빈 브라우저를 사용한다. 다음 권장 기능은 명시적 가정값을 사용하는 FIRE 설정/예측 설계다. 밝기/UI 전체 검토는 기능 완성 후 진행한다.
+
 ## Current milestone — 2026-09-04 / Issue #21
 
 실제 main은 95eddb4이며 Milestone 5(PR #18)와 UI 변경(PR #20)이 병합됐다. PR #20 main CI 33865786104와 Pages 33865786122 성공을 이번 작업에서 확인했다. 열린 issue/PR은 없었다. 다음 로드맵의 대시보드 지표를 Milestone 6으로 구현하며 사용자가 구현부터 배포까지 요청했다. feat/monthly-dashboard-metrics의 구현/검증/배포 결과는 work-log.md와 Issue #21 연결 PR에 기록한다. 아래의 오래된 미구현/별도 결정 문구는 당시 기록이다.

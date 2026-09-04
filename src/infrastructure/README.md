@@ -1,3 +1,7 @@
+## Milestone 7
+
+IndexedDbPortfolioRepository implements coherent bounded overview reads plus explicit JSON snapshots/import against existing v2 stores/indexes. Count checks precede materialization, export uses size-checked cursors, and import merges within one readwrite transaction with add-only writes. Request/validation/quota failures abort all changes and close the connection; success resolves only after commit.
+
 # Infrastructure boundary
 
 List/create count before a bounded getAll in the same transaction. Oversized stores are rejected without materializing all records. Concurrent creates enforce the 100-account limit. Updates persist explicit schema fields; see docs/resource-safety.md.
