@@ -1,5 +1,7 @@
 # Infrastructure boundary
 
+List/create count before a bounded getAll in the same transaction. Oversized stores are rejected without materializing all records. Concurrent creates enforce the 100-account limit. Updates persist explicit schema fields; see docs/resource-safety.md.
+
 Storage and external-service adapters belong here.
 
 - UI and domain code must not call IndexedDB or future cloud APIs directly.

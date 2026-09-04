@@ -1,5 +1,11 @@
 # Testing strategy
 
+## Resource-safety coverage — Issue #15
+
+Vitest maxWorkers와 Playwright workers는 각각 1이다. 기존 검증과 Actions 설치·감사·배포 절차는 유지한다. 단위 테스트는 count 경계/잘못된 값, 이름/ID 길이, 추가 필드를 검증한다. Chromium은 99건에서 동시 생성 2건 중 1건 성공, 100건 조회/상한 편집, 기존 101건 getAll 없이 거부·보존, 20회 반복 수정 후 100건/5필드 유지, Web Storage 쓰기 없는 동작을 검증한다.
+
+로컬 typecheck/lint/단위 31개/build/Chromium 16개 통과(E2E 8.7초). 작은 합성 데이터·격리 컨텍스트와 기존 설치 브라우저만 사용했다. 사용자 프로필·새 설치·전역 설정 변경은 없다. 전용 서버는 Playwright가 시작/종료한다. 이는 구조적 상한/보존 테스트이며 Chrome 전체 RAM 측정이나 누수 부재 증명이 아니다.
+
 금액 계산, 데이터 검증, 마이그레이션, import/export를 최우선으로 테스트한다.
 
 - Vitest: 도메인 단위 테스트 및 통합 수준 검증

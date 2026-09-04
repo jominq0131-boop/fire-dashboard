@@ -1,5 +1,11 @@
 # Project continuity guide
 
+## Safety prerequisite — Issue #15
+
+`fix/bounded-account-storage`에서 Milestone 5 이전 안전 보강을 로컬 검증했다. 단위 31개/Chromium 16개, typecheck/lint/build 통과. 병합·배포 완료를 의미하지 않으며 [Issue #15](https://github.com/jominq0131-boop/fire-dashboard/issues/15)의 연결 PR과 최신 Actions를 확인한다. 월별 입력은 아직 미구현이다.
+
+실제 체크아웃은 `C:\Users\MINGYU\Documents\Codex\2026-09-04\fire-dashboard-next`이다. 이전 사본 `files-pasted-by-the-user-fire`와 혼동하지 않는다. 새 대화에서는 AGENTS.md와 이 문서, resource-safety.md를 읽고 경로·remote·branch·dirty 상태·쓰기 권한을 확인한다. 권한 밖 쓰기는 승인 절차를 따른다. 사용자 Chrome 프로필이나 실제 데이터는 조사/정리 대상으로 삼지 않는다.
+
 이 문서는 새 Codex 대화에서 이 프로젝트를 이어갈 때 가장 먼저 읽는 운영 문서다. 세부 규칙의 원본은 루트의 `AGENTS.md`이며, 아키텍처와 데이터 모델의 상세 내용은 아래 문서를 따른다.
 
 - `docs/architecture.md`

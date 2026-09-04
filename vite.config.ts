@@ -7,6 +7,7 @@ export default defineConfig({
   base: process.env.GITHUB_ACTIONS && repositoryName ? `/${repositoryName}/` : "/",
   plugins: [react()],
   test: {
+    maxWorkers: 1,
     environment: "jsdom",
     include: ["tests/unit/**/*.test.ts"],
   },
