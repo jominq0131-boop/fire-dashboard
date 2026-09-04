@@ -3,6 +3,8 @@ import type { MonthlyRepository } from "../domain/monthly";
 import { MonthlyManager } from "../features/monthly/MonthlyManager";
 import type { AccountRepository } from "../domain/accounts";
 import { AccountManager } from "../features/accounts/AccountManager";
+import type { MetricsSource } from "../domain/metrics";
+import { MonthlyOverview } from "../features/monthly/MonthlyOverview";
 import { Icon } from "./Icon";
 
 export function App({
@@ -12,6 +14,7 @@ export function App({
   accountRepository: AccountRepository;
   monthlyRepository: MonthlyRepository;
 }) {
+  const [summary, setSummary] = useState<MetricsSource | null>(null);
   const [active, setActive] = useState(() => window.location.hash || "#overview");
   useEffect(() => {
     const update = () => setActive(window.location.hash || "#overview");
@@ -76,29 +79,7 @@ export function App({
             </a>
           </div>
           <div className="overview-grid">
-            <article className="asset-card">
-              <div className="asset-caption">
-                <span className="icon-tile">
-                  <Icon name="wallet" />
-                </span>
-                <span>金融資産</span>
-                <span className="subtle-badge">集計準備中</span>
-              </div>
-              <div className="asset-value">
-                <strong aria-label="金融資産: データなし">—</strong>
-                <span>円</span>
-              </div>
-              <p>月末の残高は「月別記録」で確認できます。</p>
-              <div className="asset-footer">
-                <span>
-                  <Icon name="lock" />
-                  このブラウザーだけに保存
-                </span>
-                <a href="#storage-info" className="text-link">
-                  保存について <Icon name="arrow" />
-                </a>
-              </div>
-            </article>
+            <MonthlyOverview source={summary} />
             <article className="start-card">
               <span className="step-indicator">小さく続ける、資産管理</span>
               <h2 aria-label="金融記録を月ごとに残しましょう">
@@ -113,7 +94,7 @@ export function App({
               <a className="primary-link" href="#monthly">
                 月別記録をはじめる <Icon name="arrow" />
               </a>
-              <span className="start-footnote">集計・チャート・FIRE予測は今後追加予定</span>
+              <span className="start-footnote">チャート・FIRE予測は今後追加予定</span>
             </article>
           </div>
         </section>
@@ -123,7 +104,11 @@ export function App({
         </div>
         <div className="workspace-grid">
           <div id="monthly">
-            <MonthlyManager repository={monthlyRepository} accountsRepository={accountRepository} />
+            <MonthlyManager
+              repository={monthlyRepository}
+              accountsRepository={accountRepository}
+              onSummary={setSummary}
+            />
           </div>
           <div id="accounts">
             <AccountManager repository={accountRepository} />

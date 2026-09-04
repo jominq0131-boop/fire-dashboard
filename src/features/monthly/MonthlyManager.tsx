@@ -1,3 +1,4 @@
+import type { MetricsSource } from "../../domain/metrics";
 import { useEffect, useRef, useState } from "react";
 import type { AccountRepository } from "../../domain/accounts";
 import type { AssetAccount } from "../../domain/models";
@@ -14,9 +15,11 @@ const initialMonth = () => {
 export function MonthlyManager({
   repository,
   accountsRepository,
+  onSummary,
 }: {
   repository: MonthlyRepository;
   accountsRepository: AccountRepository;
+  onSummary: (source: MetricsSource | null) => void;
 }) {
   const [month, setMonth] = useState(initialMonth);
   const [loaded, setLoaded] = useState<string | null>(null);
@@ -35,6 +38,9 @@ export function MonthlyManager({
     [error, setError] = useState(""),
     [message, setMessage] = useState("");
   const running = useRef(false);
+  useEffect(() => {
+    onSummary(loaded === month ? { month, accounts, records } : null);
+  }, [loaded, month, accounts, records, onSummary]);
   const dirty = dirtyCash || dirtyBalances.size > 0;
   useEffect(() => {
     if (!dirty) return;
@@ -52,6 +58,7 @@ export function MonthlyManager({
     setError("");
     setMessage("");
     try {
+      setLoaded(null);
       assertMonth(month);
       const nextAccounts = await accountsRepository.list();
       const next = await repository.readMonth(month);

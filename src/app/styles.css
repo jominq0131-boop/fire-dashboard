@@ -1189,3 +1189,28 @@ form .account-actions {
 .start-card h2 span {
   display: block;
 }
+
+.metrics-list {
+  margin: 24px 0;
+}
+.metrics-list > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 0;
+  border-bottom: 1px solid #e5e8ed;
+}
+.metrics-list dd {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.asset-value strong {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.asset-card > .field-hint {
+  margin: 12px 0;
+}

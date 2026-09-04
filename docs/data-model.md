@@ -1,3 +1,7 @@
+## Milestone 6 calculation contract (no schema change)
+
+IndexedDB remains v2 with unchanged fields, indexes and migrations. Metrics are derived, never stored. Financial assets sum only recorded month-end balances, including inactive accounts; absent balances are unknown, not zero. Input coverage uses the account list at read time and is not a historical completeness claim. Assets are not net worth because liabilities are not modeled. Income minus consumption expenses is surplus; subtract investment contribution separately for remaining cash. These values are not portfolio returns or balance deltas. Missing cash yields missing metrics. BigInt intermediates preserve exact arithmetic; results outside signed safe-integer yen range display calculation overflow independently, without changing source records. Month mismatches, duplicate balances and invalid references are rejected.
+
 # Data model principles
 
 ## 계좌 자원 정책 — Issue #15

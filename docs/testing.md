@@ -1,3 +1,7 @@
+## Milestone 6 coverage
+
+metrics.test.ts covers separate investment allocation, negative cash, inactive and partial balances, missing versus zero, exact safe-integer boundaries/overflow, invalid months/references/duplicates and source preservation. metrics.spec.ts covers committed-only updates, failed-write draft preservation, month switching, reload, failed reread invalidation and mobile overflow. Existing suites remain; see work-log.md for actual execution results.
+
 # Testing strategy
 
 ## Resource-safety coverage — Issue #15
