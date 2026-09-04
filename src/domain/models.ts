@@ -60,4 +60,3 @@ export interface FireSettings {
   monthlyContributionAssumption: NonNegativeYen;
   withdrawalRate?: number;
 }
-

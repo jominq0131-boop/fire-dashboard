@@ -55,4 +55,3 @@ describe("other domain primitives", () => {
     expect(isIsoDateTime("not-a-date")).toBe(false);
   });
 });
-

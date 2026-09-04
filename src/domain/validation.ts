@@ -30,4 +30,3 @@ export function isAccountCategory(value: unknown): value is AccountCategory {
 export function isIsoDateTime(value: unknown): value is string {
   return typeof value === "string" && !Number.isNaN(Date.parse(value));
 }
-
