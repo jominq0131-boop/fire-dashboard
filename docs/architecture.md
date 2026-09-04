@@ -44,3 +44,7 @@ src/domain/monthly.ts는 월/금액 입력 검증과 저장 레코드 검증, �
 읽기는 전역/월별 count를 검사한 뒤 month 인덱스로 현금흐름 1개, 잔액 100개 이하를 가져온다. 잔액의 계좌 참조도 같은 트랜잭션에서 확인한다. 저장은 전역/월 상한, 기존 값 비교, 계좌 참조를 같은 readwrite 트랜잭션에서 확인하고 commit 이후에 성공을 반환한다. 실패·손상·상한 초과는 원본을 삭제/부분 표시하지 않는다. 고유 인덱스는 같은 월 또는 월/계좌의 중복을 막는다.
 
 MonthlyManager는 선택 월을 명시적으로 읽고 현금흐름과 각 계좌 잔액을 별도 저장한다. 실패하면 입력을 유지하며 월 전환/재읽기/페이지 이탈 시 미저장 입력을 경고한다. 계좌 등록 후 명시적 재읽기로 목록을 갱신한다. 자동 탭 동기화와 전체 이력 조회는 없다. 지표/차트는 미구현임을 표시한다.
+
+## UI presentation — Issue #19
+
+App organizes overview and the existing feature managers with anchor navigation. Desktop uses a sidebar and two feature columns; mobile uses a compact top navigation and one column. Features stay mounted during navigation so drafts are preserved. Icon.tsx supplies small inline SVG UI icons without external assets or dependencies. Presentation CSS includes visible keyboard focus, reduced-motion handling and responsive form widths. Persistence and domain boundaries are unchanged.

@@ -1,16 +1,9 @@
+import { useEffect, useState } from "react";
 import type { MonthlyRepository } from "../domain/monthly";
 import { MonthlyManager } from "../features/monthly/MonthlyManager";
 import type { AccountRepository } from "../domain/accounts";
 import { AccountManager } from "../features/accounts/AccountManager";
-
-const summaryMetrics = [
-  { label: "金融資産", description: "すべての口座残高の合計" },
-  { label: "現金", description: "現金・預金の残高" },
-  { label: "投資資産", description: "NISA・特定口座などの残高" },
-  { label: "今月の収支", description: "収入から支出と投資額を引いた金額" },
-  { label: "資産の増減", description: "前月末からの金融資産の変化" },
-  { label: "FIRE達成度", description: "設定したFIRE目標に対する進捗" },
-];
+import { Icon } from "./Icon";
 
 export function App({
   accountRepository,
@@ -19,67 +12,134 @@ export function App({
   accountRepository: AccountRepository;
   monthlyRepository: MonthlyRepository;
 }) {
+  const [active, setActive] = useState(() => window.location.hash || "#overview");
+  useEffect(() => {
+    const update = () => setActive(window.location.hash || "#overview");
+    window.addEventListener("hashchange", update);
+    return () => window.removeEventListener("hashchange", update);
+  }, []);
   return (
-    <main className="dashboard-shell">
-      <header className="dashboard-header">
-        <div>
-          <p className="eyebrow">PERSONAL FINANCE</p>
-          <h1>FIRE Dashboard</h1>
-          <p className="subtitle">資産の変化と、FIREまでの道のりを見える化します。</p>
-        </div>
-        <span className="status-badge">端末内保存・試用版</span>
-      </header>
-
-      <AccountManager repository={accountRepository} />
-      <MonthlyManager repository={monthlyRepository} accountsRepository={accountRepository} />
-
-      <section aria-labelledby="summary-heading">
-        <div className="section-heading">
+    <div className="app-layout">
+      <a className="skip-link" href="#main-content">
+        本文へ移動
+      </a>
+      <aside className="sidebar">
+        <a className="brand" href="#overview" aria-label="FIRE ホーム">
+          <span className="brand-mark">
+            <Icon name="mark" />
+          </span>
+          <span>
+            fire<span className="brand-dot">.</span>
+          </span>
+        </a>
+        <div className="sidebar-label">YOUR SPACE</div>
+        <nav aria-label="メインナビゲーション">
+          <a href="#overview" aria-current={active === "#overview" ? "location" : undefined}>
+            <Icon name="home" />
+            概要
+          </a>
+          <a href="#monthly" aria-current={active === "#monthly" ? "location" : undefined}>
+            <Icon name="calendar" />
+            月別記録
+          </a>
+          <a href="#accounts" aria-current={active === "#accounts" ? "location" : undefined}>
+            <Icon name="wallet" />
+            口座管理
+          </a>
+        </nav>
+        <div className="sidebar-bottom">
+          <Icon name="lock" />
           <div>
-            <p className="eyebrow">OVERVIEW</p>
-            <h2 id="summary-heading">いまの状況</h2>
+            あなたの端末に保存<span>プライベートな資産ノート</span>
           </div>
-          <p>集計・FIRE指標は今後追加します。月別記録は入力欄で確認できます。</p>
         </div>
-        <div className="metric-grid">
-          {summaryMetrics.map((metric) => (
-            <article className="metric-card" key={metric.label}>
-              <p>{metric.label}</p>
-              <strong aria-label={`${metric.label}: データなし`}>—</strong>
-              <span>{metric.description}</span>
+      </aside>
+      <main id="main-content" className="dashboard-shell">
+        <header className="dashboard-header">
+          <div>
+            <p className="page-kicker">MY FINANCE</p>
+            <h1>FIRE Dashboard</h1>
+          </div>
+          <span className="status-badge">
+            <span />
+            端末内保存<span className="trial-label">試用版</span>
+          </span>
+        </header>
+        <section id="overview" aria-labelledby="overview-heading" className="overview-section">
+          <div className="page-heading">
+            <div>
+              <h2 id="overview-heading">資産と、これから。</h2>
+              <p>毎月の記録を、ひとつの場所に。</p>
+            </div>
+            <a className="text-link" href="#monthly">
+              今月を記録する <Icon name="arrow" />
+            </a>
+          </div>
+          <div className="overview-grid">
+            <article className="asset-card">
+              <div className="asset-caption">
+                <span className="icon-tile">
+                  <Icon name="wallet" />
+                </span>
+                <span>金融資産</span>
+                <span className="subtle-badge">集計準備中</span>
+              </div>
+              <div className="asset-value">
+                <strong aria-label="金融資産: データなし">—</strong>
+                <span>円</span>
+              </div>
+              <p>月末の残高は「月別記録」で確認できます。</p>
+              <div className="asset-footer">
+                <span>
+                  <Icon name="lock" />
+                  このブラウザーだけに保存
+                </span>
+                <a href="#storage-info" className="text-link">
+                  保存について <Icon name="arrow" />
+                </a>
+              </div>
             </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="empty-state" aria-labelledby="start-heading">
-        <div className="empty-icon" aria-hidden="true">
-          ↗
-        </div>
-        <div>
-          <p className="eyebrow">FIRST STEP</p>
-          <h2 id="start-heading">金融記録を月ごとに残しましょう</h2>
-          <p>
-            口座を登録し、対象月を読み込んで現金収支と月末残高を保存できます。資産集計・チャートはまだ実装していません。
-          </p>
-        </div>
-      </section>
-
-      <section className="chart-placeholder" aria-labelledby="trend-heading">
-        <div className="section-heading compact">
-          <div>
-            <p className="eyebrow">HISTORY</p>
-            <h2 id="trend-heading">資産推移</h2>
+            <article className="start-card">
+              <span className="step-indicator">小さく続ける、資産管理</span>
+              <h2 aria-label="金融記録を月ごとに残しましょう">
+                <span>金融記録を</span>
+                <span>月ごとに残しましょう</span>
+              </h2>
+              <p>
+                口座を登録して、ひと月ずつ。
+                <br />
+                収支と月末残高を分けて記録できます。
+              </p>
+              <a className="primary-link" href="#monthly">
+                月別記録をはじめる <Icon name="arrow" />
+              </a>
+              <span className="start-footnote">集計・チャート・FIRE予測は今後追加予定</span>
+            </article>
           </div>
-          <span>チャートは今後追加</span>
+        </section>
+        <div className="workspace-heading">
+          <h2>記録する</h2>
+          <span>金額はすべて日本円</span>
         </div>
-        <div className="chart-grid" aria-label="資産推移チャートはデータ待ちです">
-          <span />
-          <span />
-          <span />
-          <span />
+        <div className="workspace-grid">
+          <div id="monthly">
+            <MonthlyManager repository={monthlyRepository} accountsRepository={accountRepository} />
+          </div>
+          <div id="accounts">
+            <AccountManager repository={accountRepository} />
+          </div>
         </div>
-      </section>
-    </main>
+        <footer id="storage-info" className="page-footer">
+          <Icon name="lock" />
+          <div>
+            <strong>あなたの記録は、この端末に。</strong>
+            <p>
+              同期・バックアップはまだありません。ブラウザーのデータを削除すると記録も失われます。現在は試用版としてお使いください。
+            </p>
+          </div>
+          <span>FIRE / PERSONAL FINANCE</span>
+        </footer>
+      </main>
+    </div>
   );
 }

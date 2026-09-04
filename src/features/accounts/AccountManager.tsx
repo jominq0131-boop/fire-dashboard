@@ -104,7 +104,7 @@ export function AccountManager({ repository }: { repository: AccountRepository }
     <section className="account-panel" aria-labelledby="accounts-heading" aria-busy={busy}>
       <div className="section-heading">
         <div>
-          <p className="eyebrow">ACCOUNTS</p>
+          <p className="section-kicker">YOUR ACCOUNTS</p>
           <h2 id="accounts-heading">口座を管理</h2>
         </div>
         <span>
@@ -115,13 +115,14 @@ export function AccountManager({ repository }: { repository: AccountRepository }
               : "読み込み中"}
         </span>
       </div>
-      <p className="storage-note">
-        このブラウザーにのみ保存されます。同期・バックアップはまだありません。ブラウザーのデータ削除で記録が失われるため、現段階では試用としてお使いください。口座番号は入力しないでください。
-      </p>
-      <p className="storage-note">
-        口座は休止中を含め{MAX_ACCOUNTS}
-        件までです。上限に達しても既存の口座は編集できます。データを自動削除することはありません。
-      </p>
+      <p className="panel-description">記録する口座を、ここで管理。</p>
+      <details className="storage-details">
+        <summary>保存と口座について</summary>
+        <p>
+          このブラウザーにのみ保存されます。同期・バックアップはまだありません。口座番号は入力しないでください。口座は休止中を含め
+          {MAX_ACCOUNTS}件まで。上限でも既存の口座は編集でき、自動削除はしません。
+        </p>
+      </details>
       {error && (
         <p role="alert" className="error-message">
           {error}
@@ -131,7 +132,7 @@ export function AccountManager({ repository }: { repository: AccountRepository }
         {notice}
       </p>
       {!ready && !error && <p>保存済みの口座を読み込んでいます…</p>}
-      <form onSubmit={(event) => void save(event)}>
+      <form className="account-create-form" onSubmit={(event) => void save(event)}>
         <fieldset disabled={!ready || busy}>
           <legend>{editing ? "口座を編集" : "口座を追加"}</legend>
           <div className="account-fields">
@@ -144,6 +145,7 @@ export function AccountManager({ repository }: { repository: AccountRepository }
                 onChange={(event) => setName(event.target.value)}
                 maxLength={MAX_ACCOUNT_NAME_LENGTH}
                 required
+                placeholder="例：生活用の口座"
                 autoComplete="off"
               />
             </label>
@@ -178,11 +180,16 @@ export function AccountManager({ repository }: { repository: AccountRepository }
       <ul className="account-list">
         {accounts.map((account) => (
           <li key={account.id}>
-            <div>
-              <strong>{account.name}</strong>
-              <p>
-                {labels[account.category]} · {account.isActive ? "利用中" : "休止中"}
-              </p>
+            <div className="account-identity">
+              <span className="account-avatar" aria-hidden="true">
+                {account.name.slice(0, 1)}
+              </span>
+              <div>
+                <strong>{account.name}</strong>
+                <p>
+                  {labels[account.category]} · {account.isActive ? "利用中" : "休止中"}
+                </p>
+              </div>
             </div>
             <div className="account-actions">
               <button
