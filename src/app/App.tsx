@@ -101,7 +101,10 @@ export function App({
             </article>
             <article className="start-card">
               <span className="step-indicator">小さく続ける、資産管理</span>
-              <h2>金融記録を月ごとに残しましょう</h2>
+              <h2 aria-label="金融記録を月ごとに残しましょう">
+                <span>金融記録を</span>
+                <span>月ごとに残しましょう</span>
+              </h2>
               <p>
                 口座を登録して、ひと月ずつ。
                 <br />
