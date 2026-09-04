@@ -116,3 +116,11 @@ GitHub main `6a01ff1`의 최근 변경(PR #2 도메인, #4 LF 수정, #6 빈 대
 - 기존 미구현 지표 6개/빈 차트는 간결한 미집계 표시로 정리했다. 가상 금액/그래프를 만들지 않았으며 금융 계산·IndexedDB·저장 로직·상한은 그대로다.
 - 새 의존성·외부 폰트/이미지 서비스·플러그인 추가 없이 OS 일본어 글꼴과 작은 inline SVG를 사용했다.
 - format/lint/typecheck, 단위 66개, build 통과. Chromium 23개 통과(26.8초). 탐색/펼침/모바일 시각 검증을 포함하며 최종 CI/공개 결과는 연결 PR에 기록한다. 모든 시각 검증은 격리 컨텍스트와 합성 데이터로 수행했다.
+
+## Milestone 8 / Issue #27 — local verification
+
+Implemented explicit temporary FIRE assumptions, opt-in recorded-assets input, first target arrival and annual projections. Uses exact monthly BigInt rounding with a1200-month cap and explicit overflow. Inputs/results are never persisted; existing DBv3/JSONv2 and all source records remain unchanged. No dependency or service added. The contract is in milestone-8-plan.md.
+
+Unit110 and Chromium32 tests passed; final Chromium run exited0 in44.0s. Format, lint, typecheck, Pages production build and diff checks passed. New tests cover calculation limits/rounding, dates-independent elapsed months, input invalidation/reset, asset loading, session-only state and390px overflow. Initial lint flagged a handler named like a hook; renamed it and lint passed. The initial sandbox browser run did not terminate and was stopped, not counted as passing; isolated rerun with existing browser binaries passed. No user profile or real financial data was used.
+
+Implementation/local verification are complete; PR/main/deployment are pending at this entry. Final release state and verification evidence belong to the Issue #27 linked PR. Persistent assumptions, withdrawal modeling and broader sensitivity analysis remain future scope.

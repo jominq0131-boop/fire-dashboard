@@ -1,3 +1,7 @@
+## Milestone 8 update
+
+The next FIRE step now provides explicit temporary assumptions and a bounded accumulation scenario. It is not a withdrawal sustainability model. Assumption persistence, spending-derived withdrawal targets, tax/fee models, PWA and synchronization remain separate future work. The prior month-end usability release is deployed through PR #26. Historical status statements below are superseded by this section and project-continuity.md.
+
 ## Product usability priority — Issue #25
 
 월말 기억에 의존하는 입력 문제를 해결하기 위해 오늘 확인일/잔액, 계좌별 마지막 기록과 신선도, 기록 재개 안내를 우선한다. 일별 거래 장부나 금융기관 자동 수집을 구현한 것은 아니다. 월별 대표1개 정책을 명확히 하며 전체 최신 확인액과 월별 기록 비교를 분리한다. FIRE/PWA는 후속 기능이다.

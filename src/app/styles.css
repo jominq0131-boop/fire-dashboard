@@ -1332,3 +1332,46 @@ form .account-actions {
   font-size: 10px;
   margin-top: 5px;
 }
+
+.fire-planner {
+  margin-top: 24px;
+}
+.fire-planner fieldset {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.fire-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+.fire-fields label {
+  display: grid;
+  gap: 8px;
+}
+.fire-fields input {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f3f5f8;
+}
+.fire-planner button {
+  padding: 10px 14px;
+  margin: 6px 8px 6px 0;
+  border: 0;
+  border-radius: 10px;
+  background: #edf4ff;
+  color: #246bce;
+}
+.fire-planner details {
+  margin-top: 18px;
+}
+@media (max-width: 560px) {
+  .fire-fields {
+    grid-template-columns: 1fr;
+  }
+}

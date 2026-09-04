@@ -1,3 +1,7 @@
+## Milestone 8 — derived scenario contract
+
+FireScenario is transient and separate from the reserved FireSettings model. It defines startingAssets, positive target in today's yen, fixed nominal monthlyContribution, returnBps and inflationBps (annual nominal basis points). Rates range -9900..10000; money is nonnegative safe-integer yen. No IndexedDB/JSON field or version changes; no migration is needed. Projections are not stored and do not modify financial records. See milestone-8-plan.md for rounding and limits.
+
 ## Dated balance observations / DB v3 / JSON v2
 
 AccountBalanceSnapshot adds optional asOfDate (YYYY-MM-DD, real date in the same month). Absence means legacy month-end input with observation date unknown. createdAt/updatedAt remain write timestamps and are never used as balance observation dates. No guessed date is attached to old records. Each account/month still has exactly one representative record. New UI observations require dates; legacy records may retain unknown dates. The UI restricts confirmed dates to today or earlier; imported future-dated records are preserved but excluded from current totals until that date.

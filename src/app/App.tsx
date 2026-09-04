@@ -10,6 +10,7 @@ import { BackupManager } from "../features/backup/BackupManager";
 import type { PortfolioRepository } from "../domain/portfolio";
 import type { BackupRepository } from "../domain/backup";
 import { Icon } from "./Icon";
+import { FirePlanner } from "../features/fire/FirePlanner";
 
 export function App({
   accountRepository,
@@ -72,6 +73,9 @@ export function App({
             <Icon name="lock" />
             バックアップ
           </a>
+          <a href="#fire" aria-current={active === "#fire" ? "location" : undefined}>
+            <Icon name="home" /> FIRE試算
+          </a>
         </nav>
         <div className="sidebar-bottom">
           <Icon name="lock" />
@@ -128,7 +132,9 @@ export function App({
               <a className="primary-link" href="#monthly">
                 今日から記録を続ける <Icon name="arrow" />
               </a>
-              <span className="start-footnote">FIRE予測は今後追加予定</span>
+              <a className="start-footnote" href="#fire">
+                目標までの期間を試算する
+              </a>
             </article>
           </div>
         </section>
@@ -154,6 +160,7 @@ export function App({
             />
           </div>
         </div>
+        <FirePlanner repository={portfolioRepository} />
         <BackupManager
           repository={backupRepository}
           onImported={() => {
