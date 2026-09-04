@@ -1,31 +1,15 @@
-## Everyday flow
+# Features
 
-AssetOverview displays per-account last-known amounts with provenance and today-update actions. MonthlyManager records actual confirmation dates, defaults today only in the today flow, keeps past unknown inputs empty, focuses the chosen account and renders balances before cash flows. MonthlyOverview and the chart remain explicit per-month recorded values, distinct from the cross-month current total.
+화면 상태와 기능 간 오케스트레이션을 담당하며 주입된 도메인 계약을 사용합니다.
 
-## Milestone 7
+| 기능     | 책임                                                 |
+| -------- | ---------------------------------------------------- |
+| accounts | 계좌 입력/휴지와 실패·충돌 입력 보존                 |
+| monthly  | 월별 입력/요약, 마지막 자산, 이력 필터/선택/상세     |
+| charts   | SVG 좌표, 누락 구간 분리, 범례·포인터·키보드·선택 값 |
+| fire     | 임시 가정/계산 결과/최대3비교, 자산·목표 차트        |
+| backup   | JSON 다운로드/검증/미리보기/원자적 추가 복원         |
 
-AssetOverview automatically loads latest assets and a bounded history window, offers accessible SVG/table and guarded month drilldown. MonthlyManager keeps drafts and per-month summary separate from overall assets. BackupManager handles bounded file selection, preview/cancel, explicit import and JSON download. Successful import refreshes accounts/overview; monthly drafts stay mounted and require an explicit reread. No user file contents are sent to a server.
+HistoryExplorer는 최대12개월의 기존 조회 결과만 사용합니다. App을 통해 선택한 기록액을 FirePlanner에 전달하며 기존 가정 교체를 확인합니다. ProjectionChart는 이미 계산한 최대101개 점을 표시합니다. InteractiveLineChart의 좌표는 표시용이며 금액 계산이나 저장을 하지 않습니다.
 
-## Milestone 6
-
-MonthlyOverview presents committed monthly metrics and coverage. MonthlyManager publishes the loaded snapshot to App without exposing unsaved drafts. A failed reread clears the summary; failed saves preserve committed values. Existing repository contracts, bounded queries and draft protections remain.
-
-# Feature boundary
-
-The account UI explains the 100-account cap including inactive records. Creation is disabled at capacity but editing remains available. Oversized-store errors do not silently truncate or delete records.
-
-Feature-specific UI and application orchestration belong here. Features may use domain services and repository interfaces, but must not depend on a concrete persistence implementation.
-
-Milestone 4 adds `accounts/AccountManager.tsx`: account creation, editing, deactivation/reactivation, loading, validation, conflict and persistence-error states. The repository is injected by the application. Failed saves retain form input; account registration alone does not populate financial metrics. Monthly input is implemented separately in the Milestone 5 feature below.
-
-Milestone 5 adds monthly/MonthlyManager.tsx with injected monthly/account contracts. It explicitly loads one selected month, saves cash flow and each balance separately, and retains failed drafts. It warns before discarding edits and renders at most 100 account balance forms. Aggregates and charts remain unimplemented.
-
-UI refresh (Issue #19) changes presentation only: account guidance disclosure, account identity rows, month selection empty state, grouped input fields and save-state styling. Repository calls and validation/draft preservation remain unchanged. Navigation is provided by App and does not unmount these features.
-
-## FIRE planner
-
-fire/FirePlanner.tsx owns temporary assumptions, explicit recorded-assets loading and bounded annual results. It clears stale output on edits and labels provenance, non-persistence, calculation limits and excluded risks. It receives the repository contract and never writes balances or settings.
-
-## Milestone 9 comparison and data layout
-
-ScenarioComparison keeps up to3 temporary immutable copies of input assumptions and existing projection results. fire-format.ts shares presentation labels without changing calculation rules. Account-specific accessible labels stay intact while visible controls use short stable text. Common CSS separates values, names and actions and preserves full financial values through local table scrolling.
+긴 이름·오류·숫자는 레이아웃 경계를 유지하면서 표시합니다. 금액을 잘라 숨기지 않고 표 내부 스크롤을 제공합니다. 합성 데이터/격리 브라우저로 검증합니다.

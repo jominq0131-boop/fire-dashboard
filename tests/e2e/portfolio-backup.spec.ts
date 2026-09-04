@@ -211,7 +211,7 @@ test("backup transaction rollback, conflict races, preservation and bounded hist
   expect(result.duplicate).toBe(true);
   expect(result.lateAbort).toBe(true);
   expect(result.preservedAfterAbort).toBe(true);
-  expect(result.requests).toEqual([1200]);
+  expect(result.requests).toEqual([1200, 12]);
   expect(result.months).toBe(12);
   expect(result.oversized).toBe(true);
   expect(result.unchanged).toBe(true);

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useImperativeHandle, type Ref } from "react";
+import { ProjectionChart } from "./ProjectionChart";
 import { ScenarioComparison } from "./ScenarioComparison";
 import { arrivalText } from "./fire-format";
 import { parseRate, projectFire, type FireProjection } from "../../domain/fire";
@@ -21,12 +22,35 @@ const fields = [
   ["inflationBps", "想定インフレ率（%）"],
 ] as const;
 const yen = (n: number) => `${n.toLocaleString("ja-JP")} 円`;
-export function FirePlanner({ repository }: { repository: PortfolioRepository }) {
+export function FirePlanner({
+  repository,
+  navigationRef,
+}: {
+  repository: PortfolioRepository;
+  navigationRef?: Ref<{ useAssets: (value: number, source: string) => boolean }>;
+}) {
   const [values, setValues] = useState(empty);
   const [result, setResult] = useState<FireProjection | null>(null);
   const [error, setError] = useState("");
   const [source, setSource] = useState("");
   const [busy, setBusy] = useState(false);
+  useImperativeHandle(navigationRef, () => ({
+    useAssets: (value, description) => {
+      if (busy || !Number.isSafeInteger(value) || value < 0) return false;
+      if (
+        Object.values(values).some((v) => v !== "") &&
+        !window.confirm(
+          "入力中の開始資産を選択した記録額に置き換えますか？ほかの仮定と比較は保持します。",
+        )
+      )
+        return false;
+      setValues((v) => ({ ...v, startingAssets: String(value) }));
+      setResult(null);
+      setError("");
+      setSource(description);
+      return true;
+    },
+  }));
   async function loadRecorded() {
     setBusy(true);
     setError("");
@@ -156,6 +180,12 @@ export function FirePlanner({ repository }: { repository: PortfolioRepository })
             </div>
           </details>
         </div>
+      )}
+      {result && (
+        <ProjectionChart
+          title="今回の予測チャート"
+          items={[{ id: "draft", label: "今回の試算", result }]}
+        />
       )}
       <ScenarioComparison values={values} result={result} />
       <details>

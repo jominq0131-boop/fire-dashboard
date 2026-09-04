@@ -1,5 +1,6 @@
 import { currentTotal, localDate, observationStatus } from "../../domain/observations";
 import { useEffect, useState } from "react";
+import { HistoryExplorer } from "./HistoryExplorer";
 import { monthlyMetrics, type MetricAmount } from "../../domain/metrics";
 import {
   localMonth,
@@ -19,11 +20,13 @@ export function AssetOverview({
   revision,
   onSelectMonth,
   onRecordToday,
+  onForecast,
 }: {
   repository: PortfolioRepository;
   revision: number;
   onSelectMonth: (month: string) => void;
   onRecordToday: (accountId?: string) => void;
+  onForecast: (value: number, source: string) => void;
 }) {
   const [data, setData] = useState<PortfolioOverview | null>(null);
   const [end, setEnd] = useState<string>();
@@ -61,14 +64,6 @@ export function AssetOverview({
       metrics: monthlyMetrics(source),
       change: monthChange(data.months[index - 1], source),
     })) ?? [];
-  const max = Math.max(
-    0,
-    ...rows.map((r) => (typeof r.metrics.assets === "number" ? r.metrics.assets : 0)),
-  );
-  const point = (i: number, value: number) => ({
-    x: 48 + (i * 640) / Math.max(1, rows.length - 1),
-    y: 190 - (value / (max || 1)) * 150,
-  });
   return (
     <section className="asset-history" aria-label="資産の全体像" aria-busy={busy}>
       <article className="asset-card">
@@ -168,61 +163,9 @@ export function AssetOverview({
         </p>
         {!error && !busy && (
           <>
-            <svg
-              viewBox="0 0 736 230"
-              role="img"
-              aria-label="月内に確認した金融資産の推移。正確な金額と増減は下の表に表示しています。"
-            >
-              <line x1="48" y1="190" x2="688" y2="190" stroke="#a2a9b3" />
-              <text x="48" y="24" fontSize="12">
-                {rows.some((r) => typeof r.metrics.assets === "number")
-                  ? `最大 ${max.toLocaleString("ja-JP")} 円`
-                  : "残高の記録はありません"}
-              </text>
-              {rows.map((r, i) => {
-                if (typeof r.metrics.assets !== "number") return null;
-                const p = point(i, r.metrics.assets),
-                  previous = rows[i - 1];
-                const before =
-                  previous && typeof previous.metrics.assets === "number"
-                    ? point(i - 1, previous.metrics.assets)
-                    : null;
-                return (
-                  <g key={r.source.month}>
-                    {before && r.change.delta !== null && (
-                      <line
-                        x1={before.x}
-                        y1={before.y}
-                        x2={p.x}
-                        y2={p.y}
-                        stroke="#2474ef"
-                        strokeWidth="2"
-                      />
-                    )}
-                    <circle
-                      cx={p.x}
-                      cy={p.y}
-                      r="5"
-                      stroke="#2474ef"
-                      strokeWidth="2"
-                      fill={
-                        r.metrics.recordedAccounts === r.metrics.totalAccounts ? "#2474ef" : "white"
-                      }
-                    >
-                      <title>
-                        {r.source.month}: {yen(r.metrics.assets)}
-                      </title>
-                    </circle>
-                  </g>
-                );
-              })}
-              <text x="48" y="216" fontSize="12">
-                {rows[0]?.source.month}
-              </text>
-              <text x="688" y="216" textAnchor="end" fontSize="12">
-                {rows.at(-1)?.source.month}
-              </text>
-            </svg>
+            {data && (
+              <HistoryExplorer data={data} onSelectMonth={onSelectMonth} onForecast={onForecast} />
+            )}
             <div
               className="history-table"
               role="region"

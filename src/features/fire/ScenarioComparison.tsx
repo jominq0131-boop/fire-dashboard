@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import type { FireProjection } from "../../domain/fire";
 import { arrivalText } from "./fire-format";
+import { ProjectionChart } from "./ProjectionChart";
 
 export interface ScenarioValues {
   startingAssets: string;
@@ -44,6 +45,16 @@ export function ScenarioComparison({
       {!result && <p className="field-hint">追加するには、入力した仮定で計算してください。</p>}
       {items.length === 3 && (
         <p className="field-hint">3件を比較中です。新しく追加するには1件外してください。</p>
+      )}
+      {items.length > 0 && (
+        <ProjectionChart
+          title="シナリオ比較チャート"
+          items={items.map((item) => ({
+            id: String(item.id),
+            label: `シナリオ${item.id}`,
+            result: item.result,
+          }))}
+        />
       )}
       {items.length > 0 && (
         <div

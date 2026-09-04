@@ -1,76 +1,15 @@
-## Milestone 8 update
+# 로드맵 대응과 남은 범위
 
-The next FIRE step now provides explicit temporary assumptions and a bounded accumulation scenario. It is not a withdrawal sustainability model. Assumption persistence, spending-derived withdrawal targets, tax/fee models, PWA and synchronization remain separate future work. The prior month-end usability release is deployed through PR #26. Historical status statements below are superseded by this section and project-continuity.md.
+마일스톤 번호는 구현 순서이며 완성도 백분율이 아닙니다. 최초 제안의 JSON 백업은 차트/FIRE의 일부보다 먼저 구현해 데이터 이식성을 확보했습니다.
 
-## Product usability priority — Issue #25
+| 제품 영역          | 현재 구현                                         | 남은 범위                      |
+| ------------------ | ------------------------------------------------- | ------------------------------ |
+| 계좌/월별 기록     | 입력·수정·휴지, 확인 날짜, 월당 대표 잔액         | 일별 장부, 금융기관 자동 수집  |
+| 전체 자산/현금흐름 | 계좌별 마지막 기록, 월별 지표, 불완전 데이터 표시 | 부채/순자산                    |
+| 이력/차트          | 월·계좌 필터, 선/점 선택, 내역/입력/예측 연결     | 대규모 장기 이력 탐색          |
+| FIRE               | 명시적 가정, 첫 도달,3개 비교, 자산/목표 선 차트  | 영속 설정, 인출 이후 모델      |
+| JSON               | v1/v2 가져오기, v2 내보내기, 원자적 추가 복원     | 별도 대용량 복구 설계          |
+| UI                 | 반응형·극단값·키보드 차트·표 내부 스크롤          | 폭넓은 다중 브라우저/접근성 QA |
+| PWA/동기화         | 미구현                                            | 별도 필요성 검증·설계·승인     |
 
-월말 기억에 의존하는 입력 문제를 해결하기 위해 오늘 확인일/잔액, 계좌별 마지막 기록과 신선도, 기록 재개 안내를 우선한다. 일별 거래 장부나 금융기관 자동 수집을 구현한 것은 아니다. 월별 대표1개 정책을 명확히 하며 전체 최신 확인액과 월별 기록 비교를 분리한다. FIRE/PWA는 후속 기능이다.
-
-## Milestone 7 update
-
-사용자 요청으로 전체 자산 우선 개요와12개월 추이/상세 이동을 보강하고 JSON v1 백업/복원을 함께 구현한다. 최초 제안의 히스토리/차트와 JSON 항목에 대응하지만 조회는12개월 단위이고 복원은 기존 기록을 보존하는 추가 방식이다. DB v2는 유지한다. FIRE 가정/예측, PWA, 자동 동기화는 미구현이며 최종 출시 상태는 Issue #23 연결 PR을 따른다.
-
-## Latest update — Milestone 6 / Issue #21
-
-아래 점검은 과거 이력이다. 월별 입력/저장과 v2는 PR #18, UI는 PR #20으로 병합·배포됐다. 이번 범위는 최초 로드맵의 대시보드 지표로, 현재 번호 Milestone 6이다. 저장된 월별 현금흐름과 잔액에서만 파생하며 차트/히스토리/FIRE/JSON/PWA는 아직 미구현이다. 다음 단계로 JSON 백업/복원 설계를 권장한다.
-
-> 2026-09-04 후속: 아래는 PR #12 시점 점검 이력이다. 현재 작업 브랜치는 승인된 Milestone 5 월별 입력/잔액 및 v2 저장을 구현·로컬 검증했다. 날짜 검증도 정확한 4자리 월과 UTC ISO로 강화했다. main 병합·배포는 아직이며 최신 상태는 project-continuity.md와 milestone-5-plan.md를 따른다.
-
-# 최초 제안 대비 진행 점검
-
-Milestone 5 전에 Issue #15에서 계좌 조회·입력·테스트 동시성 상한을 보강한다. 기존 IndexedDB 방향을 유지하는 안전 작업이며 월별 기록/JSON 백업 완성을 뜻하지 않는다. [자원 안전 정책](resource-safety.md)을 후속 설계에도 적용한다.
-
-2026-09-04 사용자가 다시 제공한 최초 아키텍처 제안과 PR #12 구현을 비교한 기록이다. 원문에 포함된 클라우드 요금·무료 한도는 이번 점검에서 재검증하지 않았다. 클라우드 도입도 범위 밖이다.
-
-## 결론
-
-핵심 방향은 일치한다. React/TypeScript/Vite 정적 앱, GitHub Pages, 기기 내 IndexedDB, UI/도메인/저장소 경계, 현금흐름과 잔액 분리, 정수 엔 검증, 테스트와 문서 동반 원칙을 유지했다. 다만 현재는 계좌 관리와 저장 기반을 갖춘 중간 단계이며 전체 MVP나 장기 실사용 준비 완료가 아니다.
-
-## 제안과 현재 구현의 대응
-
-| 최초 제안                        | 현재 근거와 상태                                                                                                                          |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| React + TypeScript + Vite, CSS   | `package.json`, `src/app`, 외부 UI/상태관리 라이브러리 없이 구현                                                                          |
-| GitHub Pages 정적 배포           | `.github/workflows/deploy-pages.yml`; 계좌 정보는 빌드 산출물에 넣지 않음                                                                 |
-| Repository 경계와 IndexedDB      | `src/domain/accounts.ts` 계약, `src/infrastructure/indexeddb-accounts.ts` 어댑터, `src/main.tsx` 주입. UI는 어댑터를 직접 import하지 않음 |
-| 계좌 등록·수정·비활성화          | 구현 및 새로고침/실패/충돌 회귀 테스트. 물리 삭제 없이 재활성화 가능                                                                      |
-| 월별 현금흐름과 월말 잔액 분리   | `src/domain/models.ts`에 별도 모델 존재. 입력/저장은 미구현                                                                               |
-| 정수 엔                          | `number` 표현에 `Number.isSafeInteger` 검증을 결합. 소수 금액을 허용한다는 뜻이 아님. 계산은 아직 미구현                                  |
-| 핵심 지표·히스토리·차트·FIRE     | 빈 대시보드만 있음. 지표 숫자, 실제 차트, 설정/예측은 미구현                                                                              |
-| 버전 있는 JSON 백업/복원         | 필수 MVP 목표이지만 아직 미구현. IndexedDB v1을 JSON schemaVersion 구현으로 간주하면 안 됨                                                |
-| 결정론적 마이그레이션            | DB 없음(v0) → 빈 계좌 저장소(v1) 계획과 테스트만 구현. 금융 기록/JSON의 버전 간 변환은 후속 작업                                          |
-| 자동 동기화·로그인·금융 API 제외 | 계속 제외. Supabase/Firebase/D1을 새로 도입하지 않음                                                                                      |
-| 모바일·접근성                    | 반응형 CSS와 기본 의미 구조 존재. 모바일/여러 브라우저/접근성 종합 검증 완료는 아님                                                       |
-| PWA 표현                         | manifest/service worker가 없어 설치형 PWA와 앱 셸 오프라인 실행은 미구현. IndexedDB 사용만으로 PWA가 되지 않음                            |
-
-## 달라진 번호와 구현 선택
-
-| 최초 로드맵                                  | 현재 저장소의 마일스톤                                                |
-| -------------------------------------------- | --------------------------------------------------------------------- |
-| 1 규칙·기반, 2 도메인                        | Milestone 1·2에 대응                                                  |
-| 3 IndexedDB                                  | Milestone 4 계좌 저장 기반에 부분 대응; 월별 저장소는 아직 없음       |
-| 4 월별 입력                                  | 다음 Milestone 5에 대응                                               |
-| 5 대시보드 지표                              | Milestone 3은 빈 화면을 먼저 만든 것일 뿐, 이 항목을 완료한 것이 아님 |
-| 6 히스토리/차트, 7 FIRE, 8 JSON, 9 모바일 QA | 미완료 후속 범위. 현재 번호로 자동 재해석하지 않음                    |
-| 10 실사용 개선, 11 필요 시 동기화            | 실사용/복원 안정화 후 별도 검토                                       |
-
-순서 변경은 빈 대시보드를 먼저 만든 데서 발생했으며 저장 전략 변경은 아니다. 완료율을 마일스톤 숫자로 추정하지 않는다.
-
-Zod는 최초 권장 스택이지만 현재 계좌 범위는 작은 순수 검증 함수로 처리해 의존성을 추가하지 않았다. JSON 가져오기 시 검증 복잡도를 보고 목적·대안·유지 비용을 설명한 뒤 도입 여부를 정한다. 저장소 계약도 아직 계좌만 다루므로 미래의 모든 금융 데이터를 포괄하는 완성된 FinancialRepository라고 부르지 않는다.
-
-최초 예시의 `cashFlowSurplus`는 현재 저장 모델에 없다. 구현 시 원본 입력에서 파생 계산하면 중복 저장 불일치를 줄일 수 있으나 계산 규칙과 테스트는 아직 작성하지 않았다. 현재 `withdrawalRate`와 최초 `annualWithdrawalRate`의 이름도 다르므로 FIRE 설정/JSON 스키마를 확정할 때 기간과 단위를 명문화해야 한다.
-
-## 다음 작업의 주의점
-
-1. 다음 승인 범위는 기존 문서대로 Milestone 5 월별 입력/잔액이다. 계좌 참조, 중복 월/스냅샷 정책, 정수 엔 경계, 마이그레이션과 보존 테스트가 필요하다.
-2. JSON 백업/복원은 선택 기능이 아니다. 실제 기록을 축적하기 전에 round-trip, 가져오기 전후 검증, 실패 시 무변경, 구버전 변환을 검증해야 한다. 차트/FIRE보다 앞당기는 것을 권고하지만 이 점검만으로 후속 구현 순서를 변경하지 않는다.
-3. 현재 `isIsoDateTime`은 Date.parse 가능 여부만 확인해 `September 4, 2026` 같은 비-ISO 문자열도 허용한다. `isMonthKey`는 5자리 이상 연도도 허용한다. 계좌 기능은 이 날짜 검증을 사용하지 않지만, 월별/가져오기 구현 전에 지원 날짜 형식과 범위를 명확히 하고 강화해야 한다.
-4. 최초 제안의 시장 변동 추정 예시는 바로 계산 규칙으로 채택하지 않는다. 내부 계좌 이동과 순외부 유입을 구분하지 않으면 이중 계산할 수 있으므로 월말 스냅샷을 기준값으로 유지한다.
-5. CI와 Pages는 독립 실행되어 배포가 main CI 성공을 기다리지 않는다. 이번 릴리스는 PR CI와 병합 후 두 워크플로를 모두 확인한다. 자동 배포 게이트 변경은 별도 범위다.
-6. lockfile과 `npm ci`가 설치 버전을 고정하지만 package.json은 `latest` 범위다. 의존성 갱신은 명시적 변경과 검증을 거쳐야 하며 이번에는 버전을 바꾸지 않는다. 릴리스 태그도 아직 없다.
-
-이번 점검은 문서·출시 상태 확인이며 금융 계산, 날짜 규칙, 의존성, 워크플로를 변경하지 않는다.
-
-## Milestone 9 update
-
-Documented scenario-comparison follow-up and user-requested data-dependent layout stabilization are implemented together. Maximum3 temporary comparisons, tested extreme content and responsive alignment improve practical usability. This is not permanent FIRE settings, drawdown modeling, full accessibility certification or completion of the entire MVP.
+새 외부 서비스나 자동 동기화를 도입하지 않고 기존 정적 앱/IndexedDB 방향을 유지합니다. 현재 사용자에게 보이는 기능과 저장 형식은 [README](../README.md), [데이터 모델](data-model.md)을 따릅니다. 과거 제안 점검은 [보관 원문](history/proposal-alignment.md)에 있습니다.
