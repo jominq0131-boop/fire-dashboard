@@ -27,4 +27,3 @@ npm run test:e2e
 - 자동 동기화는 MVP 범위 밖이며, 필요성이 검증될 때 별도 마일스톤으로 도입한다.
 
 자세한 내용은 [아키텍처 문서](docs/architecture.md)와 [데이터 모델 원칙](docs/data-model.md)을 참고하세요.
-

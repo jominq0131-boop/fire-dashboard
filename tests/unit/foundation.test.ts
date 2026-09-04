@@ -5,4 +5,3 @@ describe("project foundation", () => {
     expect(true).toBe(true);
   });
 });
-
