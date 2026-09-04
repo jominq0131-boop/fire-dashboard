@@ -103,7 +103,7 @@
 
 ## Next recommended milestone
 
-2026-09-04 사용자가 월별 설계를 승인했다. PR #16의 CI 실행 33859153564 성공을 확인했으나 병합하지 않았다. 선행 변경을 유지하기 위해 `92f09af`에서 `feat/monthly-records`를 분기했고 Issue #17에서 도메인→저장소→UI 순으로 구현했다. PR은 #16 브랜치에 의존하는 후속 PR로 만들며, #16 병합 후 main 기준으로 전환·검증한다. [승인된 설계](milestone-5-plan.md), DB v2, 상한/참조/충돌/보존 테스트를 추가했다. 로컬 단위 66개와 Chromium 22개 통과(최종 11.4초), format/lint/typecheck/build 통과. main 병합·배포는 미완료다.
+2026-09-04 사용자가 월별 설계를 승인했다. PR #16의 CI 실행 33859153564 성공을 확인했으나 병합하지 않았다. 선행 변경을 유지하기 위해 `92f09af`에서 `feat/monthly-records`를 분기했고 Issue #17에서 도메인→저장소→UI 순으로 구현했다. [Draft PR #18](https://github.com/jominq0131-boop/fire-dashboard/pull/18)은 #16 브랜치에 의존하는 후속 PR이며, #16 병합 후 main 기준으로 전환·검증한다. [승인된 설계](milestone-5-plan.md), DB v2, 상한/참조/충돌/보존 테스트를 추가했다. 로컬 단위 66개와 Chromium 22개 통과(최종 11.4초), format/lint/typecheck/build 통과. main 병합·배포는 미완료다.
 
 **다음은 Milestone 5 구현 PR 검토와 선행 PR #16 통합**이다.
 
