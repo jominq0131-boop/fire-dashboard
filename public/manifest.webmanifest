@@ -1,0 +1,25 @@
+{
+  "name": "fire. 資産記録とFIRE試算",
+  "short_name": "fire.",
+  "description": "資産の記録からFIREの見通しまで、端末内で管理するパーソナルファイナンスアプリ",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1420",
+  "theme_color": "#0b1420",
+  "icons": [
+    {
+      "src": "app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

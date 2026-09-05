@@ -6,6 +6,7 @@ import { App } from "./app/App";
 import { IndexedDbAccountRepository } from "./infrastructure/indexeddb-accounts";
 import "./app/styles.css";
 import "./app/theme.css";
+import "./app/brand.css";
 
 const accountRepository = new IndexedDbAccountRepository();
 const monthlyRepository = new IndexedDbMonthlyRepository();

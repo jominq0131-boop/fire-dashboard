@@ -31,15 +31,19 @@
 
 FIRE 결과는 사용자가 입력한 일정한 가정에 따른 계산입니다. 세금·수수료·부채·인출 이후의 유지 가능성·시장 변동을 모델링하지 않습니다. 자세한 의미는 [데이터 모델](docs/data-model.md)을 따릅니다.
 
+## 디자인과 설치 기반
+
+fire. 상승 흐름 마크, 브라우저 파비콘, Apple touch icon과 web app manifest를 제공합니다. OS 네이티브 글꼴과 일본어 fallback을 사용해 외부 폰트 요청 없이 제목·본문·금액의 위계를 구분합니다. 모바일에서는5개 주요 화면을 safe-area를 고려한 하단 탭 바로 이동합니다. 현재 manifest는 설치 표시 기반이며 오프라인 저장·자동 동기화를 뜻하지 않습니다.
+
 ## 현재 개발 상태
 
-Milestone 11은 [PR #34](https://github.com/jominq0131-boop/fire-dashboard/pull/34)로 배포했습니다. 이번 [Milestone 12](docs/milestone-12-plan.md)는 기록 간 추세 연결과 전체 다크 디자인 통일이며, 구현·검증·배포 근거는 [Issue #35](https://github.com/jominq0131-boop/fire-dashboard/issues/35)의 연결 PR을 확인하세요. 전체 MVP 완료를 뜻하지 않습니다. 영속 FIRE 설정, 은퇴 후 인출 모델, PWA와 자동 동기화는 후속 범위입니다.
+Milestone 12는 [PR #36](https://github.com/jominq0131-boop/fire-dashboard/pull/36)으로 배포했습니다. 이번 [Milestone 13](docs/milestone-13-plan.md)은 브랜드 타이포그래피와 앱 아이콘·모바일 셸이며, 구현·검증·배포 근거는 [Issue #37](https://github.com/jominq0131-boop/fire-dashboard/issues/37)의 연결 PR을 확인하세요. 전체 MVP 완료를 뜻하지 않습니다. 영속 FIRE 설정, 은퇴 후 인출 모델, 오프라인과 자동 동기화는 후속 범위입니다.
 
 ## 개발과 문서
 
 React · TypeScript · Vite · Recharts 정적 앱입니다. 차트 라이브러리는 고정 버전과 동적 청크로 관리합니다. 최초 준비 또는 lockfile 변경 시 `npm ci`, 개발 서버는 필요할 때 `npm run dev`를 실행합니다.
 
-화면 전체는 공통 다크/민트 테마를 사용합니다. 새로운 UI도 `src/app/theme.css`의 토큰과 상태별 스타일을 따릅니다.
+화면 전체는 공통 다크/민트 테마를 사용합니다. 새 UI는 styles.css의 레이아웃 경계, theme.css의 색상 토큰, brand.css의 타이포그래피·앱 셸 책임을 따릅니다.
 
 ```sh
 npm run format
