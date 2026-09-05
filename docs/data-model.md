@@ -47,3 +47,7 @@ createdAt/updatedAt은 실제 UTC ISO 밀리초 날짜이며 생성 시각 보�
 최상위 필드는 schemaVersion/accounts/monthlyCashFlows/accountBalanceSnapshots/firePlan입니다. v1/v2/v3를 허용하고 결정론적 정렬과 검증 후 v3를 생성합니다. v1/v2는 `firePlan: null`로 읽으며 기존 원본 필드·ID·노트·시각과 확인일 미상을 보존합니다. v1로 표시한 asOfDate, 추가 필드, 중복 ID/자연 키, 잘못된 참조/값/버전은 거부합니다.
 
 최대32 MiB. 미리보기 후 추가 방식으로 복원하며 동일 기록·계획은 건너뛰고 충돌은 전체 취소합니다. 현재 계획과 들어오는 계획이 다르면 금융 기록을 포함한 복원 전체를 적용하지 않습니다. 빈 브라우저에서 전체 복원할 수 있습니다. 원자적 복원과 상한 검증은 기존 데이터를 삭제하지 않습니다.
+
+## 목표 도달형 FIRE
+
+현금/NISA 적립/NISA 성장/과세계좌를 별도로 투영하고, 평가액과 NISA 취득한도 사용량을 구분합니다. 완료월 현금 저축과 투자 평균, 월별 한도 배분, 최초 도달점, 주식의 세전 자가배당은 [Milestone15 계산 계약](milestone-15-plan.md)을 따릅니다. 신규 계산 상태는 저장하지 않으며 DB v4/JSON v3 계약과 기존 FIRE 계획을 변경하지 않습니다.

@@ -1973,3 +1973,53 @@ form .account-actions {
     flex-basis: 100%;
   }
 }
+/* Goal-based FIRE uses the shared product tokens. */
+.goal-planner {
+  padding-bottom: 32px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--line);
+}
+.goal-planner fieldset {
+  min-width: 0;
+  margin: 20px 0;
+}
+.goal-planner h3 {
+  font-size: clamp(22px, 3vw, 32px);
+}
+.goal-result {
+  margin-top: 24px;
+}
+.goal-allocation {
+  display: flex;
+  height: 20px;
+  overflow: hidden;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+.goal-breakdown {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.goal-breakdown > div {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-raised);
+  overflow-wrap: anywhere;
+}
+.goal-breakdown i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+}
+@media (max-width: 600px) {
+  .goal-breakdown {
+    grid-template-columns: 1fr;
+  }
+}
