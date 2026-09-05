@@ -9,18 +9,24 @@ test("brand metadata and install icons ship from the app base", async ({ page, r
   );
   await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#0b1420");
 
-  for (const selector of [
-    'link[rel="icon"]',
-    'link[rel="apple-touch-icon"]',
-    'link[rel="manifest"]',
-  ]) {
+  const publicAssetUrl = (href: string) => {
+    const name = new URL(href, page.url()).pathname.split("/").at(-1);
+    return new URL(name!, page.url()).href;
+  };
+  for (const [selector, contentType] of [
+    ['link[rel="icon"]', /image\/svg\+xml/],
+    ['link[rel="apple-touch-icon"]', /image\/png/],
+    ['link[rel="manifest"]', /application\/manifest\+json|application\/json/],
+  ] as const) {
     const href = await page.locator(selector).getAttribute("href");
     expect(href).toBeTruthy();
-    expect((await request.get(new URL(href!, page.url()).href)).ok()).toBe(true);
+    const response = await request.get(publicAssetUrl(href!));
+    expect(response.ok()).toBe(true);
+    expect(response.headers()["content-type"]).toMatch(contentType);
   }
 
   const manifestHref = await page.locator('link[rel="manifest"]').getAttribute("href");
-  const manifest = await (await request.get(new URL(manifestHref!, page.url()).href)).json();
+  const manifest = await (await request.get(publicAssetUrl(manifestHref!))).json();
   expect(manifest).toMatchObject({
     short_name: "fire.",
     display: "standalone",
@@ -33,16 +39,16 @@ test("brand metadata and install icons ship from the app base", async ({ page, r
     ]),
   );
 
+  const appleHref = await page.locator('link[rel="apple-touch-icon"]').getAttribute("href");
   const iconSize = await page.evaluate(
-    () =>
+    (src) =>
       new Promise<[number, number]>((resolve, reject) => {
         const image = new Image();
         image.onload = () => resolve([image.naturalWidth, image.naturalHeight]);
         image.onerror = () => reject(new Error("Apple touch icon failed to load"));
-        image.src = new URL(
-          document.querySelector<HTMLLinkElement>('link[rel="apple-touch-icon"]')!.href,
-        ).href;
+        image.src = src;
       }),
+    publicAssetUrl(appleHref!),
   );
   expect(iconSize).toEqual([180, 180]);
   await page.setViewportSize({ width: 1440, height: 1050 });
