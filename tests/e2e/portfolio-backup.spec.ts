@@ -207,7 +207,7 @@ test("backup transaction rollback, conflict races, preservation and bounded hist
   expect(result.empty.monthlyCashFlows).toEqual([]);
   expect(result.empty.accountBalanceSnapshots).toEqual([]);
   expect(result.race.sort()).toEqual([0, 4]);
-  expect(result.preserved).toEqual({ ...syntheticBackup(), schemaVersion: 2 });
+  expect(result.preserved).toEqual({ ...syntheticBackup(), schemaVersion: 3, firePlan: null });
   expect(result.duplicate).toBe(true);
   expect(result.lateAbort).toBe(true);
   expect(result.preservedAfterAbort).toBe(true);

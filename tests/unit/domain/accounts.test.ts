@@ -96,10 +96,10 @@ describe("deterministic initial database migration", () => {
   it("does nothing when reopening version 1", () => {
     expect(storageMigrationPlan(1, 1)).toEqual([]);
   });
-  it.each([-1, 0.5, 4, NaN])("rejects unsupported source version %s", (version) => {
+  it.each([-1, 0.5, 5, NaN])("rejects unsupported source version %s", (version) => {
     expect(() => storageMigrationPlan(version)).toThrow();
   });
   it("rejects unknown target versions", () => {
-    expect(() => storageMigrationPlan(1, 4)).toThrow();
+    expect(() => storageMigrationPlan(1, 5)).toThrow();
   });
 });

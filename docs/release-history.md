@@ -16,5 +16,6 @@
 | Milestone10 | 대화형 이력/예측·문서 정리 | [#32](https://github.com/jominq0131-boop/fire-dashboard/pull/32)                                                                   |
 | Milestone11 | 복합 차트·툴팁·확대        | [#34](https://github.com/jominq0131-boop/fire-dashboard/pull/34)                                                                   |
 | Milestone12 | 연결 추세·전체 다크 테마   | [#36](https://github.com/jominq0131-boop/fire-dashboard/pull/36)                                                                   |
+| Milestone13 | 브랜드 타입·아이콘·앱 셸   | [#38](https://github.com/jominq0131-boop/fire-dashboard/pull/38)                                                                   |
 
-Milestone13의 구현·검증·병합·배포 상태는 [Issue #37 연결 PR](https://github.com/jominq0131-boop/fire-dashboard/issues/37)의 릴리스 기록을 따릅니다.
+Milestone14의 구현·검증·병합·배포 상태는 [Issue #39 연결 PR](https://github.com/jominq0131-boop/fire-dashboard/issues/39)의 릴리스 기록을 따릅니다.

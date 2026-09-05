@@ -68,7 +68,7 @@ test("v1 migration preserves accounts and rollback preserves v1 before retry", a
   expect(result.afterFailure).toEqual({ version: 1, stores: ["accounts"] });
   expect(result.preserved).toEqual(result.account);
   expect(result.indexes).toEqual({ cash: true, balance: true });
-  expect(result.version).toBe(3);
+  expect(result.version).toBe(4);
 });
 
 test("monthly repository enforces references, concurrent uniqueness, stale edits and commit rollback", async ({
@@ -332,7 +332,7 @@ test("100 monthly balance rows remain editable and global capacity blocks only n
   await page.goto("/");
   await expect(page.getByRole("button", { name: "口座を追加", exact: true })).toBeEnabled();
   await page.evaluate(async () => {
-    const r = indexedDB.open("fire-dashboard", 3);
+    const r = indexedDB.open("fire-dashboard", 4);
     await new Promise<void>((resolve, reject) => {
       r.onerror = () => reject(r.error);
       r.onsuccess = () => {

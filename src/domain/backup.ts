@@ -1,16 +1,22 @@
 import { isAssetAccount, MAX_ACCOUNTS } from "./accounts";
 import { isMonthlyRecord, MAX_BALANCES, MAX_MONTHS } from "./monthly";
 import type { AssetAccount, MonthlyCashFlowRecord, AccountBalanceSnapshot } from "./models";
+import { normalizeFirePlan, sameFirePlan, type FirePlan } from "./fire-plan";
 
 export const MAX_BACKUP_BYTES = 32 * 1024 * 1024;
 export interface Backup {
-  schemaVersion: 1 | 2;
+  schemaVersion: 1 | 2 | 3;
   accounts: AssetAccount[];
   monthlyCashFlows: MonthlyCashFlowRecord[];
   accountBalanceSnapshots: AccountBalanceSnapshot[];
+  firePlan?: FirePlan | null;
+}
+export interface CurrentBackup extends Backup {
+  schemaVersion: 3;
+  firePlan: FirePlan | null;
 }
 export interface BackupRepository {
-  exportBackup(): Promise<Backup>;
+  exportBackup(): Promise<CurrentBackup>;
   importBackup(backup: Backup): Promise<number>;
 }
 const compare = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
@@ -24,16 +30,17 @@ export function canonical(value: object): string {
 }
 const invalid = () =>
   new Error("バックアップの形式・件数・参照・重複を確認してください。元の記録は変更していません。");
-/** v1 to v2 preserves records and unknown observation dates; no inferred dates are added. */
-export function normalizeBackup(value: unknown): Backup {
+/** v1/v2 to v3 preserves records and unknown observation dates; no inferred values are added. */
+export function normalizeBackup(value: unknown): CurrentBackup {
   if (!value || typeof value !== "object") throw invalid();
   const v = value as Record<string, unknown>;
   if (
-    (v.schemaVersion !== 1 && v.schemaVersion !== 2) ||
-    Object.keys(v).length !== 4 ||
+    (v.schemaVersion !== 1 && v.schemaVersion !== 2 && v.schemaVersion !== 3) ||
+    Object.keys(v).length !== (v.schemaVersion === 3 ? 5 : 4) ||
     !["schemaVersion", "accounts", "monthlyCashFlows", "accountBalanceSnapshots"].every((k) =>
       Object.hasOwn(v, k),
-    )
+    ) ||
+    (v.schemaVersion === 3 ? !Object.hasOwn(v, "firePlan") : Object.hasOwn(v, "firePlan"))
   )
     throw invalid();
   const arrays = [v.accounts, v.monthlyCashFlows, v.accountBalanceSnapshots];
@@ -62,13 +69,16 @@ export function normalizeBackup(value: unknown): Backup {
     !balances.every((b) => ids.has(b.accountId))
   )
     throw invalid();
-  const result: Backup = {
-    schemaVersion: 2,
+  let firePlan: FirePlan | null = null;
+  if (v.schemaVersion === 3 && v.firePlan !== null) firePlan = normalizeFirePlan(v.firePlan);
+  const result: CurrentBackup = {
+    schemaVersion: 3,
     accounts: [...accounts].sort((a, b) => compare(a.id, b.id)),
     monthlyCashFlows: [...cash].sort((a, b) => compare(a.month, b.month)),
     accountBalanceSnapshots: [...balances].sort(
       (a, b) => a.month.localeCompare(b.month) || compare(a.accountId, b.accountId),
     ),
+    firePlan,
   };
   if (backupBytes(canonical(result)) > MAX_BACKUP_BYTES)
     throw new Error("バックアップは32 MiB以内で扱えます。記録は削除していません。");
@@ -99,11 +109,23 @@ export function mergeBackup(current: Backup, incoming: Backup) {
     }
     return [...map.values()];
   };
+  let firePlan = left.firePlan;
+  if (right.firePlan) {
+    if (!firePlan) {
+      firePlan = right.firePlan;
+      added++;
+    } else if (!sameFirePlan(firePlan, right.firePlan)) {
+      throw new Error(
+        "既存のFIRE計画と競合しています。変更は適用していません。必要な計画をJSONで別に保管してください。",
+      );
+    }
+  }
   const backup = normalizeBackup({
-    schemaVersion: 2,
+    schemaVersion: 3,
     accounts: merge(left.accounts, right.accounts),
     monthlyCashFlows: merge(left.monthlyCashFlows, right.monthlyCashFlows),
     accountBalanceSnapshots: merge(left.accountBalanceSnapshots, right.accountBalanceSnapshots),
+    firePlan,
   });
   return { backup, added };
 }

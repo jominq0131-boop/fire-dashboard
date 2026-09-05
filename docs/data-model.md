@@ -2,14 +2,14 @@
 
 ## 현재 버전과 모델
 
-주 저장소는 IndexedDB `fire-dashboard` **v3**, 내보내기 형식은 JSON **v2**입니다. 두 버전은 별개입니다. Milestone 12는 저장 스키마나 금융 계산식을 변경하지 않습니다.
+주 저장소는 IndexedDB `fire-dashboard` **v4**, 내보내기 형식은 JSON **v3**입니다. 두 버전은 별개입니다.
 
 | 모델                   | 주요 필드와 규칙                                                                         |
 | ---------------------- | ---------------------------------------------------------------------------------------- |
 | AssetAccount           | id/name/category/isActive/sortOrder 5필드, 이름·ID 최대100 UTF-16 단위, 휴지 포함100계좌 |
 | MonthlyCashFlowRecord  | id/month/income/expenses/investmentContribution/note?/createdAt/updatedAt                |
 | AccountBalanceSnapshot | id/month/accountId/balance/asOfDate?/createdAt/updatedAt, 계좌·월당1개                   |
-| FireScenario           | 시작 자산·목표·월 적립액·수익률/물가 basis points, 임시 상태                             |
+| FirePlan               | primary ID, 입력 문자열, 마지막 계산 가정, 최대3개 비교, updatedAt                       |
 | FireProjection         | 최대1200개월 계산의 첫 도달/overflow와 최대101개 연도별 점, 저장 안 함                   |
 
 금액 입력은 0부터 Number.MAX_SAFE_INTEGER까지 정수 엔입니다. 목표는 1엔 이상입니다. 빈칸은 0이 아닙니다. 부호·소수·지수·쉼표 금액 입력은 거부합니다. 월은 YYYY-MM,1900-01~2199-12입니다. 메모는 최대1000 UTF-16 단위입니다.
@@ -21,6 +21,7 @@ createdAt/updatedAt은 실제 UTC ISO 밀리초 날짜이며 생성 시각 보�
 - v0→v1: accounts(id) 생성.
 - v1→v2: monthlyCashFlows(id, month unique), accountBalanceSnapshots(id, monthAccount unique, month index) 추가.
 - v2→v3: 기존 잔액 저장소에 accountMonth [accountId, month] unique 인덱스 추가.
+- v3→v4: firePlans(id) 빈 저장소 추가. 기존 기록을 읽거나 다시 쓰지 않음.
 - 업그레이드에는 데이터 추정·날짜 생성·원본 재작성 없음. 실패는 트랜잭션 롤백으로 이전 버전과 기록을 보존합니다.
 - 알 수 없는 미래 버전·손상·상한 초과는 명시적으로 거부하고 삭제/다운그레이드하지 않습니다.
 - 수정은 읽었던 이전 값과 트랜잭션 내 현재 값을 비교합니다. 동일 월/계좌 중복과 존재하지 않는 계좌 참조를 거부합니다.
@@ -39,10 +40,10 @@ createdAt/updatedAt은 실제 UTC ISO 밀리초 날짜이며 생성 시각 보�
 
 수익률과 물가상승률은 사용자가 직접 입력한 명목 연율 -99~100%, 소수2자리까지이며 정수 basis points로 변환합니다. 연율/12로 매월 복리 계산하고 정수 엔으로 절반 올림한 뒤 월말 고정 명목 적립액을 더합니다. 목표도 같은 방식으로 물가를 반영합니다. BigInt 중간 연산, 최대100년, 안전 정수 범위 초과 시 중단합니다.
 
-첫 도달은 이후 목표 유지나 은퇴 가능성을 뜻하지 않습니다. 세금·수수료·부채·인출·시장 변동은 계산하지 않습니다. 상세 식과 작은 금액의 반올림 특성은 [FIRE 계약](milestone-8-plan.md)에 있습니다. 비교는 최대3개 가정/결과의 독립 스냅샷입니다. 모든 가정/비교/선택 상태는 재로드 시 사라지며 백업하지 않습니다.
+첫 도달은 이후 목표 유지나 은퇴 가능성을 뜻하지 않습니다. 세금·수수료·부채·인출·시장 변동은 계산하지 않습니다. 상세 식과 작은 금액의 반올림 특성은 [FIRE 계약](milestone-8-plan.md)에 있습니다. 비교는 최대3개 가정의 독립 스냅샷입니다. 입력 중 문자열과 마지막 계산 가정·비교는 단일 계획으로 저장하고, 결과 점은 가정에서 결정론적으로 다시 계산합니다.
 
 ## JSON 백업과 복원
 
-최상위 필드는 schemaVersion/accounts/monthlyCashFlows/accountBalanceSnapshots입니다. v1/v2를 허용하고 결정론적 정렬과 검증 후 v2를 생성합니다. v1→v2는 원본 필드·ID·노트·시각과 확인일 미상을 보존하며 날짜를 만들지 않습니다. v1로 표시한 asOfDate, 추가 필드, 중복 ID/자연 키, 잘못된 참조/값/버전은 거부합니다.
+최상위 필드는 schemaVersion/accounts/monthlyCashFlows/accountBalanceSnapshots/firePlan입니다. v1/v2/v3를 허용하고 결정론적 정렬과 검증 후 v3를 생성합니다. v1/v2는 `firePlan: null`로 읽으며 기존 원본 필드·ID·노트·시각과 확인일 미상을 보존합니다. v1로 표시한 asOfDate, 추가 필드, 중복 ID/자연 키, 잘못된 참조/값/버전은 거부합니다.
 
-최대32 MiB. 미리보기 후 추가 방식으로 복원하며 동일 기록은 건너뛰고 충돌은 전체 취소합니다. 빈 브라우저에서 전체 복원할 수 있습니다. 원자적 복원과 상한 검증은 기존 데이터를 삭제하지 않습니다.
+최대32 MiB. 미리보기 후 추가 방식으로 복원하며 동일 기록·계획은 건너뛰고 충돌은 전체 취소합니다. 현재 계획과 들어오는 계획이 다르면 금융 기록을 포함한 복원 전체를 적용하지 않습니다. 빈 브라우저에서 전체 복원할 수 있습니다. 원자적 복원과 상한 검증은 기존 데이터를 삭제하지 않습니다.

@@ -9,6 +9,7 @@ import { AssetOverview } from "../features/monthly/AssetOverview";
 import { BackupManager } from "../features/backup/BackupManager";
 import type { PortfolioRepository } from "../domain/portfolio";
 import type { BackupRepository } from "../domain/backup";
+import type { FirePlanRepository } from "../domain/fire-plan";
 import { Icon } from "./Icon";
 import { FirePlanner } from "../features/fire/FirePlanner";
 
@@ -17,11 +18,13 @@ export function App({
   monthlyRepository,
   portfolioRepository,
   backupRepository,
+  firePlanRepository,
 }: {
   accountRepository: AccountRepository;
   monthlyRepository: MonthlyRepository;
   portfolioRepository: PortfolioRepository;
   backupRepository: BackupRepository;
+  firePlanRepository: FirePlanRepository;
 }) {
   const [summary, setSummary] = useState<MetricsSource | null>(null);
   const fireRef = useRef<{ useAssets: (value: number, source: string) => boolean }>(null);
@@ -164,7 +167,12 @@ export function App({
             />
           </div>
         </div>
-        <FirePlanner repository={portfolioRepository} navigationRef={fireRef} />
+        <FirePlanner
+          repository={portfolioRepository}
+          firePlanRepository={firePlanRepository}
+          navigationRef={fireRef}
+          revision={importRevision}
+        />
         <BackupManager
           repository={backupRepository}
           onImported={() => {

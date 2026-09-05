@@ -6,7 +6,7 @@ async function seed(page: Page, count: number) {
   await expect(page.getByRole("button", { name: "口座を追加", exact: true })).toBeEnabled();
   await page.evaluate(async (total) => {
     await new Promise<void>((resolve, reject) => {
-      const open = indexedDB.open("fire-dashboard", 3);
+      const open = indexedDB.open("fire-dashboard", 4);
       open.onerror = () => reject(open.error);
       open.onsuccess = () => {
         const db = open.result;
@@ -98,13 +98,14 @@ test("oversized existing stores are preserved and rejected before materializing 
     };
   });
   await page.reload();
-  await expect(page.getByRole("alert")).toContainText("100件");
-  await expect(page.getByRole("alert")).toContainText("削除していません");
+  const accountAlert = page.locator("#accounts").getByRole("alert");
+  await expect(accountAlert).toContainText("100件");
+  await expect(accountAlert).toContainText("削除していません");
   await expect(page.getByRole("listitem")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "口座を追加", exact: true })).toBeDisabled();
   const preserved = await page.evaluate(async () => {
     return new Promise((resolve, reject) => {
-      const open = indexedDB.open("fire-dashboard", 3);
+      const open = indexedDB.open("fire-dashboard", 4);
       open.onerror = () => reject(open.error);
       open.onsuccess = () => {
         const db = open.result;

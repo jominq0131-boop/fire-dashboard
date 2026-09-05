@@ -22,12 +22,27 @@ import {
   normalizeBackup,
   type Backup,
   type BackupRepository,
+  type CurrentBackup,
 } from "../domain/backup";
-import { ACCOUNT_STORE, CASH_STORE, BALANCE_STORE } from "../domain/storage-migrations";
+import { normalizeFirePlan } from "../domain/fire-plan";
+import {
+  ACCOUNT_STORE,
+  CASH_STORE,
+  BALANCE_STORE,
+  FIRE_PLAN_STORE,
+} from "../domain/storage-migrations";
 import { DATABASE_NAME, openAccountDatabase } from "./indexeddb-accounts";
 
-const stores = [ACCOUNT_STORE, CASH_STORE, BALANCE_STORE];
-const limits = [MAX_ACCOUNTS, MAX_MONTHS, MAX_BALANCES];
+const stores = [ACCOUNT_STORE, CASH_STORE, BALANCE_STORE, FIRE_PLAN_STORE];
+const limits = [MAX_ACCOUNTS, MAX_MONTHS, MAX_BALANCES, 1];
+const validSnapshotRecord = (value: unknown, index: number) => {
+  if (index === 0) return isAssetAccount(value);
+  if (index === 3) {
+    normalizeFirePlan(value);
+    return true;
+  }
+  return isMonthlyRecord(value, index === 1);
+};
 type Read = <T>(request: IDBRequest<T>, next: (value: T) => void) => void;
 export class IndexedDbPortfolioRepository implements PortfolioRepository, BackupRepository {
   constructor(private readonly databaseName = DATABASE_NAME) {}
@@ -199,8 +214,8 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
       });
     });
   }
-  private snapshot(tx: IDBTransaction, read: Read, done: (backup: Backup) => void) {
-    const values: unknown[][] = [[], [], []];
+  private snapshot(tx: IDBTransaction, read: Read, done: (backup: CurrentBackup) => void) {
+    const values: unknown[][] = stores.map(() => []);
     let bytes = 100,
       remaining = stores.length;
     stores.forEach((name, i) => {
@@ -209,17 +224,18 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
           if (--remaining === 0)
             done(
               normalizeBackup({
-                schemaVersion: 2,
+                schemaVersion: 3,
                 accounts: values[0],
                 monthlyCashFlows: values[1],
                 accountBalanceSnapshots: values[2],
+                firePlan: values[3][0] ?? null,
               }),
             );
           return;
         }
         assertCapacity(values[i].length, limits[i], true);
         const value: unknown = cursor.value;
-        if (i === 0 ? !isAssetAccount(value) : !isMonthlyRecord(value, i === 1))
+        if (!validSnapshotRecord(value, i))
           throw new Error("保存済み記録を検証できません。元のデータを保持しています。");
         bytes += backupBytes(canonical(value as object)) + 1;
         if (bytes > MAX_BACKUP_BYTES)
@@ -230,7 +246,7 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
     });
   }
   exportBackup() {
-    return this.run<Backup>("readonly", (tx, read, done) => this.snapshot(tx, read, done));
+    return this.run<CurrentBackup>("readonly", (tx, read, done) => this.snapshot(tx, read, done));
   }
   async importBackup(input: Backup) {
     // Validate before opening any write transaction; freeze a canonical copy across the await.
@@ -242,8 +258,14 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
           current.accounts,
           current.monthlyCashFlows,
           current.accountBalanceSnapshots,
+          current.firePlan ? [current.firePlan] : [],
         ];
-        const merged = [backup.accounts, backup.monthlyCashFlows, backup.accountBalanceSnapshots];
+        const merged = [
+          backup.accounts,
+          backup.monthlyCashFlows,
+          backup.accountBalanceSnapshots,
+          backup.firePlan ? [backup.firePlan] : [],
+        ];
         stores.forEach((name, i) => {
           const ids = new Set(existing[i].map((r) => r.id));
           for (const record of merged[i]) if (!ids.has(record.id)) tx.objectStore(name).add(record);

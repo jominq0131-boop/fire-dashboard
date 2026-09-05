@@ -6,8 +6,9 @@
 - monthly:1900-01~2199-12, 정수 엔, 레코드/참조/상한·월별 저장소 계약.
 - observations:실제 확인 날짜, 마지막 잔액 합계와 확인 상태.
 - metrics/portfolio:월별 지표,12개월 창, 비교 가능한 월의 차이.
-- backup:JSONv1/v2 검증, 결정론적 v2 정규화, 추가 복원 충돌 규칙.
+- backup:JSONv1/v2/v3 검증, 결정론적 v3 정규화, 계획을 포함한 추가 복원 충돌 규칙.
 - fire:명시적 가정,BigInt 월별 반올림,1200개월 상한과 overflow.
-- storage-migrations:DBv1→v2→v3 결정론적 추가 계획.
+- fire-plan:입력·마지막 계산 가정·최대3개 비교의 검증과 저장소 계약.
+- storage-migrations:DBv1→v2→v3→v4 결정론적 추가 계획.
 
 차트 좌표·선 연결의 표시 처리는 features/charts에 있으며 금융 값을 바꾸지 않습니다. 세부 계약은 [데이터 모델](../../docs/data-model.md)을 따릅니다.

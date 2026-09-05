@@ -58,9 +58,7 @@ test("resume today, retain last-known accounts, show actual dates and preserve f
   await page.screenshot({ path: "test-results/everyday-mobile.png", fullPage: true });
 });
 
-test("v2 to v3 index migration rolls back on failure and preserves legacy records", async ({
-  page,
-}) => {
+test("v2 to v4 migration rolls back on failure and preserves legacy records", async ({ page }) => {
   await page.goto("/");
   const result = await page.evaluate(async (backup) => {
     const { storageMigrationPlan } = await import(
@@ -123,16 +121,26 @@ test("v2 to v3 index migration rolls back on failure and preserves legacy record
       .objectStore("accountBalanceSnapshots")
       .index("accountMonth");
     const indexKey = index.keyPath;
+    const firePlanKey = db.transaction("firePlans").objectStore("firePlans").keyPath;
     db.close();
     const repo = new IndexedDbPortfolioRepository(name);
     const exported = await repo.exportBackup();
     const view = await repo.readOverview("2026-09", undefined, "2026-09-04");
-    return { failed, oldVersion, version, indexKey, exported, current: view.current.balances };
+    return {
+      failed,
+      oldVersion,
+      version,
+      indexKey,
+      firePlanKey,
+      exported,
+      current: view.current.balances,
+    };
   }, syntheticBackup());
   expect(result.failed).toBe(true);
   expect(result.oldVersion).toBe(2);
-  expect(result.version).toBe(3);
+  expect(result.version).toBe(4);
   expect(result.indexKey).toEqual(["accountId", "month"]);
-  expect(result.exported).toEqual({ ...syntheticBackup(), schemaVersion: 2 });
+  expect(result.firePlanKey).toBe("id");
+  expect(result.exported).toEqual({ ...syntheticBackup(), schemaVersion: 3, firePlan: null });
   expect(result.current).toEqual([syntheticBackup().accountBalanceSnapshots[1]]);
 });

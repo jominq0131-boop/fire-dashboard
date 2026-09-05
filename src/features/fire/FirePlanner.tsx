@@ -1,19 +1,21 @@
-import { useState, useImperativeHandle, type Ref } from "react";
+import { useEffect, useMemo, useRef, useState, useImperativeHandle, type Ref } from "react";
 import { ProjectionChart } from "./ProjectionChart";
 import { ScenarioComparison } from "./ScenarioComparison";
 import { arrivalText } from "./fire-format";
-import { parseRate, projectFire, type FireProjection } from "../../domain/fire";
-import { parseYen } from "../../domain/monthly";
+import {
+  emptyFireScenario,
+  FIRE_PLAN_ID,
+  MAX_FIRE_COMPARISONS,
+  projectFireValues,
+  sameFirePlanContent,
+  type FirePlan,
+  type FirePlanRepository,
+  type FireScenarioValues,
+  type SavedFireScenario,
+} from "../../domain/fire-plan";
 import { currentTotal, localDate } from "../../domain/observations";
 import type { PortfolioRepository } from "../../domain/portfolio";
 
-const empty = {
-  startingAssets: "",
-  target: "",
-  monthlyContribution: "",
-  returnBps: "",
-  inflationBps: "",
-};
 const fields = [
   ["startingAssets", "開始資産（円）"],
   ["target", "目標資産・今日の価値（円）"],
@@ -24,16 +26,111 @@ const fields = [
 const yen = (n: number) => `${n.toLocaleString("ja-JP")} 円`;
 export function FirePlanner({
   repository,
+  firePlanRepository,
   navigationRef,
+  revision = 0,
 }: {
   repository: PortfolioRepository;
+  firePlanRepository: FirePlanRepository;
   navigationRef?: Ref<{ useAssets: (value: number, source: string) => boolean }>;
+  revision?: number;
 }) {
-  const [values, setValues] = useState(empty);
-  const [result, setResult] = useState<FireProjection | null>(null);
+  const [values, setValues] = useState<FireScenarioValues>(emptyFireScenario);
+  const [currentValues, setCurrentValues] = useState<FireScenarioValues | null>(null);
+  const [comparisons, setComparisons] = useState<SavedFireScenario[]>([]);
+  const result = useMemo(
+    () => (currentValues ? projectFireValues(currentValues) : null),
+    [currentValues],
+  );
   const [error, setError] = useState("");
+  const [saveError, setSaveError] = useState("");
+  const [saveState, setSaveState] = useState<"loading" | "idle" | "saving" | "saved">("loading");
   const [source, setSource] = useState("");
   const [busy, setBusy] = useState(false);
+  const [planReady, setPlanReady] = useState(false);
+  const baseline = useRef<FirePlan | null>(null);
+  const saveQueue = useRef<Promise<void>>(Promise.resolve());
+  const saveRevision = useRef(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    void saveQueue.current
+      .catch(() => undefined)
+      .then(() => {
+        if (cancelled) return null;
+        setPlanReady(false);
+        setSaveState("loading");
+        setSaveError("");
+        return firePlanRepository.load();
+      })
+      .then((plan) => {
+        if (cancelled) return;
+        baseline.current = plan;
+        setValues(plan?.draft ?? emptyFireScenario());
+        setCurrentValues(plan?.current ?? null);
+        setComparisons(plan?.comparisons ?? []);
+        setSource("");
+        setError("");
+        setPlanReady(true);
+        setSaveState(plan ? "saved" : "idle");
+      })
+      .catch((reason: unknown) => {
+        if (cancelled) return;
+        setSaveError(reason instanceof Error ? reason.message : "FIRE計画を読み込めません。");
+        setSaveState("idle");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [firePlanRepository, revision]);
+
+  useEffect(() => {
+    if (!planReady) return;
+    const content = {
+      id: FIRE_PLAN_ID,
+      draft: values,
+      current: currentValues,
+      comparisons,
+    } as const;
+    if (
+      !baseline.current &&
+      !content.current &&
+      content.comparisons.length === 0 &&
+      Object.values(content.draft).every((value) => value === "")
+    )
+      return;
+    if (sameFirePlanContent(baseline.current, content)) return;
+    const requestRevision = ++saveRevision.current;
+    setSaveState("saving");
+    setSaveError("");
+    saveQueue.current = saveQueue.current
+      .catch(() => undefined)
+      .then(async () => {
+        if (requestRevision !== saveRevision.current) return;
+        const next: FirePlan = {
+          ...content,
+          draft: { ...content.draft },
+          current: content.current ? { ...content.current } : null,
+          comparisons: content.comparisons.map((item) => ({
+            id: item.id,
+            values: { ...item.values },
+          })),
+          updatedAt: new Date().toISOString(),
+        };
+        const saved = await firePlanRepository.save(next, baseline.current);
+        baseline.current = saved;
+        if (requestRevision === saveRevision.current) setSaveState("saved");
+      })
+      .catch((reason: unknown) => {
+        if (requestRevision !== saveRevision.current) return;
+        setSaveState("idle");
+        setSaveError(
+          reason instanceof Error
+            ? reason.message
+            : "FIRE計画を保存できません。入力は残しています。",
+        );
+      });
+  }, [comparisons, currentValues, firePlanRepository, planReady, values]);
   useImperativeHandle(navigationRef, () => ({
     useAssets: (value, description) => {
       if (busy || !Number.isSafeInteger(value) || value < 0) return false;
@@ -45,7 +142,7 @@ export function FirePlanner({
       )
         return false;
       setValues((v) => ({ ...v, startingAssets: String(value) }));
-      setResult(null);
+      setCurrentValues(null);
       setError("");
       setSource(description);
       return true;
@@ -54,7 +151,7 @@ export function FirePlanner({
   async function loadRecorded() {
     setBusy(true);
     setError("");
-    setResult(null);
+    setCurrentValues(null);
     try {
       const today = localDate();
       const { current } = await repository.readOverview(today.slice(0, 7), undefined, today);
@@ -76,29 +173,28 @@ export function FirePlanner({
       <h2 id="fire-heading">FIREシミュレーション</h2>
       <p>目標まで、あとどのくらい？ ご自身の仮定で計算できます。</p>
       <p className="field-hint">
-        仮定はこの画面だけで使用します。再読み込みで消え、バックアップには含まれません。記録済みの残高は変更しません。
+        入力と比較はこの端末に自動保存し、JSONバックアップにも含めます。計算結果は保存した仮定から再現します。記録済みの残高は変更しません。
       </p>
+      <p className="fire-save-state" aria-live="polite">
+        {saveState === "loading" && "保存済みのFIRE計画を読み込んでいます…"}
+        {saveState === "saving" && "FIRE計画を保存しています…"}
+        {saveState === "saved" && "FIRE計画をこの端末に保存しました"}
+      </p>
+      {saveError && <p role="alert">{saveError}</p>}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           setError("");
-          setResult(null);
+          setCurrentValues(null);
           try {
-            setResult(
-              projectFire({
-                startingAssets: parseYen(values.startingAssets),
-                target: parseYen(values.target),
-                monthlyContribution: parseYen(values.monthlyContribution),
-                returnBps: parseRate(values.returnBps),
-                inflationBps: parseRate(values.inflationBps),
-              }),
-            );
+            projectFireValues(values);
+            setCurrentValues({ ...values });
           } catch (e) {
             setError(e instanceof Error ? e.message : "入力を確認してください。");
           }
         }}
       >
-        <fieldset disabled={busy}>
+        <fieldset disabled={busy || !planReady}>
           <legend>計算の前提</legend>
           <button type="button" onClick={() => void loadRecorded()}>
             記録した総資産を使う
@@ -115,7 +211,7 @@ export function FirePlanner({
                   value={values[key]}
                   onChange={(e) => {
                     setValues({ ...values, [key]: e.target.value });
-                    setResult(null);
+                    setCurrentValues(null);
                     setError("");
                     if (key === "startingAssets") setSource("");
                   }}
@@ -127,8 +223,8 @@ export function FirePlanner({
           <button
             type="button"
             onClick={() => {
-              setValues(empty);
-              setResult(null);
+              setValues(emptyFireScenario());
+              setCurrentValues(null);
               setSource("");
               setError("");
             }}
@@ -187,7 +283,16 @@ export function FirePlanner({
           items={[{ id: "draft", label: "今回の試算", result }]}
         />
       )}
-      <ScenarioComparison values={values} result={result} />
+      <ScenarioComparison
+        result={result}
+        items={comparisons}
+        onAdd={() => {
+          if (!result || comparisons.length >= MAX_FIRE_COMPARISONS) return;
+          const id = Math.max(0, ...comparisons.map((item) => item.id)) + 1;
+          setComparisons([...comparisons, { id, values: { ...values } }]);
+        }}
+        onRemove={(id) => setComparisons(comparisons.filter((item) => item.id !== id))}
+      />
       <details>
         <summary>計算方法と結果の読み方</summary>
         <p>

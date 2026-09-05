@@ -7,8 +7,8 @@
 | accounts | 계좌 입력/휴지와 실패·충돌 입력 보존                           |
 | monthly  | 월별 입력/요약, 마지막 자산, 이력 필터/선택/상세               |
 | charts   | Recharts 복합 표시, 실선/참고 점선 연결, 툴팁·범례·키보드·확대 |
-| fire     | 임시 가정/계산 결과/최대3비교, 자산·목표 차트                  |
-| backup   | JSON 다운로드/검증/미리보기/원자적 추가 복원                   |
+| fire     | 가정·마지막 계산·최대3비교 자동 저장, 자산·목표 차트           |
+| backup   | 금융 기록과 FIRE 계획의 JSON 다운로드/검증/원자적 추가 복원    |
 
 HistoryExplorer는 최대12개월의 기존 조회 결과만 사용하고 자산/수입·지출 비교를 전환합니다. App을 통해 선택한 기록액을 FirePlanner에 전달하며 기존 가정 교체를 확인합니다. ProjectionChart는 이미 계산한 최대101개 점을 표시합니다. InteractiveLineChart는 동적 로딩 경계이며 FinancialChart의 좌표는 표시용입니다. 라이브러리는 금액 계산이나 저장을 하지 않습니다.
 
