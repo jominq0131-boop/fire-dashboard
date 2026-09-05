@@ -53,3 +53,7 @@ index.html은 제품명·설명·테마 색·Apple 메타데이터와 manifest�
 텍스트는 OS 네이티브 산세리프와 일본어 fallback을 사용하고 제목에는 가능한 경우 네이티브 rounded face를 사용합니다. 숫자는 tabular numerals를 유지하고 일본어 표시 텍스트는12px 미만으로 축소하지 않습니다. 상태는 색상만으로 전달하지 않고 텍스트/아이콘/ARIA를 함께 사용하며 reduced-motion 설정에서는 전환 시간을 사실상 제거합니다.
 
 [데이터 모델](data-model.md) · [자원 한도](resource-safety.md) · [검증](testing.md)
+
+## 목표 도달형 계산
+
+Milestone15는 [목표 도달형 계약](milestone-15-plan.md)을 추가합니다. GoalPlanner가 PortfolioRepository의 기존 제한 조회에서 시작 잔액과 완료월 저축 평균을 가져오고, goal-fire의 순수 계산으로 현금·NISA·과세계좌와 목표의6개 시리즈를 생성합니다. 기존 FirePlanner 저장과 비교는 유지합니다. 신규 입력은 메모리 상태이며 영속 스키마 변경이 없습니다.

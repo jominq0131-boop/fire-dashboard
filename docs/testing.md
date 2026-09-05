@@ -39,3 +39,7 @@ Vitest와 Playwright는 작업자1개, 합성 데이터만 사용합니다. Play
 5. PR에 검증된 head/merge SHA, Actions 링크, 실제 배포 결과 기록.
 
 CI와 Pages는 현재 독립 워크플로입니다. Pages 성공만으로 main CI가 성공했다고 간주하지 않습니다. [작업 기록](work-log.md)에 실행 결과를, [출시 이력](release-history.md)에 링크를 남깁니다.
+
+## 목표 도달형 검증
+
+`tests/unit/domain/goal-fire.test.ts`는 정확한 도달월, 현금 제외 인출, NISA 각 한도/연도 전환/취득액, 월별 반올림, 미도달/현금 부족/overflow를 검증합니다. `tests/e2e/goal-fire.spec.ts`는 합성 기록의 완료월 평균, 구성 금액/비율, 차트와 키보드, 입력 수정,320/390/1440px 넘침과 오류 상태를 확인합니다. 기존 FIRE 자동 저장 테스트도 함께 유지합니다.

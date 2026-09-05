@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, useImperativeHandle, type Ref } from "react";
 import { ProjectionChart } from "./ProjectionChart";
 import { ScenarioComparison } from "./ScenarioComparison";
+import { GoalPlanner } from "./GoalPlanner";
 import { arrivalText } from "./fire-format";
 import {
   emptyFireScenario,
@@ -171,6 +172,8 @@ export function FirePlanner({
   return (
     <section id="fire" className="asset-card fire-planner" aria-labelledby="fire-heading">
       <h2 id="fire-heading">FIREシミュレーション</h2>
+      <GoalPlanner repository={repository} />
+      <h3>従来の一括資産プラン・比較</h3>
       <p>目標まで、あとどのくらい？ ご自身の仮定で計算できます。</p>
       <p className="field-hint">
         入力と比較はこの端末に自動保存し、JSONバックアップにも含めます。計算結果は保存した仮定から再現します。記録済みの残高は変更しません。
