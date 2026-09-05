@@ -1943,7 +1943,8 @@ form .account-actions {
     border-radius: 16px;
   }
   .financial-plot {
-    height: 300px;
+    /* Leave one CSS pixel for fractional device-scale rounding in headless browsers. */
+    height: 301px;
   }
   .chart-heading,
   .chart-legend,
