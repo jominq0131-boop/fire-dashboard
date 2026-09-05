@@ -13,7 +13,7 @@
 
 ## 구현 계약
 
-[월별 저장](milestone-5-plan.md) → [이력·백업](milestone-7-plan.md) → [확인일 기록](everyday-recording-plan.md) → [FIRE 계산](milestone-8-plan.md) → [비교·레이아웃](milestone-9-plan.md) → [대화형 차트](milestone-10-plan.md) → [차트 분석 워크스페이스](milestone-11-plan.md) → [연결 추세·전체 디자인](milestone-12-plan.md)
+[월별 저장](milestone-5-plan.md) → [이력·백업](milestone-7-plan.md) → [확인일 기록](everyday-recording-plan.md) → [FIRE 계산](milestone-8-plan.md) → [비교·레이아웃](milestone-9-plan.md) → [대화형 차트](milestone-10-plan.md) → [차트 분석 워크스페이스](milestone-11-plan.md) → [연결 추세·전체 디자인](milestone-12-plan.md) → [브랜드 타이포그래피·앱 셸](milestone-13-plan.md)
 
 이 계약들은 해당 구현 시점의 의도를 보존합니다. 현재 저장 버전과 동작은 데이터 모델 문서가 우선이며 실제 출시 증거는 연결 PR에 있습니다.
 

@@ -56,7 +56,7 @@ export function App({
             fire<span className="brand-dot">.</span>
           </span>
         </a>
-        <div className="sidebar-label">YOUR SPACE</div>
+        <div className="sidebar-label">PERSONAL FINANCE</div>
         <nav aria-label="メインナビゲーション">
           <a href="#overview" aria-current={active === "#overview" ? "location" : undefined}>
             <Icon name="home" />
@@ -75,7 +75,7 @@ export function App({
             バックアップ
           </a>
           <a href="#fire" aria-current={active === "#fire" ? "location" : undefined}>
-            <Icon name="home" /> FIRE試算
+            <Icon name="spark" /> FIRE試算
           </a>
         </nav>
         <div className="sidebar-bottom">
@@ -88,8 +88,8 @@ export function App({
       <main id="main-content" className="dashboard-shell">
         <header className="dashboard-header">
           <div>
-            <p className="page-kicker">MY FINANCE</p>
-            <h1>FIRE Dashboard</h1>
+            <p className="page-kicker">YOUR FINANCIAL COMPASS</p>
+            <h1 aria-label="FIRE Dashboard">資産を、もっと自分らしく。</h1>
           </div>
           <span className="status-badge">
             <span />
