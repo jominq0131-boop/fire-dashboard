@@ -70,8 +70,18 @@ test("three immutable comparison snapshots, cap, removal, overflow and reload", 
     .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))
     .toBe(true);
   await expect(comparison.getByRole("button", { name: /比較から外す/ })).toHaveCount(3);
+  await expect
+    .poll(() =>
+      page.evaluate(async () => {
+        const { IndexedDbFirePlanRepository } = await import(
+          new URL("src/infrastructure/indexeddb-fire-plan.ts", location.href).href
+        );
+        return (await new IndexedDbFirePlanRepository().load())?.comparisons.length;
+      }),
+    )
+    .toBe(3);
   await page.reload();
-  await expect(comparison.getByRole("table")).toHaveCount(0);
+  await expect(comparison.getByRole("button", { name: /比較から外す/ })).toHaveCount(3);
 });
 
 test("long names and maximum yen keep cards, actions and fields within their tracks", async ({

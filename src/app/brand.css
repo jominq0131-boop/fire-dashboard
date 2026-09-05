@@ -184,6 +184,35 @@ body {
   font-size: 12px;
 }
 
+/* Japanese auxiliary copy remains legible at compact widths and high-density displays. */
+.app-layout
+  :is(
+    .sidebar-label,
+    .page-kicker,
+    .section-kicker,
+    .chart-eyebrow,
+    .analysis-eyebrow,
+    .step-indicator,
+    .workspace-heading > span,
+    .section-heading > span,
+    .balance-heading > span,
+    .field-hint,
+    .fire-save-state,
+    .text-link,
+    .asset-footer,
+    .asset-footer .text-link,
+    .status-badge,
+    .start-footnote,
+    .chart-help,
+    .chart-unit,
+    .chart-range label,
+    .chart-inspector,
+    small
+  ) {
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .app-layout :is(.asset-card, .start-card) {
     transition:
@@ -242,8 +271,8 @@ body {
     gap: 3px;
     border: 0;
     border-radius: 12px;
-    font-size: 11px;
-    line-height: 1.1;
+    font-size: 12px;
+    line-height: 1.15;
     white-space: nowrap;
   }
 
@@ -278,14 +307,6 @@ body {
 
   .app-layout .page-heading h2 {
     font-size: clamp(28px, 9vw, 36px);
-  }
-
-  .app-layout :is(.page-kicker, .step-indicator, .workspace-heading > span, .start-footnote) {
-    font-size: 11px;
-  }
-
-  .app-layout :is(.asset-footer, .asset-footer .text-link, .status-badge) {
-    font-size: 10px;
   }
 
   .app-layout .page-heading > .text-link {

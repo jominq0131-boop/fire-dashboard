@@ -118,7 +118,7 @@ test("overview cash reads are bounded, validated and read-only", async ({ page }
       IDBIndex.prototype.getAll = original;
     }
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("fire-dashboard", 3);
+      const request = indexedDB.open("fire-dashboard", 4);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });

@@ -25,7 +25,7 @@ describe("versioned portable backup", () => {
     expect(canonical(normalizeBackup(reversed))).toBe(canonical(normalizeBackup(data)));
     expect(data).toEqual(before);
   });
-  it.each([0, 3, "1", null])("rejects unsupported version %s", (schemaVersion) =>
+  it.each([0, 4, "1", null])("rejects unsupported version %s", (schemaVersion) =>
     expect(() => normalizeBackup({ ...syntheticBackup(), schemaVersion })).toThrow(),
   );
   it.each([

@@ -21,11 +21,11 @@ it("validates real calendar dates and matching observation months", () => {
   expect(isMonthlyRecord({ ...b, asOfDate: "2026-08-31" }, false)).toBe(false);
   expect(isMonthlyRecord({ ...b, asOfDate: "" }, false)).toBe(false);
 });
-it("migrates JSON v1 without inventing dates and round-trips v2", () => {
+it("migrates JSON v1 without inventing dates and round-trips v3", () => {
   const v1 = syntheticBackup(),
     before = canonical(v1);
   const v2 = normalizeBackup(v1);
-  expect(v2).toEqual({ ...v1, schemaVersion: 2 });
+  expect(v2).toEqual({ ...v1, schemaVersion: 3, firePlan: null });
   expect(canonical(v1)).toBe(before);
   v2.accountBalanceSnapshots = v2.accountBalanceSnapshots.map((b) => ({
     ...b,
@@ -34,7 +34,7 @@ it("migrates JSON v1 without inventing dates and round-trips v2", () => {
   expect(normalizeBackup(JSON.parse(canonical(v2)))).toEqual(v2);
   expect(() => normalizeBackup({ ...v2, schemaVersion: 1 })).toThrow();
 });
-it("adds only the account/month index in v3 and retains all prior migration plans", () => {
+it("adds the account/month index in v3 and empty FIRE store in v4", () => {
   const migration = storageMigrationPlan(2, 3);
   expect(migration).toEqual([
     {
@@ -45,8 +45,10 @@ it("adds only the account/month index in v3 and retains all prior migration plan
       indexes: [{ name: "accountMonth", keyPath: ["accountId", "month"], unique: true }],
     },
   ]);
-  expect(storageMigrationPlan(0)).toEqual([...storageMigrationPlan(0, 2), ...migration]);
-  expect(storageMigrationPlan(3)).toEqual([]);
+  const v4 = [{ version: 4, store: "firePlans", keyPath: "id" }];
+  expect(storageMigrationPlan(3, 4)).toEqual(v4);
+  expect(storageMigrationPlan(0)).toEqual([...storageMigrationPlan(0, 2), ...migration, ...v4]);
+  expect(storageMigrationPlan(4)).toEqual([]);
 });
 it("distinguishes missing, unknown-date, fresh and stale records", () => {
   const b = syntheticBackup().accountBalanceSnapshots[0];

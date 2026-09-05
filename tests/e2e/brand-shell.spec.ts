@@ -79,8 +79,27 @@ test("mobile navigation behaves like a safe-area tab bar and typography stays re
     await expect(item.locator("svg")).toBeVisible();
     expect(
       Number.parseFloat(await item.evaluate((node) => getComputedStyle(node).fontSize)),
-    ).toBeGreaterThanOrEqual(11);
+    ).toBeGreaterThanOrEqual(12);
   }
+  const undersizedJapanese = await page.evaluate(() =>
+    [...document.body.querySelectorAll<HTMLElement>("*")]
+      .filter((node) => {
+        const directText = [...node.childNodes]
+          .filter((child) => child.nodeType === Node.TEXT_NODE)
+          .map((child) => child.textContent ?? "")
+          .join("");
+        const rect = node.getBoundingClientRect();
+        return (
+          /[\u3040-\u30ff\u3400-\u9fff]/u.test(directText) &&
+          rect.width > 0 &&
+          rect.height > 0 &&
+          getComputedStyle(node).visibility !== "hidden" &&
+          Number.parseFloat(getComputedStyle(node).fontSize) < 12
+        );
+      })
+      .map((node) => ({ tag: node.tagName, className: node.className, text: node.textContent })),
+  );
+  expect(undersizedJapanese).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: "test-results/branded-shell-mobile.png" });
   await page.screenshot({ path: "test-results/branded-flow-mobile.png", fullPage: true });
