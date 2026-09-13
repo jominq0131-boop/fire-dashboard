@@ -47,3 +47,5 @@ CI와 Pages는 현재 독립 워크플로입니다. Pages 성공만으로 main C
 ## Milestone16 검증
 
 목표 계획 단위 검증과 JSON v1~v4 보존/충돌 검증, goal-plan-storage의 실제 DB v4→v5 보존/롤백/탭 충돌/손상/초과, goal-plan-ui의 새로고침/빈 브라우저 복원/연도 경계를 추가합니다. 기존 검사의 현재 DB/JSON 기대 버전만5/4로 갱신하고 과거 버전 fixture는 유지합니다.
+
+responsive-window.spec.ts는 같은 페이지를 새로고침 없이320~2560px로 반복 변경합니다. 본문 오른쪽 경계,1600px 경계에서 축소 없음, 데스크톱 확장과 차트 재측정,860px 한 열 전환, 가로 넘침과 pageerror를 검증합니다.

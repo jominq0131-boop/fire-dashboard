@@ -37,7 +37,7 @@ fire. 상승 흐름 마크, 브라우저 파비콘, Apple touch icon과 web app 
 
 ## 현재 개발 상태
 
-Milestone15는 [PR #42](https://github.com/jominq0131-boop/fire-dashboard/pull/42)로 병합·배포했습니다. [Milestone16](docs/milestone-16-plan.md)은 [Issue #44](https://github.com/jominq0131-boop/fire-dashboard/issues/44)의 목표형 입력 자동 저장/JSON 복원 작업이며 로컬 구현·검증을 완료했으며 원격 게시 승인 대기입니다. 아직 Milestone16 병합·배포 완료를 뜻하지 않습니다.
+Milestone15는 [PR #42](https://github.com/jominq0131-boop/fire-dashboard/pull/42)로 병합·배포했습니다. [Milestone16](docs/milestone-16-plan.md)은 [Issue #44](https://github.com/jominq0131-boop/fire-dashboard/issues/44)의 목표형 입력 자동 저장/JSON 복원 작업이며 로컬 구현·검증을 완료했으며 창 크기 반응 수정과 함께 통합·배포 중입니다. 아직 Milestone16 병합·배포 완료를 뜻하지 않습니다.
 
 ## 개발과 문서
 
@@ -58,6 +58,6 @@ npm run test:e2e
 
 [문서 안내](docs/README.md) · [작업 재개 안내](docs/project-continuity.md) · [검증 절차](docs/testing.md) · [출시 이력](docs/release-history.md)
 
-## 다음 FIRE 화면 — 로컬 구현
+## 목표 도달형 FIRE
 
 [Milestone15](docs/milestone-15-plan.md)는 현재 현금·주식과 완료월 저축 평균에서 목표금액 도달 시점을 계산합니다. NISA 한도를 먼저 채우고 과세계좌로 적립하며, 도달시점 자산 금액/비율과 주식의 연3% 세전 자가배당을 표시합니다. Milestone16 작업에서는 목표 입력을 새로고침/JSON 백업에 보존하며 기존 자동 저장 계획/비교는 유지됩니다. 아직 병합·배포 완료를 뜻하지 않습니다.
