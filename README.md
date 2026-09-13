@@ -37,7 +37,7 @@ fire. 상승 흐름 마크, 브라우저 파비콘, Apple touch icon과 web app 
 
 ## 현재 개발 상태
 
-Milestone15는 [PR #42](https://github.com/jominq0131-boop/fire-dashboard/pull/42)로 병합·배포했습니다. [Milestone16](docs/milestone-16-plan.md)은 [Issue #44](https://github.com/jominq0131-boop/fire-dashboard/issues/44)의 목표형 입력 자동 저장/JSON 복원 작업이며 로컬 구현·검증을 완료했으며 PR 검토 단계입니다. 아직 Milestone16 병합·배포 완료를 뜻하지 않습니다.
+Milestone15는 [PR #42](https://github.com/jominq0131-boop/fire-dashboard/pull/42)로 병합·배포했습니다. [Milestone16](docs/milestone-16-plan.md)은 [Issue #44](https://github.com/jominq0131-boop/fire-dashboard/issues/44)의 목표형 입력 자동 저장/JSON 복원 작업이며 로컬 구현·검증을 완료했으며 원격 게시 승인 대기입니다. 아직 Milestone16 병합·배포 완료를 뜻하지 않습니다.
 
 ## 개발과 문서
 
