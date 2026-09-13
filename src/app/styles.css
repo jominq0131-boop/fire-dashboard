@@ -163,9 +163,9 @@ summary {
   font-size: 10px;
 }
 .dashboard-shell {
-  max-width: 1460px;
+  min-width: 0;
   margin-left: 208px;
-  padding: 34px 48px 30px;
+  padding: 34px clamp(28px, 3vw, 60px) 30px;
 }
 .dashboard-header {
   display: flex;
@@ -826,14 +826,6 @@ form .account-actions {
   font-size: 8px;
   letter-spacing: 1px;
   padding-top: 3px;
-}
-@media (min-width: 1600px) {
-  .dashboard-shell {
-    margin-right: auto;
-    max-width: 1280px;
-    padding-left: 60px;
-    padding-right: 60px;
-  }
 }
 @media (max-width: 1150px) {
   .sidebar {

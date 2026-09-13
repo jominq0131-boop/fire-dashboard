@@ -25,7 +25,7 @@ it("migrates JSON v1 without inventing dates and round-trips v3", () => {
   const v1 = syntheticBackup(),
     before = canonical(v1);
   const v2 = normalizeBackup(v1);
-  expect(v2).toEqual({ ...v1, schemaVersion: 3, firePlan: null });
+  expect(v2).toEqual({ ...v1, schemaVersion: 4, firePlan: null, goalPlan: null });
   expect(canonical(v1)).toBe(before);
   v2.accountBalanceSnapshots = v2.accountBalanceSnapshots.map((b) => ({
     ...b,
@@ -47,8 +47,13 @@ it("adds the account/month index in v3 and empty FIRE store in v4", () => {
   ]);
   const v4 = [{ version: 4, store: "firePlans", keyPath: "id" }];
   expect(storageMigrationPlan(3, 4)).toEqual(v4);
-  expect(storageMigrationPlan(0)).toEqual([...storageMigrationPlan(0, 2), ...migration, ...v4]);
-  expect(storageMigrationPlan(4)).toEqual([]);
+  expect(storageMigrationPlan(0)).toEqual([
+    ...storageMigrationPlan(0, 2),
+    ...migration,
+    ...v4,
+    ...storageMigrationPlan(4, 5),
+  ]);
+  expect(storageMigrationPlan(5)).toEqual([]);
 });
 it("distinguishes missing, unknown-date, fresh and stale records", () => {
   const b = syntheticBackup().accountBalanceSnapshots[0];

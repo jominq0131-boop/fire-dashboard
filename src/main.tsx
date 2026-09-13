@@ -1,3 +1,4 @@
+import { IndexedDbGoalPlanRepository } from "./infrastructure/indexeddb-goal-plan";
 import { IndexedDbPortfolioRepository } from "./infrastructure/indexeddb-portfolio";
 import { IndexedDbMonthlyRepository } from "./infrastructure/indexeddb-monthly";
 import { StrictMode } from "react";
@@ -12,6 +13,7 @@ import "./app/brand.css";
 const accountRepository = new IndexedDbAccountRepository();
 const monthlyRepository = new IndexedDbMonthlyRepository();
 const portfolioRepository = new IndexedDbPortfolioRepository();
+const goalPlanRepository = new IndexedDbGoalPlanRepository();
 const firePlanRepository = new IndexedDbFirePlanRepository();
 
 createRoot(document.getElementById("root")!).render(
@@ -22,6 +24,7 @@ createRoot(document.getElementById("root")!).render(
       portfolioRepository={portfolioRepository}
       backupRepository={portfolioRepository}
       firePlanRepository={firePlanRepository}
+      goalPlanRepository={goalPlanRepository}
     />
   </StrictMode>,
 );

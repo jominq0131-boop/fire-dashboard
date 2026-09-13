@@ -2,7 +2,7 @@
 
 ## 실행과 저장
 
-React/TypeScript/Vite를 빌드한 정적 파일을 GitHub Pages가 제공합니다. 금융 기록과 FIRE 계획은 각 기기의 IndexedDB에만 저장합니다. 현재 DB v4, JSON 백업 v3입니다. 네트워크 금융 연동·인증·자동 동기화는 없습니다.
+React/TypeScript/Vite를 빌드한 정적 파일을 GitHub Pages가 제공합니다. 금융 기록과 FIRE 계획은 각 기기의 IndexedDB에만 저장합니다. 현재 DB v5, JSON 백업 v4입니다. 네트워크 금융 연동·인증·자동 동기화는 없습니다.
 
 ## 계층
 
@@ -56,4 +56,8 @@ index.html은 제품명·설명·테마 색·Apple 메타데이터와 manifest�
 
 ## 목표 도달형 계산
 
-Milestone15는 [목표 도달형 계약](milestone-15-plan.md)을 추가합니다. GoalPlanner가 PortfolioRepository의 기존 제한 조회에서 시작 잔액과 완료월 저축 평균을 가져오고, goal-fire의 순수 계산으로 현금·NISA·과세계좌와 목표의6개 시리즈를 생성합니다. 기존 FirePlanner 저장과 비교는 유지합니다. 신규 입력은 메모리 상태이며 영속 스키마 변경이 없습니다.
+Milestone15는 [목표 도달형 계약](milestone-15-plan.md)을 추가합니다. GoalPlanner가 PortfolioRepository의 기존 제한 조회에서 시작 잔액과 완료월 저축 평균을 가져오고, goal-fire의 순수 계산으로 현금·NISA·과세계좌와 목표의6개 시리즈를 생성합니다. 기존 FirePlanner 저장과 비교는 유지합니다. 목표 입력은 주입된 GoalPlanRepository로 저장합니다. 계산 결과는 메모리에만 유지합니다.
+
+GoalPlanner는 단일 입력 저장 큐와 이전 값 비교를 사용합니다. 백업 복원 revision 변경 시 큐 완료 후 다시 읽고 결과를 무효화합니다. [Milestone16](milestone-16-plan.md)은 DB v5 goalPlans/JSON v4를 추가하며 기존 FIRE 저장소와 독립적입니다.
+
+본문은 사이드바를 제외한 가용 창 너비를 모두 사용하고 좌우 여백은28~60px로 변합니다. 1600px 이상에서 본문 폭을1280px로 고정하던 규칙을 제거했습니다. 860px 이하에서 한 열/하단 탐색으로 전환하며 차트도 컨테이너 크기를 다시 측정합니다.

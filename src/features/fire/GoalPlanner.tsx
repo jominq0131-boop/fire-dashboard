@@ -1,4 +1,10 @@
-import { useState } from "react";
+import {
+  initialGoalValues,
+  type GoalValues as Values,
+  type GoalPlan,
+  type GoalPlanRepository,
+} from "../../domain/goal-plan";
+import { useEffect, useRef, useState } from "react";
 import {
   goalSeed,
   projectGoal,
@@ -33,22 +39,6 @@ const nisaFields = [
   ["usedYearTsumitate", "今年のつみたて枠・買付済額"],
   ["usedYearGrowth", "今年の成長枠・買付済額"],
 ] as const;
-type Values = Record<Exclude<keyof GoalAssumptions, "startMonth">, string>;
-const initial = (): Values => ({
-  cash: "",
-  tsumitate: "",
-  growth: "",
-  taxable: "",
-  monthlyCash: "",
-  monthlyInvestment: "",
-  target: "50000000",
-  returnBps: "3",
-  withdrawalBps: "3",
-  usedTotal: "",
-  usedGrowth: "",
-  usedYearTsumitate: "",
-  usedYearGrowth: "",
-});
 function elapsed(month: number) {
   return `${Math.floor(month / 12)}年${month % 12}か月`;
 }
@@ -56,14 +46,91 @@ function dateAt(start: string, months: number) {
   const index = Number(start.slice(0, 4)) * 12 + Number(start.slice(5)) - 1 + months;
   return `${Math.floor(index / 12)}年${(index % 12) + 1}月`;
 }
-export function GoalPlanner({ repository }: { repository: PortfolioRepository }) {
-  const [values, setValues] = useState(initial);
+export function GoalPlanner({
+  repository,
+  goalPlanRepository,
+  revision = 0,
+}: {
+  repository: PortfolioRepository;
+  goalPlanRepository: GoalPlanRepository;
+  revision?: number;
+}) {
+  const [values, setValues] = useState(initialGoalValues);
   const [result, setResult] = useState<GoalResult | null>(null);
   const [calculated, setCalculated] = useState<GoalAssumptions | null>(null);
   const [error, setError] = useState("");
   const [source, setSource] = useState("");
   const [busy, setBusy] = useState(false);
   const [selected, setSelected] = useState(0);
+  const [referenceMonth, setReferenceMonth] = useState(() => localDate().slice(0, 7));
+  const [ready, setReady] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("目標計画を読み込んでいます…");
+  const [saveError, setSaveError] = useState("");
+  const baseline = useRef<GoalPlan | null>(null);
+  const queue = useRef<Promise<void>>(Promise.resolve());
+  const sequence = useRef(0);
+  const changed = useRef(false);
+  useEffect(() => {
+    let cancelled = false;
+    ++sequence.current;
+    setReady(false);
+    setSaveStatus("目標計画を読み込んでいます…");
+    void queue.current
+      .then(() => goalPlanRepository.load())
+      .then((plan) => {
+        if (cancelled) return;
+        baseline.current = plan;
+        changed.current = false;
+        setValues(plan?.draft ?? initialGoalValues());
+        setReferenceMonth(plan?.referenceMonth ?? localDate().slice(0, 7));
+        setResult(null);
+        setCalculated(null);
+        setSource("");
+        setError("");
+        setSaveError("");
+        setSaveStatus(plan ? "目標計画をこの端末に保存済みです" : "");
+        setReady(true);
+      })
+      .catch((e: unknown) => {
+        if (cancelled) return;
+        setSaveStatus("");
+        setSaveError(e instanceof Error ? e.message : "目標計画を読み込めません。");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [goalPlanRepository, revision]);
+  useEffect(() => {
+    if (!ready || !changed.current) return;
+    const request = ++sequence.current;
+    const draft = { ...values };
+    setSaveStatus("目標計画を保存しています…");
+    setSaveError("");
+    queue.current = queue.current
+      .then(async () => {
+        if (request !== sequence.current) return;
+        const saved = await goalPlanRepository.save(
+          {
+            id: "primary",
+            draft,
+            referenceMonth,
+            updatedAt: new Date(
+              Math.max(Date.now(), Date.parse(baseline.current?.updatedAt ?? "") || 0),
+            ).toISOString(),
+          },
+          baseline.current,
+        );
+        baseline.current = saved;
+        if (request === sequence.current) setSaveStatus("目標計画をこの端末に保存しました");
+      })
+      .catch((e: unknown) => {
+        if (request !== sequence.current) return;
+        setSaveStatus("");
+        setSaveError(
+          e instanceof Error ? e.message : "目標計画を保存できません。入力は残しています。",
+        );
+      });
+  }, [values, referenceMonth, ready, goalPlanRepository]);
   async function load() {
     setBusy(true);
     setError("");
@@ -72,6 +139,7 @@ export function GoalPlanner({ repository }: { repository: PortfolioRepository })
       const today = localDate();
       const overview = await repository.readOverview(today.slice(0, 7), undefined, today);
       const seed = goalSeed(overview, today.slice(0, 7));
+      changed.current = true;
       setValues((v) => ({
         ...v,
         cash: String(seed.cash),
@@ -101,6 +169,7 @@ export function GoalPlanner({ repository }: { repository: PortfolioRepository })
           inputMode={key.endsWith("Bps") || key === "monthlyCash" ? "decimal" : "numeric"}
           value={values[key]}
           onChange={(e) => {
+            changed.current = true;
             setValues({ ...values, [key]: e.target.value });
             setResult(null);
             setError("");
@@ -115,8 +184,22 @@ export function GoalPlanner({ repository }: { repository: PortfolioRepository })
       <h3 id="goal-heading">今のペースで、目標に届くのはいつ？</h3>
       <p>現金と株式を分け、毎月の貯蓄から目標への道のりを描きます。</p>
       <p className="field-hint">
-        この新しい試算の入力は画面を開いている間だけ保持します。再読み込み・JSONバックアップには含まれません。下の従来プランの自動保存は継続します。
+        入力はこの端末に自動保存し、JSONバックアップに含めます。復元後は入力を確認して再計算してください。計算結果は保存しません。保存完了の表示を確認してから再読み込み・バックアップしてください。
       </p>
+      <p className="fire-save-state" aria-live="polite">
+        {saveStatus}
+      </p>
+      {saveError && <p role="alert">{saveError}</p>}
+      {ready && (
+        <p className="field-hint">
+          入力の確認月: {referenceMonth}。現在の残高とNISAの今年の買付額を確認してください。
+        </p>
+      )}
+      {ready && referenceMonth !== localDate().slice(0, 7) && (
+        <p role="alert">
+          以前の月の入力です。年が変わった場合は今年のNISA買付額を確認・修正してください。
+        </p>
+      )}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -135,6 +218,8 @@ export function GoalPlanner({ repository }: { repository: PortfolioRepository })
             );
             const s = { ...parsed, startMonth: localDate().slice(0, 7) } as GoalAssumptions;
             const next = projectGoal(s);
+            changed.current = true;
+            setReferenceMonth(s.startMonth);
             setCalculated(s);
             setResult(next);
             setSelected(0);
@@ -143,7 +228,7 @@ export function GoalPlanner({ repository }: { repository: PortfolioRepository })
           }
         }}
       >
-        <fieldset disabled={busy}>
+        <fieldset disabled={busy || !ready}>
           <legend>1. 現在の資産と貯蓄ペース</legend>
           <button type="button" onClick={() => void load()}>
             現在の資産・貯蓄ペースを読み込む
@@ -156,7 +241,7 @@ export function GoalPlanner({ repository }: { repository: PortfolioRepository })
             投資積立。二重計上せず現金と株式へ別々に加算します。現金の利息は0%、株式は上記の一定年利です。
           </p>
         </fieldset>
-        <fieldset disabled={busy}>
+        <fieldset disabled={busy || !ready}>
           <legend>2. NISAの利用状況</legend>
           <p>
             評価額から利用枠は推定できません。証券会社の新NISA利用状況を確認し、未利用なら0を入力してください。
@@ -166,7 +251,7 @@ export function GoalPlanner({ repository }: { repository: PortfolioRepository })
             両枠の対象商品を買う前提で、つみたて枠→成長枠→特定・一般口座の順に新規積立します。年間120万/240万円、保有取得額1800万円（成長枠1200万円）を上限に計算。年間枠は1月にリセットします。2023年以前の旧NISAは対象外です。
           </p>
         </fieldset>
-        <button disabled={busy} type="submit">
+        <button disabled={busy || !ready} type="submit">
           目標到達を計算する
         </button>
       </form>

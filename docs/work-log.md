@@ -1,5 +1,11 @@
 # 작업 기록
 
+## Milestone 16 — Issue #44
+
+main 538ffc89에서 codex/milestone-16-goal-persistence를 생성했습니다. 목표 입력 자동 저장, 기준 월 안내, DB v5 빈 goalPlans 추가, JSON v4와 구버전 보존 복원을 구현했습니다. 새 의존성/실제 금융 자료/사용자 브라우저 프로필 변경은 없습니다.
+
+단위154개, 전체 Chromium56개(2.5분, exit0), lint/typecheck/build/format/diff 검사를 통과했습니다. 목표 계획 저장/새로고침/다른 브라우저 복원/충돌 원자성/연도 경계, DB v4→v5 보존과 실패 롤백, 기존 기능과320/390/1440px 넘침 검사를 확인했습니다. 초기 브라우저 부재는 프로젝트 전용 Chromium 설치로 해결했고 제한 환경의 종료 지연은 소유한 테스트 명령을 중단한 뒤 권한 있는 실행에서 정상 종료를 확인했습니다. 기존 테스트의 현재 버전 기대값과 미래 버전 fixture를5/6으로 갱신했습니다. PR 병합·배포는 아직 수행하지 않았습니다. 로컬 구현 커밋은5e924d8입니다. GitHub push는 자동 승인 검토에서 코드 외부 전송/원격 브랜치 생성의 명시적 승인 부족을 사유로 차단되어 게시·PR 생성은 미수행입니다. 사용자 승인 후 같은 브랜치를 게시하고 CI/병합/배포를 이어갑니다.
+
 ## Milestone 15 — Issue #41
 
 2026-09-05, 원격 main d3a5e0f와 열린 PR/issue 없음, 해당 main CI/Pages 성공을 확인하고 codex/goal-based-fire에서 구현했습니다. 배포 작업을 위해 [Issue #41](https://github.com/jominq0131-boop/fire-dashboard/issues/41)을 만들었습니다. 현재 현금/주식과 저축 추세에서 목표 도달월을 찾고 도달시점 자산 구성, 주식의 연3% 세전 자가배당을 표시해 달라는 요청입니다.
@@ -8,9 +14,13 @@ GoalPlanner와 goal-fire 순수 계산을 추가했습니다. 기존 제한 조�
 
 신규 입력은 화면 메모리만 사용하며 이를 UI와 문서에 명시했습니다. 기존 FIRE 자동 저장/비교는 유지합니다. DB v4/JSON v3, 의존성 변경은 없습니다. 실제 금융 데이터/사용자 프로필을 읽거나 수정하지 않았습니다. 신규 입력 영속 저장, 세후 계산, 도달 후 지속성은 후속 범위입니다.
 
-로컬 단위144개, 신규/기존 FIRE 브라우저8개, lint/typecheck/build/format/diff 검사를 통과했습니다. 합성 데이터로 도달월/인출액/완료월 평균과320/390/1440px 가로 넘침 없음을 확인했습니다. 전체 Chromium 회귀51개도2.7분에 정상 종료/exit0으로 통과했습니다. PR 생성/원격 게시/병합/배포는 아직 수행하지 않았습니다.
+로컬 단위144개, 신규/기존 FIRE 브라우저8개, lint/typecheck/build/format/diff 검사를 통과했습니다. 합성 데이터로 도달월/인출액/완료월 평균과320/390/1440px 가로 넘침 없음을 확인했습니다. 전체 Chromium 회귀51개도2.7분에 정상 종료/exit0으로 통과했습니다.
 
 PR #42의 첫 CI는50/51개 통과 후 Linux headless의 소수 픽셀 반올림으로 모바일 차트 높이가299.9999px로 측정되어 기존300px 하한 검사1개가 실패했습니다. 테스트를 낮추지 않고 모바일 차트 CSS 높이에1px 여유를 두어 실제 측정값도300px 이상이 되도록 수정했습니다.
+
+수정 head `f8b4734c`의 [PR CI](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/33947820926)가 성공한 뒤 [PR #42](https://github.com/jominq0131-boop/fire-dashboard/pull/42)를 squash merge했습니다. merge SHA는 `538ffc89e8bdaa3e39f94698b6b62c3d72637266`입니다. 해당 SHA의 [main CI](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/33948002107)와 [Pages](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/33948002118)가 모두 성공했습니다.
+
+공개 HTML·기본 JS·차트 JS·CSS는 모두 HTTP200이며 Pages와 같은 환경에서 만든 빌드와 SHA-256이 일치했습니다. 각각 `e7c7b39c…`, `2e47ab00…`, `c1225432…`, `4c2a0ca6…`입니다. [실제 사이트](https://jominq0131-boop.github.io/fire-dashboard/)에서 목표형 FIRE 입력을 확인했고,390px에서 문서 폭375px/viewport390px, 차트 높이301px, 고정 하단 내비게이션, 브라우저 page error0건을 확인했습니다. 실제 금융 데이터를 수정하지 않았습니다.
 
 ## Milestone 14 — Issue #39
 
@@ -65,3 +75,7 @@ IndexedDB v4에 단일 firePlans 저장소를 추가하고 입력 문자열, 마
 초기 새 테스트의 select 라벨 탐색 문제는 명시적 접근성 이름으로 수정했습니다. 화면 검토에서 현금흐름 누락을 찾아 월 인덱스로 최대12건을 같은 읽기 트랜잭션에서 검증·조회하도록 보강했습니다. 기존 제한 조회 테스트의 기대 요청을 잔액1200 + 현금흐름12로 정확히 갱신했고, 실제 저장값/미입력/손상/합계overflow를 추가 검증했습니다. 계산식과 DB/JSON 버전, 의존성은 그대로입니다.
 
 이 기록은 로컬 검증 시점이며 PR/main 병합·배포는 이후 단계입니다. 최종 SHA·Actions·공개 파일 검증 결과는 [Issue #31](https://github.com/jominq0131-boop/fire-dashboard/issues/31) 연결 PR의 릴리스 기록을 따릅니다. 과거 모든 작업 원문은 [이전 작업 기록](history/work-log.md)에 있습니다.
+
+## 창 크기 반응 수정과 PR 통합
+
+2026-09-13 사용자가 모든 열린 PR 병합과 최신 배포, 창 크기 반응 수정을 승인했습니다. 브랜치 게시를 완료했습니다. 본문 max-width1460px 및1600px 이상에서1280px로 축소되는 규칙이 원인이었습니다. 새 창 크기 회귀 검사는 수정 전112px의 우측 빈 공간으로 실패했고, 폭 제한 제거/유동 여백 적용 후320~2560px 반복 변경에서 통과했습니다. 문서 PR #43의 변경도 최종 통합 대상입니다. 최종 CI/병합/배포는 진행 중입니다.

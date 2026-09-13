@@ -8,7 +8,7 @@ const values = {
   inflationBps: "0",
 };
 
-test("v3 to v4 adds an empty FIRE plan store without rewriting existing records", async ({
+test("v3 to current adds an empty FIRE plan store without rewriting existing records", async ({
   page,
 }) => {
   await page.goto("/");
@@ -65,8 +65,8 @@ test("v3 to v4 adds an empty FIRE plan store without rewriting existing records"
     return output;
   });
   expect(result).toEqual({
-    version: 4,
-    stores: ["accountBalanceSnapshots", "accounts", "firePlans", "monthlyCashFlows"],
+    version: 5,
+    stores: ["accountBalanceSnapshots", "accounts", "firePlans", "goalPlans", "monthlyCashFlows"],
     account: {
       id: "preserved",
       name: "保持口座",

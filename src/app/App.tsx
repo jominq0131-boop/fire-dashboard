@@ -1,3 +1,4 @@
+import type { GoalPlanRepository } from "../domain/goal-plan";
 import { useEffect, useState, useCallback, useRef } from "react";
 import type { MonthlyRepository } from "../domain/monthly";
 import { MonthlyManager } from "../features/monthly/MonthlyManager";
@@ -19,12 +20,14 @@ export function App({
   portfolioRepository,
   backupRepository,
   firePlanRepository,
+  goalPlanRepository,
 }: {
   accountRepository: AccountRepository;
   monthlyRepository: MonthlyRepository;
   portfolioRepository: PortfolioRepository;
   backupRepository: BackupRepository;
   firePlanRepository: FirePlanRepository;
+  goalPlanRepository: GoalPlanRepository;
 }) {
   const [summary, setSummary] = useState<MetricsSource | null>(null);
   const fireRef = useRef<{ useAssets: (value: number, source: string) => boolean }>(null);
@@ -170,6 +173,7 @@ export function App({
         <FirePlanner
           repository={portfolioRepository}
           firePlanRepository={firePlanRepository}
+          goalPlanRepository={goalPlanRepository}
           navigationRef={fireRef}
           revision={importRevision}
         />

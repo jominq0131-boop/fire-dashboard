@@ -43,3 +43,9 @@ CI와 Pages는 현재 독립 워크플로입니다. Pages 성공만으로 main C
 ## 목표 도달형 검증
 
 `tests/unit/domain/goal-fire.test.ts`는 정확한 도달월, 현금 제외 인출, NISA 각 한도/연도 전환/취득액, 월별 반올림, 미도달/현금 부족/overflow를 검증합니다. `tests/e2e/goal-fire.spec.ts`는 합성 기록의 완료월 평균, 구성 금액/비율, 차트와 키보드, 입력 수정,320/390/1440px 넘침과 오류 상태를 확인합니다. 기존 FIRE 자동 저장 테스트도 함께 유지합니다.
+
+## Milestone16 검증
+
+목표 계획 단위 검증과 JSON v1~v4 보존/충돌 검증, goal-plan-storage의 실제 DB v4→v5 보존/롤백/탭 충돌/손상/초과, goal-plan-ui의 새로고침/빈 브라우저 복원/연도 경계를 추가합니다. 기존 검사의 현재 DB/JSON 기대 버전만5/4로 갱신하고 과거 버전 fixture는 유지합니다.
+
+responsive-window.spec.ts는 같은 페이지를 새로고침 없이320~2560px로 반복 변경합니다. 본문 오른쪽 경계,1600px 경계에서 축소 없음, 데스크톱 확장과 차트 재측정,860px 한 열 전환, 가로 넘침과 pageerror를 검증합니다.
