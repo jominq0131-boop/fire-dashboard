@@ -4,13 +4,13 @@
 
 실제 체크아웃은 `C:\Users\MINGYU\Documents\Codex\2026-09-04\fire-dashboard-next`입니다. 이전 사본 `files-pasted-by-the-user-fire`는 수정하지 않습니다. 저장소는 `jominq0131-boop/fire-dashboard`, 배포는 GitHub Pages입니다.
 
-2026-09-13에 원격 main 538ffc89와 열린 문서 PR #43/CI 대기를 확인하고 Milestone16을 시작했습니다. 작업 이력은 work-log.md를 확인합니다.
+## 현재 상태 — Milestone16 공개 배포 확인
 
-## 현재 범위 — Milestone 16 및 반응형 수정 통합 중
+[PR #45](https://github.com/jominq0131-boop/fire-dashboard/pull/45)를 main ae285ca02b33efab4af3dfa30449280ef4315b19에 병합했으며 PR #43의 커밋도 함께 main에 들어갔습니다. 목표형 입력 자동 저장/JSON v4와 반응형 창 크기 수정을 포함합니다.
 
-Milestone15는 PR #42로 main 538ffc89에 병합·배포했습니다. 배포 기록 PR #43의 이력을 통합 브랜치에 병합했습니다. Milestone15의 main CI/Pages/공개 파일/390px 검증 근거는 work-log.md에 보존했습니다.
+Pages 성공과 공개 HTML/JS/CSS SHA-256 일치,320~2560px 실화면 크기 변경,390px 가로 넘침 없음, 저장 후 새로고침 복원과 pageerror0건을 확인했습니다. PR CI/main CI/Pages 링크와 상세 근거는 [작업 기록](work-log.md)을 확인합니다.
 
-[Issue #44](https://github.com/jominq0131-boop/fire-dashboard/issues/44)의 [목표 입력 저장 계약](milestone-16-plan.md)에 따라 codex/milestone-16-goal-persistence에서 작업합니다. 목표 입력 자동 저장, DB v5, JSON v4, 이전 데이터 보존과 기준 월 안내가 범위입니다. 구현·검증과 PR/main/배포 완료는 구분합니다.
+[목표 입력 저장 계약](milestone-16-plan.md)에 따라 DB v5, JSON v4와 기존 자료 보존을 유지합니다. 결과 점은 저장하지 않고 입력 확인 후 다시 계산합니다.
 
 ## 작업 시작 순서
 
@@ -27,5 +27,3 @@ Milestone15는 PR #42로 main 538ffc89에 병합·배포했습니다. 배포 기
 ## 이후 후보
 
 취득원가를 반영한 세후 인출액, 도달 후 인출·유지 가능성은 후속 범위입니다. 일별 장부, 금융기관 자동 수집, 서비스 워커 기반 오프라인, 자동 동기화와 폭넓은 다중 브라우저 QA는 별도 범위입니다. 미완료 기능을 배포된 것으로 기록하지 않습니다.
-
-사용자가2026-09-13 모든 열린 PR 병합/배포를 승인했습니다. 창 폭 상한을 제거하고320~2560px 변경 검사를 추가했습니다. 이전 게시 승인 차단은 해소됐으며, 현재 최종 CI와 배포를 진행합니다.
