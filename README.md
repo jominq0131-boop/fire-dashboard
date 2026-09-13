@@ -37,7 +37,7 @@ fire. 상승 흐름 마크, 브라우저 파비콘, Apple touch icon과 web app 
 
 ## 현재 개발 상태
 
-Milestone14는 [PR #40](https://github.com/jominq0131-boop/fire-dashboard/pull/40)으로 main에 병합했습니다. 현재 [Milestone15](docs/milestone-15-plan.md)는 [Issue #41](https://github.com/jominq0131-boop/fire-dashboard/issues/41)의 목표 도달형 FIRE 구현입니다. 현재 자산과 저축 추세, NISA 우선 적립, 도달시점 자산 구성과 세전 자가배당을 제공합니다. 신규 입력은 화면 메모리에만 유지하며 아직 병합·배포된 기능이 아닙니다.
+Milestone15는 [PR #42](https://github.com/jominq0131-boop/fire-dashboard/pull/42)로 배포했습니다. [계산 계약](docs/milestone-15-plan.md)에 따라 현재 자산과 저축 추세, NISA 우선 적립, 도달시점 자산 구성과 세전 자가배당을 제공합니다. 신규 입력은 화면 메모리에만 유지하며 기존 FIRE 계획의 자동 저장·비교·백업은 계속 지원합니다.
 
 ## 개발과 문서
 
@@ -58,6 +58,6 @@ npm run test:e2e
 
 [문서 안내](docs/README.md) · [작업 재개 안내](docs/project-continuity.md) · [검증 절차](docs/testing.md) · [출시 이력](docs/release-history.md)
 
-## 다음 FIRE 화면 — 로컬 구현
+## 목표 도달형 FIRE
 
-[Milestone15](docs/milestone-15-plan.md)는 현재 현금·주식과 완료월 저축 평균에서 목표금액 도달 시점을 계산합니다. NISA 한도를 먼저 채우고 과세계좌로 적립하며, 도달시점 자산 금액/비율과 주식의 연3% 세전 자가배당을 표시합니다. 새 계산의 입력은 새로고침/백업에 보존되지 않으며 기존 자동 저장 계획/비교는 유지됩니다. 아직 병합·배포 완료를 뜻하지 않습니다.
+[Milestone15](docs/milestone-15-plan.md)는 현재 현금·주식과 완료월 저축 평균에서 목표금액 도달 시점을 계산합니다. NISA 한도를 먼저 채우고 과세계좌로 적립하며, 도달시점 자산 금액/비율과 주식의 연3% 세전 자가배당을 표시합니다. 새 계산의 입력은 새로고침/백업에 보존되지 않으며 기존 자동 저장 계획/비교는 유지됩니다.

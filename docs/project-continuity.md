@@ -4,13 +4,13 @@
 
 실제 체크아웃은 `C:\Users\MINGYU\Documents\Codex\2026-09-04\fire-dashboard-next`입니다. 이전 사본 `files-pasted-by-the-user-fire`는 수정하지 않습니다. 저장소는 `jominq0131-boop/fire-dashboard`, 배포는 GitHub Pages입니다.
 
-2026-09-05에 원격 main d3a5e0f와 열린 PR/issue 없음, main CI/Pages 성공을 확인하고 codex/goal-based-fire에서 시작했습니다. Milestone14는 PR #40으로 main에 병합되어 있습니다.
+Milestone15는 [PR #42](https://github.com/jominq0131-boop/fire-dashboard/pull/42)로 main `538ffc89`에 병합·배포했습니다. 해당 main CI와 Pages 성공, 공개 파일 해시와390px 실제 화면을 확인했습니다.
 
-## 현재 범위 — Milestone 15
+## 현재 상태 — Milestone 15 배포 완료
 
 사용자는 현재 현금·주식과 저축 추세를 기준으로 목표금액 도달 시점, 당시 자산 구성, 연3% 자가배당과 NISA 우선 적립을 요청했습니다. [Issue #41](https://github.com/jominq0131-boop/fire-dashboard/issues/41)과 [구체적 계산 계약](milestone-15-plan.md)을 따릅니다. 기존 일괄 자산/물가 조정 계획과 비교는 보존합니다.
 
-신규 계산은 현재 화면 메모리에서만 유지되며 새로고침/JSON 백업에는 포함되지 않음을 UI에 표시합니다. 기존 계획의 자동 저장과 백업은 계속 동작합니다. 로컬 검증과 PR 검토, main 병합, 실제 배포는 별도입니다. 이번 검증 근거는 [작업 기록](work-log.md)을 확인합니다.
+신규 계산은 현재 화면 메모리에서만 유지되며 새로고침/JSON 백업에는 포함되지 않음을 UI에 표시합니다. 기존 계획의 자동 저장과 백업은 계속 동작합니다. 배포 검증 근거는 [작업 기록](work-log.md)을 확인합니다.
 
 ## 작업 시작 순서
 
