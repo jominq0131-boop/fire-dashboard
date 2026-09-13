@@ -1,3 +1,4 @@
+import { normalizeGoalPlan } from "../domain/goal-plan";
 import { MAX_ACCOUNTS, isAssetAccount } from "../domain/accounts";
 import type { AccountBalanceSnapshot, MonthlyCashFlowRecord } from "../domain/models";
 import { monthEnd, isObservationDate } from "../domain/observations";
@@ -30,13 +31,18 @@ import {
   CASH_STORE,
   BALANCE_STORE,
   FIRE_PLAN_STORE,
+  GOAL_PLAN_STORE,
 } from "../domain/storage-migrations";
 import { DATABASE_NAME, openAccountDatabase } from "./indexeddb-accounts";
 
-const stores = [ACCOUNT_STORE, CASH_STORE, BALANCE_STORE, FIRE_PLAN_STORE];
-const limits = [MAX_ACCOUNTS, MAX_MONTHS, MAX_BALANCES, 1];
+const stores = [ACCOUNT_STORE, CASH_STORE, BALANCE_STORE, FIRE_PLAN_STORE, GOAL_PLAN_STORE];
+const limits = [MAX_ACCOUNTS, MAX_MONTHS, MAX_BALANCES, 1, 1];
 const validSnapshotRecord = (value: unknown, index: number) => {
   if (index === 0) return isAssetAccount(value);
+  if (index === 4) {
+    normalizeGoalPlan(value);
+    return true;
+  }
   if (index === 3) {
     normalizeFirePlan(value);
     return true;
@@ -224,11 +230,12 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
           if (--remaining === 0)
             done(
               normalizeBackup({
-                schemaVersion: 3,
+                schemaVersion: 4,
                 accounts: values[0],
                 monthlyCashFlows: values[1],
                 accountBalanceSnapshots: values[2],
                 firePlan: values[3][0] ?? null,
+                goalPlan: values[4][0] ?? null,
               }),
             );
           return;
@@ -259,12 +266,14 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
           current.monthlyCashFlows,
           current.accountBalanceSnapshots,
           current.firePlan ? [current.firePlan] : [],
+          current.goalPlan ? [current.goalPlan] : [],
         ];
         const merged = [
           backup.accounts,
           backup.monthlyCashFlows,
           backup.accountBalanceSnapshots,
           backup.firePlan ? [backup.firePlan] : [],
+          backup.goalPlan ? [backup.goalPlan] : [],
         ];
         stores.forEach((name, i) => {
           const ids = new Set(existing[i].map((r) => r.id));

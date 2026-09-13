@@ -2,7 +2,7 @@
 
 ## 현재 버전과 모델
 
-주 저장소는 IndexedDB `fire-dashboard` **v4**, 내보내기 형식은 JSON **v3**입니다. 두 버전은 별개입니다.
+주 저장소는 IndexedDB `fire-dashboard` **v5**, 내보내기 형식은 JSON **v4**입니다. 두 버전은 별개입니다.
 
 | 모델                   | 주요 필드와 규칙                                                                         |
 | ---------------------- | ---------------------------------------------------------------------------------------- |
@@ -44,10 +44,14 @@ createdAt/updatedAt은 실제 UTC ISO 밀리초 날짜이며 생성 시각 보�
 
 ## JSON 백업과 복원
 
-최상위 필드는 schemaVersion/accounts/monthlyCashFlows/accountBalanceSnapshots/firePlan입니다. v1/v2/v3를 허용하고 결정론적 정렬과 검증 후 v3를 생성합니다. v1/v2는 `firePlan: null`로 읽으며 기존 원본 필드·ID·노트·시각과 확인일 미상을 보존합니다. v1로 표시한 asOfDate, 추가 필드, 중복 ID/자연 키, 잘못된 참조/값/버전은 거부합니다.
+최상위 필드는 schemaVersion/accounts/monthlyCashFlows/accountBalanceSnapshots/firePlan/goalPlan입니다. v1/v2/v3/v4를 허용하고 결정론적 정렬과 검증 후 v4를 생성합니다. v1/v2는 `firePlan: null`로 읽으며 기존 원본 필드·ID·노트·시각과 확인일 미상을 보존합니다. v1로 표시한 asOfDate, 추가 필드, 중복 ID/자연 키, 잘못된 참조/값/버전은 거부합니다.
 
 최대32 MiB. 미리보기 후 추가 방식으로 복원하며 동일 기록·계획은 건너뛰고 충돌은 전체 취소합니다. 현재 계획과 들어오는 계획이 다르면 금융 기록을 포함한 복원 전체를 적용하지 않습니다. 빈 브라우저에서 전체 복원할 수 있습니다. 원자적 복원과 상한 검증은 기존 데이터를 삭제하지 않습니다.
 
 ## 목표 도달형 FIRE
 
-현금/NISA 적립/NISA 성장/과세계좌를 별도로 투영하고, 평가액과 NISA 취득한도 사용량을 구분합니다. 완료월 현금 저축과 투자 평균, 월별 한도 배분, 최초 도달점, 주식의 세전 자가배당은 [Milestone15 계산 계약](milestone-15-plan.md)을 따릅니다. 신규 계산 상태는 저장하지 않으며 DB v4/JSON v3 계약과 기존 FIRE 계획을 변경하지 않습니다.
+현금/NISA 적립/NISA 성장/과세계좌를 별도로 투영하고, 평가액과 NISA 취득한도 사용량을 구분합니다. 완료월 현금 저축과 투자 평균, 월별 한도 배분, 최초 도달점, 주식의 세전 자가배당은 [Milestone15 계산 계약](milestone-15-plan.md)을 따릅니다. 목표 입력은 Milestone16의 goalPlan으로 저장하며 결과 점은 저장하지 않습니다.
+
+## 목표 계획 저장
+
+[Milestone16 계약](milestone-16-plan.md)에 따라 DB v4→v5는 빈 goalPlans(id)를 추가합니다. GoalPlan은 primary ID, 13개 입력 문자열(각16자 이하), referenceMonth, updatedAt입니다. JSON v4의 goalPlan은 계획 또는 null이며 v1~v3 이행과 복원에서 기존 계획/금융 기록을 보존합니다.

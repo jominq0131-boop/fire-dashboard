@@ -1,3 +1,4 @@
+import type { GoalPlanRepository } from "../../domain/goal-plan";
 import { useEffect, useMemo, useRef, useState, useImperativeHandle, type Ref } from "react";
 import { ProjectionChart } from "./ProjectionChart";
 import { ScenarioComparison } from "./ScenarioComparison";
@@ -28,11 +29,13 @@ const yen = (n: number) => `${n.toLocaleString("ja-JP")} 円`;
 export function FirePlanner({
   repository,
   firePlanRepository,
+  goalPlanRepository,
   navigationRef,
   revision = 0,
 }: {
   repository: PortfolioRepository;
   firePlanRepository: FirePlanRepository;
+  goalPlanRepository: GoalPlanRepository;
   navigationRef?: Ref<{ useAssets: (value: number, source: string) => boolean }>;
   revision?: number;
 }) {
@@ -172,7 +175,11 @@ export function FirePlanner({
   return (
     <section id="fire" className="asset-card fire-planner" aria-labelledby="fire-heading">
       <h2 id="fire-heading">FIREシミュレーション</h2>
-      <GoalPlanner repository={repository} />
+      <GoalPlanner
+        repository={repository}
+        goalPlanRepository={goalPlanRepository}
+        revision={revision}
+      />
       <h3>従来の一括資産プラン・比較</h3>
       <p>目標まで、あとどのくらい？ ご自身の仮定で計算できます。</p>
       <p className="field-hint">

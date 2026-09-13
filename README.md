@@ -27,7 +27,7 @@
 
 투자 잔액 막대는 전체 자산에 이미 포함된 현재 NISA·과세 투자 분류 계좌의 기록액입니다. 월별 투자 납입과 구분합니다. 기록의 증감에는 입출금도 포함되므로 운용 손익으로 해석하지 않습니다.
 
-금융 기록과 FIRE 계획은 이 사이트의 브라우저 IndexedDB v4에 저장합니다. JSON v3로 내보내며 v1/v2도 가져올 수 있습니다. FIRE 계산 결과 점은 저장하지 않고 가정에서 다시 계산합니다. 자동 동기화는 없습니다. 브라우저 데이터를 지우면 자료를 잃을 수 있으므로 JSON을 정기적으로 보관합니다.
+금융 기록과 FIRE 계획은 이 사이트의 브라우저 IndexedDB v5에 저장합니다. JSON v4로 내보내며 v1/v2/v3도 가져올 수 있습니다. FIRE 계산 결과 점은 저장하지 않고 가정에서 다시 계산합니다. 자동 동기화는 없습니다. 브라우저 데이터를 지우면 자료를 잃을 수 있으므로 JSON을 정기적으로 보관합니다.
 
 FIRE 결과는 사용자가 입력한 일정한 가정에 따른 계산입니다. 세금·수수료·부채·인출 이후의 유지 가능성·시장 변동을 모델링하지 않습니다. 자세한 의미는 [데이터 모델](docs/data-model.md)을 따릅니다.
 
@@ -37,7 +37,7 @@ fire. 상승 흐름 마크, 브라우저 파비콘, Apple touch icon과 web app 
 
 ## 현재 개발 상태
 
-Milestone14는 [PR #40](https://github.com/jominq0131-boop/fire-dashboard/pull/40)으로 main에 병합했습니다. 현재 [Milestone15](docs/milestone-15-plan.md)는 [Issue #41](https://github.com/jominq0131-boop/fire-dashboard/issues/41)의 목표 도달형 FIRE 구현입니다. 현재 자산과 저축 추세, NISA 우선 적립, 도달시점 자산 구성과 세전 자가배당을 제공합니다. 신규 입력은 화면 메모리에만 유지하며 아직 병합·배포된 기능이 아닙니다.
+Milestone15는 [PR #42](https://github.com/jominq0131-boop/fire-dashboard/pull/42)로 병합·배포했습니다. [Milestone16](docs/milestone-16-plan.md)은 [Issue #44](https://github.com/jominq0131-boop/fire-dashboard/issues/44)의 목표형 입력 자동 저장/JSON 복원 작업이며 로컬 구현·검증을 완료했으며 PR 검토 단계입니다. 아직 Milestone16 병합·배포 완료를 뜻하지 않습니다.
 
 ## 개발과 문서
 
@@ -60,4 +60,4 @@ npm run test:e2e
 
 ## 다음 FIRE 화면 — 로컬 구현
 
-[Milestone15](docs/milestone-15-plan.md)는 현재 현금·주식과 완료월 저축 평균에서 목표금액 도달 시점을 계산합니다. NISA 한도를 먼저 채우고 과세계좌로 적립하며, 도달시점 자산 금액/비율과 주식의 연3% 세전 자가배당을 표시합니다. 새 계산의 입력은 새로고침/백업에 보존되지 않으며 기존 자동 저장 계획/비교는 유지됩니다. 아직 병합·배포 완료를 뜻하지 않습니다.
+[Milestone15](docs/milestone-15-plan.md)는 현재 현금·주식과 완료월 저축 평균에서 목표금액 도달 시점을 계산합니다. NISA 한도를 먼저 채우고 과세계좌로 적립하며, 도달시점 자산 금액/비율과 주식의 연3% 세전 자가배당을 표시합니다. Milestone16 작업에서는 목표 입력을 새로고침/JSON 백업에 보존하며 기존 자동 저장 계획/비교는 유지됩니다. 아직 병합·배포 완료를 뜻하지 않습니다.

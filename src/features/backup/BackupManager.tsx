@@ -55,7 +55,7 @@ export function BackupManager({
             );
             const link = document.createElement("a");
             link.href = url;
-            link.download = "fire-dashboard-backup-v3.json";
+            link.download = "fire-dashboard-backup-v4.json";
             link.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
             setMessage(
@@ -96,10 +96,10 @@ export function BackupManager({
           <p>
             口座 {preview.accounts.length} 件 / 現金収支 {preview.monthlyCashFlows.length} 件 / 残高{" "}
             {preview.accountBalanceSnapshots.length} 件 / FIRE計画{" "}
-            {preview.firePlan ? "1 件" : "なし"}
+            {preview.firePlan ? "1 件" : "なし"} / 目標計画 {preview.goalPlan ? "1 件" : "なし"}
           </p>
           <p>
-            FIRE計画がある場合は入力と比較も含みます。復元後は月別記録とFIRE画面を読み込み直します。
+            FIRE計画の入力と比較、目標計画の入力も含みます。復元後は月別記録とFIRE画面を読み込み直します。
           </p>
           <button
             disabled={busy}

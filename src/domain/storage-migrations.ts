@@ -1,7 +1,8 @@
-export const DATABASE_VERSION = 4;
+export const DATABASE_VERSION = 5;
 export const ACCOUNT_STORE = "accounts";
 export const CASH_STORE = "monthlyCashFlows";
 export const BALANCE_STORE = "accountBalanceSnapshots";
+export const GOAL_PLAN_STORE = "goalPlans";
 export const FIRE_PLAN_STORE = "firePlans";
 interface MigrationStep {
   version: number;
@@ -50,5 +51,6 @@ export function storageMigrationPlan(from: number, to: number = DATABASE_VERSION
       indexes: [{ name: "accountMonth", keyPath: ["accountId", "month"], unique: true }],
     });
   if (from < 4 && to >= 4) steps.push({ version: 4, store: FIRE_PLAN_STORE, keyPath: "id" });
+  if (from < 5 && to >= 5) steps.push({ version: 5, store: GOAL_PLAN_STORE, keyPath: "id" });
   return steps;
 }

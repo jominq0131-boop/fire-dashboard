@@ -1,5 +1,11 @@
 # 작업 기록
 
+## Milestone 16 — Issue #44
+
+main 538ffc89에서 codex/milestone-16-goal-persistence를 생성했습니다. 목표 입력 자동 저장, 기준 월 안내, DB v5 빈 goalPlans 추가, JSON v4와 구버전 보존 복원을 구현했습니다. 새 의존성/실제 금융 자료/사용자 브라우저 프로필 변경은 없습니다.
+
+단위154개, 전체 Chromium56개(2.5분, exit0), lint/typecheck/build/format/diff 검사를 통과했습니다. 목표 계획 저장/새로고침/다른 브라우저 복원/충돌 원자성/연도 경계, DB v4→v5 보존과 실패 롤백, 기존 기능과320/390/1440px 넘침 검사를 확인했습니다. 초기 브라우저 부재는 프로젝트 전용 Chromium 설치로 해결했고 제한 환경의 종료 지연은 소유한 테스트 명령을 중단한 뒤 권한 있는 실행에서 정상 종료를 확인했습니다. 기존 테스트의 현재 버전 기대값과 미래 버전 fixture를5/6으로 갱신했습니다. PR 병합·배포는 아직 수행하지 않았습니다.
+
 ## Milestone 15 — Issue #41
 
 2026-09-05, 원격 main d3a5e0f와 열린 PR/issue 없음, 해당 main CI/Pages 성공을 확인하고 codex/goal-based-fire에서 구현했습니다. 배포 작업을 위해 [Issue #41](https://github.com/jominq0131-boop/fire-dashboard/issues/41)을 만들었습니다. 현재 현금/주식과 저축 추세에서 목표 도달월을 찾고 도달시점 자산 구성, 주식의 연3% 세전 자가배당을 표시해 달라는 요청입니다.
