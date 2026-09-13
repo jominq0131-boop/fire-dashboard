@@ -14,9 +14,13 @@ GoalPlanner와 goal-fire 순수 계산을 추가했습니다. 기존 제한 조�
 
 신규 입력은 화면 메모리만 사용하며 이를 UI와 문서에 명시했습니다. 기존 FIRE 자동 저장/비교는 유지합니다. DB v4/JSON v3, 의존성 변경은 없습니다. 실제 금융 데이터/사용자 프로필을 읽거나 수정하지 않았습니다. 신규 입력 영속 저장, 세후 계산, 도달 후 지속성은 후속 범위입니다.
 
-로컬 단위144개, 신규/기존 FIRE 브라우저8개, lint/typecheck/build/format/diff 검사를 통과했습니다. 합성 데이터로 도달월/인출액/완료월 평균과320/390/1440px 가로 넘침 없음을 확인했습니다. 전체 Chromium 회귀51개도2.7분에 정상 종료/exit0으로 통과했습니다. PR 생성/원격 게시/병합/배포는 아직 수행하지 않았습니다.
+로컬 단위144개, 신규/기존 FIRE 브라우저8개, lint/typecheck/build/format/diff 검사를 통과했습니다. 합성 데이터로 도달월/인출액/완료월 평균과320/390/1440px 가로 넘침 없음을 확인했습니다. 전체 Chromium 회귀51개도2.7분에 정상 종료/exit0으로 통과했습니다.
 
 PR #42의 첫 CI는50/51개 통과 후 Linux headless의 소수 픽셀 반올림으로 모바일 차트 높이가299.9999px로 측정되어 기존300px 하한 검사1개가 실패했습니다. 테스트를 낮추지 않고 모바일 차트 CSS 높이에1px 여유를 두어 실제 측정값도300px 이상이 되도록 수정했습니다.
+
+수정 head `f8b4734c`의 [PR CI](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/33947820926)가 성공한 뒤 [PR #42](https://github.com/jominq0131-boop/fire-dashboard/pull/42)를 squash merge했습니다. merge SHA는 `538ffc89e8bdaa3e39f94698b6b62c3d72637266`입니다. 해당 SHA의 [main CI](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/33948002107)와 [Pages](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/33948002118)가 모두 성공했습니다.
+
+공개 HTML·기본 JS·차트 JS·CSS는 모두 HTTP200이며 Pages와 같은 환경에서 만든 빌드와 SHA-256이 일치했습니다. 각각 `e7c7b39c…`, `2e47ab00…`, `c1225432…`, `4c2a0ca6…`입니다. [실제 사이트](https://jominq0131-boop.github.io/fire-dashboard/)에서 목표형 FIRE 입력을 확인했고,390px에서 문서 폭375px/viewport390px, 차트 높이301px, 고정 하단 내비게이션, 브라우저 page error0건을 확인했습니다. 실제 금융 데이터를 수정하지 않았습니다.
 
 ## Milestone 14 — Issue #39
 

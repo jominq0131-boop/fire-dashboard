@@ -8,7 +8,7 @@
 
 ## 현재 범위 — Milestone 16 및 반응형 수정 통합 중
 
-Milestone15는 PR #42로 main 538ffc89에 병합·배포했습니다. 배포 기록 PR #43은 이번 작업 시작 시 열려 있었고 CI가 대기 중이었습니다.
+Milestone15는 PR #42로 main 538ffc89에 병합·배포했습니다. 배포 기록 PR #43의 이력을 통합 브랜치에 병합했습니다. Milestone15의 main CI/Pages/공개 파일/390px 검증 근거는 work-log.md에 보존했습니다.
 
 [Issue #44](https://github.com/jominq0131-boop/fire-dashboard/issues/44)의 [목표 입력 저장 계약](milestone-16-plan.md)에 따라 codex/milestone-16-goal-persistence에서 작업합니다. 목표 입력 자동 저장, DB v5, JSON v4, 이전 데이터 보존과 기준 월 안내가 범위입니다. 구현·검증과 PR/main/배포 완료는 구분합니다.
 
