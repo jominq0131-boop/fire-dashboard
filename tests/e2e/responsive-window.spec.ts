@@ -37,7 +37,13 @@ test("window resizing expands desktop content and reflows to mobile without relo
           .first()
           .evaluate((node) => {
             const chart = node.getBoundingClientRect();
-            return chart.width > 0 && chart.right <= document.documentElement.clientWidth;
+            const plot = node.closest(".financial-plot")!.getBoundingClientRect();
+            // ResizeObserver updates the SVG after the surrounding layout changes.
+            return (
+              chart.width > 0 &&
+              chart.right <= document.documentElement.clientWidth &&
+              Math.abs(chart.width - plot.width) <= 1
+            );
           }),
       )
       .toBe(true);
