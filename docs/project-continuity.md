@@ -6,7 +6,7 @@
 
 ## 현재 작업 — Milestone17 세후 인출액
 
-시작 main은7ac6540이며 PR #46/#48의 CI·Pages까지 성공했습니다. [Issue #49](https://github.com/jominq0131-boop/fire-dashboard/issues/49)와 [Milestone17 계약](milestone-17-plan.md)에 따라 취득원가·세율 입력과 세후 인출액, 구계획 보존 이행을 구현·로컬 검증했습니다. 아직 이번 기능의 배포 완료 기록은 아닙니다.
+시작 main은7ac6540이며 PR #46/#48의 CI·Pages까지 성공했습니다. [Issue #49](https://github.com/jominq0131-boop/fire-dashboard/issues/49)와 [Milestone17 계약](milestone-17-plan.md)에 따라 취득원가·세율 입력과 세후 인출액, 구계획 보존 이행을 구현·로컬 검증했습니다. 최종 병합 SHA·CI·Pages·공개 검증 결과는 [PR #50](https://github.com/jominq0131-boop/fire-dashboard/pull/50)의 검증 기록을 확인합니다.
 
 ## 직전 출시 — Milestone16
 

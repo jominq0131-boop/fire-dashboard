@@ -37,7 +37,7 @@ fire. 상승 흐름 마크, 브라우저 파비콘, Apple touch icon과 web app 
 
 ## 현재 개발 상태
 
-Milestone17 세후 인출액의 구현·로컬 검증을 완료했습니다. [계산·저장 계약](docs/milestone-17-plan.md)에 따라 과세계좌 취득원가와 가정 세율을 자동 저장하고 세전/세금/세후 연·월 금액을 구분합니다. PR CI·병합·배포 완료는 연결 PR의 검증 기록을 따릅니다.
+Milestone17 세후 인출액의 구현·로컬 검증을 완료했습니다. [계산·저장 계약](docs/milestone-17-plan.md)에 따라 과세계좌 취득원가와 가정 세율을 자동 저장하고 세전/세금/세후 연·월 금액을 구분합니다. PR CI·병합·배포 완료는 [PR #50](https://github.com/jominq0131-boop/fire-dashboard/pull/50)의 최종 검증 기록을 따릅니다.
 
 [PR #45](https://github.com/jominq0131-boop/fire-dashboard/pull/45)로 Milestone16 목표형 입력 자동 저장·JSON 복원과 창 크기 반응 수정을 main에 병합했습니다. 기존 PR #43도 함께 병합됐습니다. [배포 기록](docs/work-log.md)에 Pages·공개 파일·실화면 검증 근거를 남겼습니다.
 
