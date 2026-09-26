@@ -39,6 +39,7 @@ export interface GoalResult {
   monthlyWithdrawal: number | null;
   annualNetWithdrawal: WithdrawalEstimate | null;
   monthlyNetWithdrawal: WithdrawalEstimate | null;
+  taxableCostAtGoal: bigint | null;
 }
 const max = BigInt(Number.MAX_SAFE_INTEGER);
 const money = (n: number) => Number.isSafeInteger(n) && n >= 0;
@@ -120,6 +121,7 @@ export function projectGoal(s: GoalAssumptions): GoalResult {
     monthlyWithdrawal: null,
     annualNetWithdrawal: null,
     monthlyNetWithdrawal: null,
+    taxableCostAtGoal: null,
   };
   const grow = (n: bigint) => round(n * BigInt(120000 + s.returnBps), 120000n);
   for (let month = 1; month <= 1200 && !result.reached; month++) {
@@ -155,6 +157,7 @@ export function projectGoal(s: GoalAssumptions): GoalResult {
     if (month % 12 === 0 || result.reached) result.points.push(p);
   }
   if (result.reached) {
+    result.taxableCostAtGoal = taxableCost;
     const stocks =
       BigInt(result.reached.tsumitate) +
       BigInt(result.reached.growth) +

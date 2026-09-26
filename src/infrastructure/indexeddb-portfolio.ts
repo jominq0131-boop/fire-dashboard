@@ -230,7 +230,7 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
           if (--remaining === 0)
             done(
               normalizeBackup({
-                schemaVersion: 5,
+                schemaVersion: 6,
                 accounts: values[0],
                 monthlyCashFlows: values[1],
                 accountBalanceSnapshots: values[2],

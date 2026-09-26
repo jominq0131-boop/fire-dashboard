@@ -10,10 +10,41 @@ const plan = () => ({
   referenceMonth: "2026-09",
   updatedAt: "2026-09-13T00:00:00.000Z",
 });
+it("preserves v5 tax settings and adds only empty retirement spending and example assumptions", () => {
+  const current = plan();
+  const draft = Object.fromEntries(
+    Object.entries(current.draft).filter(([key]) => !key.startsWith("drawdown")),
+  );
+  draft.taxableCost = "123456";
+  draft.taxRate = "15";
+  const taxPlan = { ...current, draft };
+  const before = structuredClone(taxPlan);
+  const input = { ...syntheticBackup(), schemaVersion: 5, firePlan: null, goalPlan: taxPlan };
+  const migrated = normalizeBackup(input);
+  expect(migrated.schemaVersion).toBe(6);
+  expect(migrated.goalPlan).toEqual({
+    ...current,
+    draft: { ...current.draft, taxableCost: "123456", taxRate: "15" },
+  });
+  expect(taxPlan).toEqual(before);
+  expect(() => normalizeBackup({ ...input, schemaVersion: 6 })).toThrow();
+  expect(() => normalizeBackup({ ...input, goalPlan: current })).toThrow();
+  const edited = {
+    ...migrated,
+    goalPlan: {
+      ...migrated.goalPlan!,
+      draft: { ...migrated.goalPlan!.draft, drawdownMonthly: "100000" },
+    },
+  };
+  expect(normalizeBackup(JSON.parse(JSON.stringify(edited)))).toEqual(edited);
+  expect(() => mergeBackup(edited, migrated)).toThrow("目標計画と競合");
+});
 it("migrates exactly the legacy draft without mutation and rejects mixed version fields", () => {
   const current = plan();
   const draft = Object.fromEntries(
-    Object.entries(current.draft).filter(([key]) => key !== "taxableCost" && key !== "taxRate"),
+    Object.entries(current.draft).filter(
+      ([key]) => key !== "taxableCost" && key !== "taxRate" && !key.startsWith("drawdown"),
+    ),
   );
   const legacy = { ...current, draft };
   const before = structuredClone(legacy);
@@ -71,7 +102,7 @@ it("migrates v1-v3 without losing records or the legacy plan", () => {
     const input = { ...old, schemaVersion: version, ...(version === 3 ? { firePlan: null } : {}) };
     expect(normalizeBackup(input)).toEqual({
       ...old,
-      schemaVersion: 5,
+      schemaVersion: 6,
       firePlan: null,
       goalPlan: null,
     });

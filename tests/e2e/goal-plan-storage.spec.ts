@@ -17,7 +17,9 @@ test("legacy goal read/export leaves original bytes intact and tax edits use con
     );
     const name = "synthetic-legacy-tax-plan";
     const oldDraft = Object.fromEntries(
-      Object.entries(draft).filter(([key]) => key !== "taxableCost" && key !== "taxRate"),
+      Object.entries(draft).filter(
+        ([key]) => key !== "taxableCost" && key !== "taxRate" && !key.startsWith("drawdown"),
+      ),
     );
     const old = {
       id: "primary" as const,
@@ -78,7 +80,7 @@ test("legacy goal read/export leaves original bytes intact and tax edits use con
   }, values);
   expect(result.raw).toEqual(result.old);
   expect(result.loaded?.draft).toEqual(values);
-  expect(result.exported.schemaVersion).toBe(5);
+  expect(result.exported.schemaVersion).toBe(6);
   expect(result.exported.goalPlan).toEqual(result.loaded);
   expect(result.conflict).toBe(true);
   expect(result.restoredCount).toBe(1);

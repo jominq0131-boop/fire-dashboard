@@ -1982,6 +1982,14 @@ form .account-actions {
 .goal-result {
   margin-top: 24px;
 }
+.drawdown-planner {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.drawdown-result {
+  margin-top: 24px;
+}
 .goal-allocation {
   display: flex;
   height: 20px;

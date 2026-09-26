@@ -143,7 +143,7 @@ test("v2 to v4 migration rolls back on failure and preserves legacy records", as
   expect(result.firePlanKey).toBe("id");
   expect(result.exported).toEqual({
     ...syntheticBackup(),
-    schemaVersion: 5,
+    schemaVersion: 6,
     firePlan: null,
     goalPlan: null,
   });
