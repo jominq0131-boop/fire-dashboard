@@ -2,7 +2,15 @@ import type { GoalAssumptions } from "./goal-fire";
 import { assertMonth } from "./monthly";
 import { DEFAULT_TAX_RATE } from "./withdrawal";
 
-export type GoalValues = Record<Exclude<keyof GoalAssumptions, "startMonth">, string>;
+export const initialDrawdownValues = () => ({
+  drawdownMonthly: "",
+  drawdownYears: "30",
+  drawdownReturnBps: "3",
+  drawdownInflationBps: "2",
+});
+export type DrawdownValues = ReturnType<typeof initialDrawdownValues>;
+export type GoalValues = Record<Exclude<keyof GoalAssumptions, "startMonth">, string> &
+  DrawdownValues;
 export const initialGoalValues = (): GoalValues => ({
   cash: "",
   tsumitate: "",
@@ -19,6 +27,7 @@ export const initialGoalValues = (): GoalValues => ({
   usedYearGrowth: "",
   taxableCost: "",
   taxRate: DEFAULT_TAX_RATE,
+  ...initialDrawdownValues(),
 });
 export interface GoalPlan {
   id: "primary";
@@ -32,7 +41,7 @@ export interface GoalPlanRepository {
 }
 export function normalizeGoalPlan(
   value: unknown,
-  format: "stored" | "legacy" | "current" = "stored",
+  format: "stored" | "legacy" | "tax" | "current" = "stored",
 ): GoalPlan {
   const invalid = () =>
     new Error("保存済みの目標計画を検証できません。元のデータは変更していません。");
@@ -53,12 +62,14 @@ export function normalizeGoalPlan(
   assertMonth(plan.referenceMonth);
   const draft = plan.draft as Record<string, unknown>;
   const keys = Object.keys(initialGoalValues());
-  const legacyKeys = keys.filter((key) => key !== "taxableCost" && key !== "taxRate");
-  const legacy = Object.keys(draft).length === legacyKeys.length;
-  const expected = legacy ? legacyKeys : keys;
+  const taxKeys = keys.filter((key) => !key.startsWith("drawdown"));
+  const legacyKeys = taxKeys.filter((key) => key !== "taxableCost" && key !== "taxRate");
+  const count = Object.keys(draft).length;
+  const detected =
+    count === legacyKeys.length ? "legacy" : count === taxKeys.length ? "tax" : "current";
+  const expected = detected === "legacy" ? legacyKeys : detected === "tax" ? taxKeys : keys;
   if (
-    (format === "legacy" && !legacy) ||
-    (format === "current" && legacy) ||
+    (format !== "stored" && format !== detected) ||
     Object.keys(draft).length !== expected.length ||
     !expected.every(
       (key) =>

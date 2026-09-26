@@ -209,7 +209,7 @@ test("backup transaction rollback, conflict races, preservation and bounded hist
   expect(result.race.sort()).toEqual([0, 4]);
   expect(result.preserved).toEqual({
     ...syntheticBackup(),
-    schemaVersion: 5,
+    schemaVersion: 6,
     firePlan: null,
     goalPlan: null,
   });

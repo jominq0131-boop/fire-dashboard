@@ -18,6 +18,7 @@ import { parseTaxRate } from "../../domain/withdrawal";
 import type { PortfolioRepository } from "../../domain/portfolio";
 import { InteractiveLineChart } from "../charts/InteractiveLineChart";
 import { chartColors } from "../charts/line-geometry";
+import { DrawdownPlanner } from "./DrawdownPlanner";
 
 const yen = (n: number) => `${n.toLocaleString("ja-JP")} 円`;
 const assetFields = [
@@ -213,18 +214,20 @@ export function GoalPlanner({
           setError("");
           try {
             const parsed = Object.fromEntries(
-              Object.entries(values).map(([k, v]) => [
-                k,
-                k === "taxRate"
-                  ? parseTaxRate(v)
-                  : k === "taxableCost" && v === ""
-                    ? null
-                    : k.endsWith("Bps")
-                      ? parseRate(v)
-                      : k === "monthlyCash" && /^-\d+$/.test(v)
-                        ? -parseYen(v.slice(1))
-                        : parseYen(v),
-              ]),
+              Object.entries(values)
+                .filter(([k]) => !k.startsWith("drawdown"))
+                .map(([k, v]) => [
+                  k,
+                  k === "taxRate"
+                    ? parseTaxRate(v)
+                    : k === "taxableCost" && v === ""
+                      ? null
+                      : k.endsWith("Bps")
+                        ? parseRate(v)
+                        : k === "monthlyCash" && /^-\d+$/.test(v)
+                          ? -parseYen(v.slice(1))
+                          : parseYen(v),
+                ]),
             );
             const s = { ...parsed, startMonth: localDate().slice(0, 7) } as GoalAssumptions;
             const next = projectGoal(s);
@@ -427,6 +430,23 @@ export function GoalPlanner({
           <p className="field-hint">
             グラフは年ごとと到達月の試算です。到達月まで毎月計算し、選択した時点の内訳を確認できます。
           </p>
+          {ready && result.reached && (
+            <DrawdownPlanner
+              start={{
+                cash: result.reached.cash,
+                nisa: result.reached.tsumitate + result.reached.growth,
+                taxable: result.reached.taxable,
+                taxableCost: result.taxableCostAtGoal,
+              }}
+              taxRate={calculated.taxRate ?? 20315}
+              values={values}
+              onChange={(key, value) => {
+                changed.current = true;
+                setValues((v) => ({ ...v, [key]: value }));
+              }}
+              dateAt={(month) => dateAt(calculated.startMonth, result.reached!.month + month)}
+            />
+          )}
         </div>
       )}
       <details>

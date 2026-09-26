@@ -38,7 +38,7 @@ test("goal drafts survive reload, empty-browser restore and stale-tab conflicts"
   const file = await download;
   const buffer = await readFile((await file.path())!);
   const data = JSON.parse(buffer.toString());
-  expect(data.schemaVersion).toBe(5);
+  expect(data.schemaVersion).toBe(6);
   expect(data.goalPlan.draft.cash).toBe("654321");
   expect(data.goalPlan.draft.taxableCost).toBe("5000000");
   expect(data.goalPlan.draft.taxRate).toBe("20.315");

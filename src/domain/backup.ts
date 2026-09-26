@@ -6,7 +6,7 @@ import { normalizeFirePlan, sameFirePlan, type FirePlan } from "./fire-plan";
 
 export const MAX_BACKUP_BYTES = 32 * 1024 * 1024;
 export interface Backup {
-  schemaVersion: 1 | 2 | 3 | 4 | 5;
+  schemaVersion: 1 | 2 | 3 | 4 | 5 | 6;
   accounts: AssetAccount[];
   monthlyCashFlows: MonthlyCashFlowRecord[];
   accountBalanceSnapshots: AccountBalanceSnapshot[];
@@ -14,7 +14,7 @@ export interface Backup {
   firePlan?: FirePlan | null;
 }
 export interface CurrentBackup extends Backup {
-  schemaVersion: 5;
+  schemaVersion: 6;
   goalPlan: GoalPlan | null;
   firePlan: FirePlan | null;
 }
@@ -42,7 +42,8 @@ export function normalizeBackup(value: unknown): CurrentBackup {
       v.schemaVersion !== 2 &&
       v.schemaVersion !== 3 &&
       v.schemaVersion !== 4 &&
-      v.schemaVersion !== 5) ||
+      v.schemaVersion !== 5 &&
+      v.schemaVersion !== 6) ||
     Object.keys(v).length !== (Number(v.schemaVersion) >= 4 ? 6 : v.schemaVersion === 3 ? 5 : 4) ||
     !["schemaVersion", "accounts", "monthlyCashFlows", "accountBalanceSnapshots"].every((k) =>
       Object.hasOwn(v, k),
@@ -80,7 +81,7 @@ export function normalizeBackup(value: unknown): CurrentBackup {
   let firePlan: FirePlan | null = null;
   if (Number(v.schemaVersion) >= 3 && v.firePlan !== null) firePlan = normalizeFirePlan(v.firePlan);
   const result: CurrentBackup = {
-    schemaVersion: 5,
+    schemaVersion: 6,
     accounts: [...accounts].sort((a, b) => compare(a.id, b.id)),
     monthlyCashFlows: [...cash].sort((a, b) => compare(a.month, b.month)),
     accountBalanceSnapshots: [...balances].sort(
@@ -89,7 +90,10 @@ export function normalizeBackup(value: unknown): CurrentBackup {
     firePlan,
     goalPlan:
       Number(v.schemaVersion) >= 4 && v.goalPlan !== null
-        ? normalizeGoalPlan(v.goalPlan, v.schemaVersion === 4 ? "legacy" : "current")
+        ? normalizeGoalPlan(
+            v.goalPlan,
+            v.schemaVersion === 4 ? "legacy" : v.schemaVersion === 5 ? "tax" : "current",
+          )
         : null,
   };
   if (backupBytes(canonical(result)) > MAX_BACKUP_BYTES)
@@ -141,7 +145,7 @@ export function mergeBackup(current: Backup, incoming: Backup) {
       throw new Error("既存の目標計画と競合しています。変更は適用していません。");
   }
   const backup = normalizeBackup({
-    schemaVersion: 5,
+    schemaVersion: 6,
     accounts: merge(left.accounts, right.accounts),
     monthlyCashFlows: merge(left.monthlyCashFlows, right.monthlyCashFlows),
     accountBalanceSnapshots: merge(left.accountBalanceSnapshots, right.accountBalanceSnapshots),
