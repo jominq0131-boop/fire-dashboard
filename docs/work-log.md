@@ -1,5 +1,11 @@
 # 작업 기록
 
+## 배포 기록 마무리와 차트 회귀 검사 — 2026-09-26
+
+배포 기록 PR #46을 main 5664341에 병합했습니다. Pages 성공, 공개 HTML/JS/CSS HTTP200과 로컬 Pages 빌드 SHA-256 일치, 격리 Chromium 390px 가로 넘침 없음/pageerror0건을 확인했습니다. main CI 36246734124는 단위·정적 검사·빌드와 브라우저56개를 통과했으나 창 크기 검사에서1920/2560px의 SVG 폭을 모두1485px로 읽어 실패했습니다.
+
+[Issue #47](https://github.com/jominq0131-boop/fire-dashboard/issues/47)에서 ResizeObserver 반영 전에 이전 SVG 폭도 통과하던 대기 조건을 보강했습니다. 컨테이너와 SVG 폭 일치를 확인한 뒤 기록하며 기존 확장/넘침 검사는 유지합니다. 제품 코드·계산·스키마·의존성 변경은 없습니다. 관련 Chromium 검사를3회 반복 통과했습니다. 최종 PR/main CI와 배포 결과는 연결 PR에 기록합니다.
+
 ## Milestone16·반응형 공개 배포 — 2026-09-13
 
 [PR #45](https://github.com/jominq0131-boop/fire-dashboard/pull/45)의 head070b9ad는 단위154개, 로컬 Chromium57개(2.7분, exit0), format/lint/typecheck/build/diff 및 [PR CI](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/34743213147)를 통과했습니다. PR #43의 커밋을 포함해 merge commit ae285ca02b33efab4af3dfa30449280ef4315b19로 병합했으며 두 PR 모두 merged 상태를 확인했습니다.
