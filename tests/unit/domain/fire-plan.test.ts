@@ -93,7 +93,7 @@ describe("persistent FIRE plan", () => {
       schemaVersion: 3,
       firePlan: plan(),
     });
-    expect(current.schemaVersion).toBe(4);
+    expect(current.schemaVersion).toBe(5);
     expect(current.firePlan).toEqual(plan());
     expect(normalizeBackup(structuredClone(current))).toEqual(current);
   });

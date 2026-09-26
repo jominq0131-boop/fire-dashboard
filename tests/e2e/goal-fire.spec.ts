@@ -25,6 +25,40 @@ async function fillGoal(page: Page, overrides: Record<string, string> = {}) {
   return goal;
 }
 
+test("net withdrawal shows profit tax, unknown basis and responsive persisted assumptions", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/");
+  const goal = await fillGoal(page, {
+    "現金・預金（円）": "0",
+    "特定・一般口座の株式（円）": "10000000",
+    "目標金額（額面）（円）": "1",
+    "課税口座の保有取得額（不明なら空欄）（円）": "5000000",
+  });
+  const estimate = goal.getByRole("region", { name: "税引後の取り崩し見積もり" });
+  await expect(estimate).toContainText("269,527 円");
+  await expect(estimate).toContainText("30,473 円");
+  await expect(estimate).toContainText("22,461 円");
+  for (const width of [320, 390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))
+      .toBe(true);
+    await estimate.screenshot({ path: `test-results/net-withdrawal-${width}.png` });
+  }
+  await goal.getByLabel("課税口座の保有取得額（不明なら空欄）（円）", { exact: true }).fill("");
+  await expect(estimate).toHaveCount(0);
+  await goal.getByRole("button", { name: "目標到達を計算する" }).click();
+  await expect(estimate).toContainText("取得額が不明");
+  await expect(goal.getByRole("status")).toContainText("年間 300,000 円");
+  await goal.getByLabel("売却益の想定税率（%）", { exact: true }).fill("100.001");
+  await goal.getByRole("button", { name: "目標到達を計算する" }).click();
+  await expect(goal.getByRole("alert")).toContainText("0〜100%");
+  expect(errors).toEqual([]);
+});
+
 test("exact goal arrival, composition, self-withdrawals and mobile chart", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
@@ -37,7 +71,9 @@ test("exact goal arrival, composition, self-withdrawals and mobile chart", async
   await expect(goal.getByRole("region", { name: "目標到達時の資産構成" })).toContainText(
     "10,500,000 円",
   );
-  await expect(goal.locator(".goal-breakdown")).toContainText("21.0%");
+  await expect(
+    goal.getByRole("region", { name: "目標到達時の資産構成" }).locator(".goal-breakdown"),
+  ).toContainText("21.0%");
   await expect(goal.locator(".recharts-line-curve").first()).toBeVisible();
   const slider = goal.getByRole("slider");
   await slider.focus();

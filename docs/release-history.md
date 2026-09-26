@@ -24,3 +24,5 @@ Milestone14의 구현·검증·병합·배포 상태는 [Issue #39 연결 PR](ht
 
 - Milestone15 목표 도달형 계산: [PR #42](https://github.com/jominq0131-boop/fire-dashboard/pull/42), 배포 기록 [PR #43](https://github.com/jominq0131-boop/fire-dashboard/pull/43).
 - Milestone16 목표 입력 자동 저장·JSON 복원, 창 크기에 반응하는 본문/차트: [PR #45](https://github.com/jominq0131-boop/fire-dashboard/pull/45). 공개 파일 해시와320~2560px 확인 근거는 [작업 기록](work-log.md)에 있습니다.
+
+- Milestone17 취득원가·가정 세율 기반 세후 인출액과 JSON v5: [PR #50](https://github.com/jominq0131-boop/fire-dashboard/pull/50). 구현 계약은 [Milestone17](milestone-17-plan.md), 최종 병합/배포 상태와 검증 근거는 PR의 릴리스 기록을 따릅니다.

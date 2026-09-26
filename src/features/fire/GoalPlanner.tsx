@@ -14,6 +14,7 @@ import {
 import { localDate } from "../../domain/observations";
 import { parseYen } from "../../domain/monthly";
 import { parseRate } from "../../domain/fire";
+import { parseTaxRate } from "../../domain/withdrawal";
 import type { PortfolioRepository } from "../../domain/portfolio";
 import { InteractiveLineChart } from "../charts/InteractiveLineChart";
 import { chartColors } from "../charts/line-geometry";
@@ -146,6 +147,7 @@ export function GoalPlanner({
         tsumitate: String(seed.tsumitate),
         growth: String(seed.growth),
         taxable: String(seed.taxable),
+        taxableCost: "",
         monthlyCash: seed.monthlyCash === null ? "" : String(seed.monthlyCash),
         monthlyInvestment: seed.monthlyInvestment === null ? "" : String(seed.monthlyInvestment),
       }));
@@ -162,11 +164,15 @@ export function GoalPlanner({
     return (
       <label key={key}>
         {label}
-        {!key.endsWith("Bps") && "（円）"}
+        {!key.endsWith("Bps") && key !== "taxRate" && "（円）"}
         <input
-          required
+          required={key !== "taxableCost"}
           maxLength={16}
-          inputMode={key.endsWith("Bps") || key === "monthlyCash" ? "decimal" : "numeric"}
+          inputMode={
+            key.endsWith("Bps") || key === "taxRate" || key === "monthlyCash"
+              ? "decimal"
+              : "numeric"
+          }
           value={values[key]}
           onChange={(e) => {
             changed.current = true;
@@ -209,11 +215,15 @@ export function GoalPlanner({
             const parsed = Object.fromEntries(
               Object.entries(values).map(([k, v]) => [
                 k,
-                k.endsWith("Bps")
-                  ? parseRate(v)
-                  : k === "monthlyCash" && /^-\d+$/.test(v)
-                    ? -parseYen(v.slice(1))
-                    : parseYen(v),
+                k === "taxRate"
+                  ? parseTaxRate(v)
+                  : k === "taxableCost" && v === ""
+                    ? null
+                    : k.endsWith("Bps")
+                      ? parseRate(v)
+                      : k === "monthlyCash" && /^-\d+$/.test(v)
+                        ? -parseYen(v.slice(1))
+                        : parseYen(v),
               ]),
             );
             const s = { ...parsed, startMonth: localDate().slice(0, 7) } as GoalAssumptions;
@@ -251,6 +261,22 @@ export function GoalPlanner({
             両枠の対象商品を買う前提で、つみたて枠→成長枠→特定・一般口座の順に新規積立します。年間120万/240万円、保有取得額1800万円（成長枠1200万円）を上限に計算。年間枠は1月にリセットします。2023年以前の旧NISAは対象外です。
           </p>
         </fieldset>
+        <fieldset disabled={busy || !ready}>
+          <legend>3. 税引後の受取額を見積もる</legend>
+          <p>
+            特定・一般口座で現在保有する株式・投信の取得額を入力してください。評価額やNISAの利用額とは別の金額です。
+          </p>
+          <div className="fire-fields">
+            {input("taxableCost", "課税口座の保有取得額（不明なら空欄）")}
+            {input("taxRate", "売却益の想定税率（%）")}
+          </div>
+          <p className="field-hint">
+            取得額が不明でも税引前の計算は使えます。記録の再読込時は取得額を空欄に戻すため再確認してください。含み損がある場合は取得額が評価額を超えても入力できます。
+          </p>
+          <p className="field-hint">
+            20.315%は現在の制度を参考にした初期仮定です。到達年にかかわらず入力した税率を使い、将来の税制変更は自動反映しません。
+          </p>
+        </fieldset>
         <button disabled={busy || !ready} type="submit">
           目標到達を計算する
         </button>
@@ -284,6 +310,54 @@ export function GoalPlanner({
               </div>
             )}
           </div>
+          {result.reached && result.annualNetWithdrawal && result.monthlyNetWithdrawal && (
+            <section aria-label="税引後の取り崩し見積もり" className="withdrawal-estimate">
+              <h4>取り崩しで受け取れる金額の目安</h4>
+              <p>
+                NISA・課税口座を評価額の割合で売却。現金は取り崩しません。想定税率 {values.taxRate}
+                %。
+              </p>
+              {result.annualNetWithdrawal.net === null && (
+                <p className="field-hint">
+                  取得額が不明のため、税額・税引後の受取額は未計算です。上の取得額を入力して再計算してください。
+                </p>
+              )}
+              <div className="goal-breakdown">
+                {(
+                  [
+                    ["年額", result.annualNetWithdrawal],
+                    ["月額相当", result.monthlyNetWithdrawal],
+                  ] as const
+                ).map(([label, value]) => {
+                  return (
+                    <div key={label}>
+                      <h5>{label}</h5>
+                      <dl>
+                        {(
+                          [
+                            ["税引前の売却額", value.gross],
+                            ["NISA売却分（非課税）", value.nisaSale],
+                            ["課税口座の売却分", value.taxableSale],
+                            ["うち課税対象の利益（推定）", value.taxableGain],
+                            ["推定税額", value.tax],
+                            ["税引後の受取額", value.net],
+                          ] as const
+                        ).map(([name, amount]) => (
+                          <div key={name}>
+                            <dt>{name}</dt>
+                            <dd>{amount === null ? "未計算" : yen(amount)}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="field-hint">
+                月額は到達時の同じ資産から計算した年率÷12相当です。毎月の連続売却や到達後の資産維持を予測するものではありません。年額と月額は別々に1円単位で丸めます。
+              </p>
+            </section>
+          )}
           {result.stopped && (
             <p role="alert">
               {result.stoppedMonth}か月目に
@@ -361,7 +435,7 @@ export function GoalPlanner({
           今月を起点に翌月末から積立。既存の現金は株式へ移しません。毎月、株式を年利÷12で運用して1円に四捨五入し、その後積立を追加します。目標は固定の名目金額で、インフレは含みません。最大1200か月で最初の到達を探します。
         </p>
         <p>
-          自己配当は企業の配当金ではなく、到達時の株式評価額×取り崩し率の売却額です。月額は年額の12分の1相当を別途1円に丸めます。現金は対象外。NISAと課税口座を合算した税引前の額で、課税口座の売却益にかかる税・手数料は控除していません。到達後の残高推移や資金の持続性は今回の試算に含みません。
+          自己配当は企業の配当金ではなく、到達時の株式評価額×取り崩し率の売却額です。税引後の見積もりでは課税口座の取得額に積立中の課税口座への買付額を加え、評価額に対する利益割合を売却分に当てはめます。利益がない場合の推定税額は0円です。個別銘柄・手数料・損益通算・繰越控除・外国税は考慮しない概算で、申告用の税額ではありません。到達後の残高推移や資金の持続性は含みません。
         </p>
         <p>
           積立中の売却・枠復活・旧NISA・課税口座からNISAへの買い直しはモデル化しません。株式欄には株式・投信の評価額を入力し、証券口座内の預り金は現金欄へ分けてください。
@@ -369,6 +443,15 @@ export function GoalPlanner({
         <a href="https://www.fsa.go.jp/policy/nisa2/know/" target="_blank" rel="noreferrer">
           金融庁：NISAの制度と限度額
         </a>
+        <p>
+          <a
+            href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1463.htm"
+            target="_blank"
+            rel="noreferrer"
+          >
+            国税庁：株式等を譲渡したときの課税
+          </a>
+        </p>
       </details>
     </section>
   );

@@ -106,7 +106,7 @@ test("saved FIRE plan and comparisons travel in backup without stored projection
   const path = await (await download).path();
   expect(path).not.toBeNull();
   const exported = JSON.parse(await readFile(path!, "utf8"));
-  expect(exported.schemaVersion).toBe(4);
+  expect(exported.schemaVersion).toBe(5);
   expect(exported.firePlan.comparisons).toHaveLength(1);
   expect(JSON.stringify(exported.firePlan)).not.toContain("points");
 
