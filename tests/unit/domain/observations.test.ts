@@ -25,7 +25,7 @@ it("migrates JSON v1 without inventing dates and round-trips v3", () => {
   const v1 = syntheticBackup(),
     before = canonical(v1);
   const v2 = normalizeBackup(v1);
-  expect(v2).toEqual({ ...v1, schemaVersion: 4, firePlan: null, goalPlan: null });
+  expect(v2).toEqual({ ...v1, schemaVersion: 5, firePlan: null, goalPlan: null });
   expect(canonical(v1)).toBe(before);
   v2.accountBalanceSnapshots = v2.accountBalanceSnapshots.map((b) => ({
     ...b,

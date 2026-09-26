@@ -8,6 +8,10 @@ test("goal drafts survive reload, empty-browser restore and stale-tab conflicts"
 }) => {
   await page.goto("/");
   const goal = page.locator(".goal-planner");
+  await goal
+    .getByLabel("課税口座の保有取得額（不明なら空欄）（円）", { exact: true })
+    .fill("5000000");
+  await goal.getByLabel("売却益の想定税率（%）", { exact: true }).fill("20.315");
   await goal.getByLabel("現金・預金（円）", { exact: true }).fill("123456");
   await goal.getByLabel("毎月の現金貯蓄（マイナス可）（円）", { exact: true }).fill("-");
   await expect(goal).toContainText("目標計画をこの端末に保存しました");
@@ -34,8 +38,10 @@ test("goal drafts survive reload, empty-browser restore and stale-tab conflicts"
   const file = await download;
   const buffer = await readFile((await file.path())!);
   const data = JSON.parse(buffer.toString());
-  expect(data.schemaVersion).toBe(4);
+  expect(data.schemaVersion).toBe(5);
   expect(data.goalPlan.draft.cash).toBe("654321");
+  expect(data.goalPlan.draft.taxableCost).toBe("5000000");
+  expect(data.goalPlan.draft.taxRate).toBe("20.315");
   const isolated = await browser.newContext();
   try {
     const restored = await isolated.newPage();
@@ -49,6 +55,12 @@ test("goal drafts survive reload, empty-browser restore and stale-tab conflicts"
       restored.locator(".goal-planner").getByLabel("現金・預金（円）", { exact: true }),
     ).toHaveValue("654321");
     await restored.reload();
+    await expect(
+      restored.getByLabel("課税口座の保有取得額（不明なら空欄）（円）", { exact: true }),
+    ).toHaveValue("5000000");
+    await expect(restored.getByLabel("売却益の想定税率（%）", { exact: true })).toHaveValue(
+      "20.315",
+    );
     await expect(
       restored
         .locator(".goal-planner")

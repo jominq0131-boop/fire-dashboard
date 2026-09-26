@@ -1,6 +1,91 @@
 import { expect, test } from "@playwright/test";
 import { initialGoalValues } from "../../src/domain/goal-plan";
 const values = { ...initialGoalValues(), target: "2200" };
+test("legacy goal read/export leaves original bytes intact and tax edits use conflict protection", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const result = await page.evaluate(async (draft) => {
+    const { IndexedDbGoalPlanRepository } = await import(
+      new URL("src/infrastructure/indexeddb-goal-plan.ts", location.href).href
+    );
+    const { IndexedDbPortfolioRepository } = await import(
+      new URL("src/infrastructure/indexeddb-portfolio.ts", location.href).href
+    );
+    const { openAccountDatabase } = await import(
+      new URL("src/infrastructure/indexeddb-accounts.ts", location.href).href
+    );
+    const name = "synthetic-legacy-tax-plan";
+    const oldDraft = Object.fromEntries(
+      Object.entries(draft).filter(([key]) => key !== "taxableCost" && key !== "taxRate"),
+    );
+    const old = {
+      id: "primary" as const,
+      draft: oldDraft,
+      referenceMonth: "2026-09",
+      updatedAt: "2026-09-01T00:00:00.000Z",
+    };
+    const db = await openAccountDatabase(name);
+    const write = db.transaction("goalPlans", "readwrite");
+    write.objectStore("goalPlans").put(old);
+    await new Promise<void>((resolve, reject) => {
+      write.oncomplete = () => resolve();
+      write.onabort = () => reject(write.error);
+    });
+    db.close();
+    const repo = new IndexedDbGoalPlanRepository(name);
+    const backup = new IndexedDbPortfolioRepository(name);
+    const loaded = await repo.load();
+    const exported = await backup.exportBackup();
+    const inspect = await openAccountDatabase(name);
+    const read = inspect.transaction("goalPlans").objectStore("goalPlans").get("primary");
+    const raw = await new Promise((resolve) => {
+      read.onsuccess = () => resolve(read.result);
+    });
+    inspect.close();
+    const saved = await repo.save(
+      { ...loaded!, draft: { ...loaded!.draft, taxableCost: "500", taxRate: "20.315" } },
+      loaded,
+    );
+    let conflict = false;
+    try {
+      await repo.save({ ...loaded!, draft: { ...loaded!.draft, taxableCost: "999" } }, loaded);
+    } catch {
+      conflict = true;
+    }
+    const oldBackup = { ...exported, schemaVersion: 4, goalPlan: old };
+    const isolated = new IndexedDbPortfolioRepository("synthetic-legacy-tax-restore");
+    const restoredCount = await isolated.importBackup(oldBackup);
+    const restored = await isolated.exportBackup();
+    let restoreConflict = "";
+    try {
+      await backup.importBackup(oldBackup);
+    } catch (error) {
+      restoreConflict = (error as Error).message;
+    }
+    return {
+      old,
+      raw,
+      loaded,
+      exported,
+      saved,
+      conflict,
+      restoreConflict,
+      restoredCount,
+      restored,
+      preserved: await repo.load(),
+    };
+  }, values);
+  expect(result.raw).toEqual(result.old);
+  expect(result.loaded?.draft).toEqual(values);
+  expect(result.exported.schemaVersion).toBe(5);
+  expect(result.exported.goalPlan).toEqual(result.loaded);
+  expect(result.conflict).toBe(true);
+  expect(result.restoredCount).toBe(1);
+  expect(result.restored).toEqual(result.exported);
+  expect(result.restoreConflict).toContain("目標計画と競合");
+  expect(result.preserved).toEqual(result.saved);
+});
 test("Goal plan writes reject stale tabs and malformed stored values without overwriting", async ({
   page,
 }) => {

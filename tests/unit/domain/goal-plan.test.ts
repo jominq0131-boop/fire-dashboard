@@ -5,10 +5,34 @@ import { storageMigrationPlan } from "../../../src/domain/storage-migrations";
 import { syntheticBackup } from "../../fixtures/portfolio";
 
 const plan = () => ({
-  id: "primary",
+  id: "primary" as const,
   draft: initialGoalValues(),
   referenceMonth: "2026-09",
   updatedAt: "2026-09-13T00:00:00.000Z",
+});
+it("migrates exactly the legacy draft without mutation and rejects mixed version fields", () => {
+  const current = plan();
+  const draft = Object.fromEntries(
+    Object.entries(current.draft).filter(([key]) => key !== "taxableCost" && key !== "taxRate"),
+  );
+  const legacy = { ...current, draft };
+  const before = structuredClone(legacy);
+  const migrated = normalizeGoalPlan(legacy);
+  expect(migrated).toEqual(current);
+  expect(legacy).toEqual(before);
+  const oldBackup = { ...syntheticBackup(), schemaVersion: 4, firePlan: null, goalPlan: legacy };
+  expect(normalizeBackup(oldBackup).goalPlan).toEqual(current);
+  expect(() => normalizeBackup({ ...oldBackup, schemaVersion: 5 })).toThrow();
+  expect(() => normalizeBackup({ ...oldBackup, goalPlan: current })).toThrow();
+  expect(() => normalizeGoalPlan({ ...legacy, draft: { ...draft, taxRate: "20" } })).toThrow();
+  const configured = {
+    ...current,
+    draft: { ...current.draft, taxableCost: "123", taxRate: "20.315" },
+  };
+  const newer = { ...normalizeBackup(oldBackup), goalPlan: configured };
+  expect(normalizeBackup(JSON.parse(JSON.stringify(newer)))).toEqual(newer);
+  expect(() => mergeBackup(newer, normalizeBackup(oldBackup))).toThrow("目標計画と競合");
+  expect(newer.goalPlan).toEqual(configured);
 });
 it("preserves bounded incomplete drafts without interpreting them as valid calculations", () => {
   const input = plan();
@@ -47,7 +71,7 @@ it("migrates v1-v3 without losing records or the legacy plan", () => {
     const input = { ...old, schemaVersion: version, ...(version === 3 ? { firePlan: null } : {}) };
     expect(normalizeBackup(input)).toEqual({
       ...old,
-      schemaVersion: 4,
+      schemaVersion: 5,
       firePlan: null,
       goalPlan: null,
     });

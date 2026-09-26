@@ -2011,8 +2011,32 @@ form .account-actions {
   margin-right: 6px;
   border-radius: 50%;
 }
+.withdrawal-estimate .goal-breakdown {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.withdrawal-estimate h5 {
+  margin: 0;
+  font-size: 16px;
+}
+.withdrawal-estimate dl {
+  margin: 0;
+}
+.withdrawal-estimate dl > div {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.withdrawal-estimate dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.withdrawal-estimate dl > div:last-child {
+  color: var(--accent);
+  border-bottom: 0;
+}
 @media (max-width: 600px) {
-  .goal-breakdown {
+  .goal-breakdown,
+  .withdrawal-estimate .goal-breakdown {
     grid-template-columns: 1fr;
   }
 }

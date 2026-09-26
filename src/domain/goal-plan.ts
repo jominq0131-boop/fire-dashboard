@@ -1,5 +1,6 @@
 import type { GoalAssumptions } from "./goal-fire";
 import { assertMonth } from "./monthly";
+import { DEFAULT_TAX_RATE } from "./withdrawal";
 
 export type GoalValues = Record<Exclude<keyof GoalAssumptions, "startMonth">, string>;
 export const initialGoalValues = (): GoalValues => ({
@@ -16,6 +17,8 @@ export const initialGoalValues = (): GoalValues => ({
   usedGrowth: "",
   usedYearTsumitate: "",
   usedYearGrowth: "",
+  taxableCost: "",
+  taxRate: DEFAULT_TAX_RATE,
 });
 export interface GoalPlan {
   id: "primary";
@@ -27,7 +30,10 @@ export interface GoalPlanRepository {
   load(): Promise<GoalPlan | null>;
   save(next: GoalPlan, previous: GoalPlan | null): Promise<GoalPlan>;
 }
-export function normalizeGoalPlan(value: unknown): GoalPlan {
+export function normalizeGoalPlan(
+  value: unknown,
+  format: "stored" | "legacy" | "current" = "stored",
+): GoalPlan {
   const invalid = () =>
     new Error("保存済みの目標計画を検証できません。元のデータは変更していません。");
   if (!value || typeof value !== "object") throw invalid();
@@ -47,9 +53,14 @@ export function normalizeGoalPlan(value: unknown): GoalPlan {
   assertMonth(plan.referenceMonth);
   const draft = plan.draft as Record<string, unknown>;
   const keys = Object.keys(initialGoalValues());
+  const legacyKeys = keys.filter((key) => key !== "taxableCost" && key !== "taxRate");
+  const legacy = Object.keys(draft).length === legacyKeys.length;
+  const expected = legacy ? legacyKeys : keys;
   if (
-    Object.keys(draft).length !== keys.length ||
-    !keys.every(
+    (format === "legacy" && !legacy) ||
+    (format === "current" && legacy) ||
+    Object.keys(draft).length !== expected.length ||
+    !expected.every(
       (key) =>
         Object.hasOwn(draft, key) && typeof draft[key] === "string" && draft[key].length <= 16,
     )
@@ -58,7 +69,10 @@ export function normalizeGoalPlan(value: unknown): GoalPlan {
   // Drafts may be incomplete or invalid; calculation validates them separately.
   return {
     id: "primary",
-    draft: Object.fromEntries(keys.map((key) => [key, draft[key]])) as GoalValues,
+    draft: {
+      ...initialGoalValues(),
+      ...Object.fromEntries(expected.map((key) => [key, draft[key]])),
+    } as GoalValues,
     referenceMonth: plan.referenceMonth,
     updatedAt: plan.updatedAt,
   };

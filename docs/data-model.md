@@ -2,7 +2,7 @@
 
 ## 현재 버전과 모델
 
-주 저장소는 IndexedDB `fire-dashboard` **v5**, 내보내기 형식은 JSON **v4**입니다. 두 버전은 별개입니다.
+주 저장소는 IndexedDB `fire-dashboard` **v5**, 내보내기 형식은 JSON **v5**입니다. 두 버전은 별개입니다.
 
 | 모델                   | 주요 필드와 규칙                                                                         |
 | ---------------------- | ---------------------------------------------------------------------------------------- |
@@ -44,7 +44,7 @@ createdAt/updatedAt은 실제 UTC ISO 밀리초 날짜이며 생성 시각 보�
 
 ## JSON 백업과 복원
 
-최상위 필드는 schemaVersion/accounts/monthlyCashFlows/accountBalanceSnapshots/firePlan/goalPlan입니다. v1/v2/v3/v4를 허용하고 결정론적 정렬과 검증 후 v4를 생성합니다. v1/v2는 `firePlan: null`로 읽으며 기존 원본 필드·ID·노트·시각과 확인일 미상을 보존합니다. v1로 표시한 asOfDate, 추가 필드, 중복 ID/자연 키, 잘못된 참조/값/버전은 거부합니다.
+최상위 필드는 schemaVersion/accounts/monthlyCashFlows/accountBalanceSnapshots/firePlan/goalPlan입니다. v1/v2/v3/v4/v5를 허용하고 결정론적 정렬과 검증 후 v5를 생성합니다. v1/v2는 `firePlan: null`로 읽으며 기존 원본 필드·ID·노트·시각과 확인일 미상을 보존합니다. v1로 표시한 asOfDate, 추가 필드, 중복 ID/자연 키, 잘못된 참조/값/버전은 거부합니다.
 
 최대32 MiB. 미리보기 후 추가 방식으로 복원하며 동일 기록·계획은 건너뛰고 충돌은 전체 취소합니다. 현재 계획과 들어오는 계획이 다르면 금융 기록을 포함한 복원 전체를 적용하지 않습니다. 빈 브라우저에서 전체 복원할 수 있습니다. 원자적 복원과 상한 검증은 기존 데이터를 삭제하지 않습니다.
 
@@ -55,3 +55,9 @@ createdAt/updatedAt은 실제 UTC ISO 밀리초 날짜이며 생성 시각 보�
 ## 목표 계획 저장
 
 [Milestone16 계약](milestone-16-plan.md)에 따라 DB v4→v5는 빈 goalPlans(id)를 추가합니다. GoalPlan은 primary ID, 13개 입력 문자열(각16자 이하), referenceMonth, updatedAt입니다. JSON v4의 goalPlan은 계획 또는 null이며 v1~v3 이행과 복원에서 기존 계획/금융 기록을 보존합니다.
+
+## Milestone17 세후 계산과 계획 이행
+
+[세후 계산 계약](milestone-17-plan.md)은 과세계좌 원가/가정 세율을 추가합니다. goalPlan은 현재15개 문자열(각16자)이며 원가 빈칸은 미상입니다. DB v5 저장소는 그대로 두고 구13필드 계획을 검증한 뒤 원가 빈칸/세율20.315를 메모리에서만 추가합니다. 원본과 시각은 읽기로 변경하지 않습니다. JSON v4는 구13필드, v5는15필드만 허용하고 부분 이행/추가 필드는 거부합니다. 새 세금 설정과 다른 구계획 복원은 전체 충돌 처리합니다.
+
+원가는 과세 신규매수액만 누적하고 수익으로 늘리지 않습니다. 현금 제외 주식 비례 매도에서 양의 이익에만 입력 세율(0~100%, 소수3자리)을 적용합니다. 금액 단계별 BigInt/엔 반올림을 사용하고 원가 미상은 세후 미계산으로 구별합니다. 손익통산·실제 신고·미래 세법/지속성은 계산하지 않습니다.

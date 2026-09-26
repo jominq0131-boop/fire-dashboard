@@ -2,6 +2,7 @@ import { assertMonth } from "./monthly";
 import { currentTotal } from "./observations";
 import { monthlyMetrics } from "./metrics";
 import type { PortfolioOverview } from "./portfolio";
+import { estimateWithdrawal, type WithdrawalEstimate } from "./withdrawal";
 
 export interface GoalAssumptions {
   startMonth: string;
@@ -18,6 +19,8 @@ export interface GoalAssumptions {
   usedGrowth: number;
   usedYearTsumitate: number;
   usedYearGrowth: number;
+  taxableCost?: number | null;
+  taxRate?: number;
 }
 export interface GoalPoint {
   month: number;
@@ -34,6 +37,8 @@ export interface GoalResult {
   stoppedMonth: number | null;
   annualWithdrawal: number | null;
   monthlyWithdrawal: number | null;
+  annualNetWithdrawal: WithdrawalEstimate | null;
+  monthlyNetWithdrawal: WithdrawalEstimate | null;
 }
 const max = BigInt(Number.MAX_SAFE_INTEGER);
 const money = (n: number) => Number.isSafeInteger(n) && n >= 0;
@@ -42,6 +47,16 @@ const round = (n: bigint, denominator: bigint) => (n + denominator / 2n) / denom
 /** No sales during accumulation. Existing cash is retained; new purchases use both eligible NISA buckets first. */
 export function projectGoal(s: GoalAssumptions): GoalResult {
   assertMonth(s.startMonth);
+  const taxRate = s.taxRate ?? 20315;
+  if (
+    (s.taxableCost != null && !money(s.taxableCost)) ||
+    !Number.isInteger(taxRate) ||
+    taxRate < 0 ||
+    taxRate > 100000
+  )
+    throw new Error("課税口座の取得額・想定税率を確認してください。");
+  if (s.taxable === 0 && s.taxableCost != null && s.taxableCost !== 0)
+    throw new Error("課税口座の評価額が0円の場合、取得額は0円または空欄にしてください。");
   const amounts = [
     s.cash,
     s.tsumitate,
@@ -86,6 +101,7 @@ export function projectGoal(s: GoalAssumptions): GoalResult {
     usedGrowth = s.usedGrowth;
   let yearT = s.usedYearTsumitate,
     yearG = s.usedYearGrowth;
+  let taxableCost = s.taxableCost == null ? (s.taxable === 0 ? 0n : null) : BigInt(s.taxableCost);
   const point = (month: number): GoalPoint => ({
     month,
     cash: Number(cash),
@@ -102,6 +118,8 @@ export function projectGoal(s: GoalAssumptions): GoalResult {
     stoppedMonth: null,
     annualWithdrawal: null,
     monthlyWithdrawal: null,
+    annualNetWithdrawal: null,
+    monthlyNetWithdrawal: null,
   };
   const grow = (n: bigint) => round(n * BigInt(120000 + s.returnBps), 120000n);
   for (let month = 1; month <= 1200 && !result.reached; month++) {
@@ -121,6 +139,7 @@ export function projectGoal(s: GoalAssumptions): GoalResult {
     tsumitate = grow(tsumitate) + BigInt(t);
     growth = grow(growth) + BigInt(g);
     taxable = grow(taxable) + BigInt(s.monthlyInvestment - t - g);
+    if (taxableCost !== null) taxableCost += BigInt(s.monthlyInvestment - t - g);
     usedTotal += t + g;
     usedGrowth += g;
     yearT += t;
@@ -142,6 +161,20 @@ export function projectGoal(s: GoalAssumptions): GoalResult {
       BigInt(result.reached.taxable);
     result.annualWithdrawal = Number(round(stocks * BigInt(s.withdrawalBps), 10000n));
     result.monthlyWithdrawal = Number(round(stocks * BigInt(s.withdrawalBps), 120000n));
+    result.annualNetWithdrawal = estimateWithdrawal(
+      result.annualWithdrawal,
+      stocks,
+      taxable,
+      taxableCost,
+      taxRate,
+    );
+    result.monthlyNetWithdrawal = estimateWithdrawal(
+      result.monthlyWithdrawal,
+      stocks,
+      taxable,
+      taxableCost,
+      taxRate,
+    );
   }
   return result;
 }
