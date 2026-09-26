@@ -19,6 +19,8 @@ test("loads recorded assets explicitly without writing records", async ({ page }
   await expect(fire.getByLabel("開始資産（円）", { exact: true })).toHaveValue("120");
 });
 test("explicit scenario, invalidation, reset and persistent draft", async ({ page }) => {
+  // Run the whole mobile flow at its final size; resizing mid-scroll races smooth scrolling.
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   const fire = page.getByRole("region", { name: "FIREシミュレーション" });
   await fire.getByRole("button", { name: "記録した総資産を使う" }).click();
@@ -41,7 +43,6 @@ test("explicit scenario, invalidation, reset and persistent draft", async ({ pag
   await fire.getByRole("button", { name: "シミュレーションする" }).click();
   await expect(fire.getByRole("alert")).toBeVisible();
   await expect(fire.getByRole("status")).toHaveCount(0);
-  await page.setViewportSize({ width: 390, height: 844 });
   await expect
     .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))
     .toBe(true);
