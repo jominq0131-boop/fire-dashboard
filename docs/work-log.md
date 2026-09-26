@@ -1,5 +1,15 @@
 # 작업 기록
 
+## Milestone16·반응형 공개 배포 — 2026-09-13
+
+[PR #45](https://github.com/jominq0131-boop/fire-dashboard/pull/45)의 head070b9ad는 단위154개, 로컬 Chromium57개(2.7분, exit0), format/lint/typecheck/build/diff 및 [PR CI](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/34743213147)를 통과했습니다. PR #43의 커밋을 포함해 merge commit ae285ca02b33efab4af3dfa30449280ef4315b19로 병합했으며 두 PR 모두 merged 상태를 확인했습니다.
+
+해당 main의 [CI](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/34743410726)와 [Pages](https://github.com/jominq0131-boop/fire-dashboard/actions/runs/34743410776)는 별도 실행입니다. Pages 성공 뒤 [공개 사이트](https://jominq0131-boop.github.io/fire-dashboard/)를 검증했습니다. HTML/JS/CSS 모두 HTTP200이며 Pages 환경의 검증 빌드와 SHA-256이 일치했습니다. HTML f79ab4fe…, 기본 JS 2e930c83…, 차트 JS 88568db1…, CSS5807ae36…입니다.
+
+실제 사이트에서 창 너비1440/1600/1920/2560px에 따라 본문1232/1392/1712/2352px로 확장됩니다.860/390/320px에서는 한 열, 가로 넘침 없음,1920px 복귀 시 두 열을 확인했습니다. 격리 브라우저에서 합성 입력123456의 저장/새로고침 복원과 pageerror0건을 확인했습니다. 실제 금융 데이터/사용자 브라우저 프로필은 변경하지 않았습니다.
+
+아래 기록의 게시 차단과 통합 진행 상태는 작업 당시 이력입니다. 사용자 후속 승인으로 게시와 병합을 마쳤습니다.
+
 ## Milestone 16 — Issue #44
 
 main 538ffc89에서 codex/milestone-16-goal-persistence를 생성했습니다. 목표 입력 자동 저장, 기준 월 안내, DB v5 빈 goalPlans 추가, JSON v4와 구버전 보존 복원을 구현했습니다. 새 의존성/실제 금융 자료/사용자 브라우저 프로필 변경은 없습니다.

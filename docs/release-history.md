@@ -19,3 +19,8 @@
 | Milestone13 | 브랜드 타입·아이콘·앱 셸   | [#38](https://github.com/jominq0131-boop/fire-dashboard/pull/38)                                                                   |
 
 Milestone14의 구현·검증·병합·배포 상태는 [Issue #39 연결 PR](https://github.com/jominq0131-boop/fire-dashboard/issues/39)의 릴리스 기록을 따릅니다.
+
+## 최신 출시
+
+- Milestone15 목표 도달형 계산: [PR #42](https://github.com/jominq0131-boop/fire-dashboard/pull/42), 배포 기록 [PR #43](https://github.com/jominq0131-boop/fire-dashboard/pull/43).
+- Milestone16 목표 입력 자동 저장·JSON 복원, 창 크기에 반응하는 본문/차트: [PR #45](https://github.com/jominq0131-boop/fire-dashboard/pull/45). 공개 파일 해시와320~2560px 확인 근거는 [작업 기록](work-log.md)에 있습니다.
