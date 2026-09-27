@@ -8,16 +8,16 @@ import {
 import { accountCategories, type AccountCategory, type AssetAccount } from "../../domain/models";
 
 const labels: Record<AccountCategory, string> = {
-  cash: "現金・預金",
-  nisa_tsumitate: "NISA つみたて投資枠",
-  nisa_growth: "NISA 成長投資枠",
-  taxable: "課税口座",
-  other: "その他",
+  cash: "현금·예금",
+  nisa_tsumitate: "NISA 적립투자 한도",
+  nisa_growth: "NISA 성장투자 한도",
+  taxable: "과세 계좌",
+  other: "기타",
 };
 const errorMessage = (error: unknown) =>
   error instanceof AccountError
     ? error.message
-    : "保存処理を完了できませんでした。入力内容を控えて、再読み込みしてください。";
+    : "저장을 완료하지 못했습니다. 입력 내용을 따로 보관한 뒤 새로고침해 주세요.";
 
 export function AccountManager({
   repository,
@@ -80,7 +80,7 @@ export function AccountManager({
       );
       onChanged?.();
       resetForm();
-      setNotice("口座をこの端末に保存しました。");
+      setNotice("계좌를 이 기기에 저장했습니다.");
     } catch (failure) {
       setError(errorMessage(failure));
     } finally {
@@ -100,7 +100,9 @@ export function AccountManager({
       setAccounts((items) => items.map((item) => (item.id === saved.id ? saved : item)));
       onChanged?.();
       setNotice(
-        saved.isActive ? "口座を再開しました。" : "口座を休止しました。データは保持されています。",
+        saved.isActive
+          ? "계좌 사용을 재개했습니다."
+          : "계좌 사용을 중지했습니다. 데이터는 보존됩니다.",
       );
     } catch (failure) {
       setError(errorMessage(failure));
@@ -114,23 +116,25 @@ export function AccountManager({
     <section className="account-panel" aria-labelledby="accounts-heading" aria-busy={busy}>
       <div className="section-heading">
         <div>
-          <p className="section-kicker">YOUR ACCOUNTS</p>
-          <h2 id="accounts-heading">口座を管理</h2>
+          <p className="section-kicker">내 계좌</p>
+          <h2 id="accounts-heading">계좌 관리</h2>
         </div>
         <span>
           {error && !ready
-            ? "読み込み不可"
+            ? "불러오기 실패"
             : ready
-              ? `${accounts.filter((account) => account.isActive).length} 件の利用中口座`
-              : "読み込み中"}
+              ? `${accounts.filter((account) => account.isActive).length}개의 사용 중인 계좌`
+              : "불러오는 중"}
         </span>
       </div>
-      <p className="panel-description">記録する口座を、ここで管理。</p>
+      <p className="panel-description">기록할 계좌를 여기서 관리하세요.</p>
       <details className="storage-details">
-        <summary>保存と口座について</summary>
+        <summary>저장과 계좌 안내</summary>
         <p>
-          このブラウザーにのみ保存されます。自動同期はありません。バックアップ画面でJSONを保存できます。口座番号は入力しないでください。口座は休止中を含め
-          {MAX_ACCOUNTS}件まで。上限でも既存の口座は編集でき、自動削除はしません。
+          이 브라우저에만 저장되며 자동 동기화는 지원하지 않습니다. 백업 화면에서 JSON을 저장할 수
+          있습니다. 계좌번호는 입력하지 마세요. 중지한 계좌를 포함해 최대
+          {MAX_ACCOUNTS}개까지 등록할 수 있습니다. 한도에 도달해도 기존 계좌는 편집할 수 있으며
+          자동으로 삭제하지 않습니다.
         </p>
       </details>
       {error && (
@@ -141,13 +145,13 @@ export function AccountManager({
       <p role="status" className="save-notice">
         {notice}
       </p>
-      {!ready && !error && <p>保存済みの口座を読み込んでいます…</p>}
+      {!ready && !error && <p>저장된 계좌를 불러오는 중…</p>}
       <form className="account-create-form" onSubmit={(event) => void save(event)}>
         <fieldset disabled={!ready || busy}>
-          <legend>{editing ? "口座を編集" : "口座を追加"}</legend>
+          <legend>{editing ? "계좌 편집" : "계좌 추가"}</legend>
           <div className="account-fields">
             <label htmlFor="account-name">
-              口座名
+              계좌명
               <input
                 id="account-name"
                 ref={nameInput}
@@ -155,12 +159,12 @@ export function AccountManager({
                 onChange={(event) => setName(event.target.value)}
                 maxLength={MAX_ACCOUNT_NAME_LENGTH}
                 required
-                placeholder="例：生活用の口座"
+                placeholder="예: 생활비 계좌"
                 autoComplete="off"
               />
             </label>
             <label htmlFor="account-category">
-              口座の種類
+              계좌 종류
               <select
                 id="account-category"
                 value={category}
@@ -176,17 +180,17 @@ export function AccountManager({
           </div>
           <div className="account-actions">
             <button type="submit" disabled={!editing && accounts.length >= MAX_ACCOUNTS}>
-              {busy ? "保存中…" : editing ? "変更を保存" : "口座を追加"}
+              {busy ? "저장 중…" : editing ? "변경 저장" : "계좌 추가"}
             </button>
             {editing && (
               <button className="secondary" type="button" onClick={resetForm}>
-                編集をやめる
+                편집 취소
               </button>
             )}
           </div>
         </fieldset>
       </form>
-      {ready && accounts.length === 0 && <p>口座はまだ登録されていません。</p>}
+      {ready && accounts.length === 0 && <p>등록된 계좌가 없습니다.</p>}
       <ul className="account-list">
         {accounts.map((account) => (
           <li key={account.id}>
@@ -197,7 +201,7 @@ export function AccountManager({
               <div>
                 <strong>{account.name}</strong>
                 <p>
-                  {labels[account.category]} · {account.isActive ? "利用中" : "休止中"}
+                  {labels[account.category]} · {account.isActive ? "사용 중" : "사용 중지"}
                 </p>
               </div>
             </div>
@@ -206,7 +210,7 @@ export function AccountManager({
                 className="secondary"
                 type="button"
                 disabled={busy || editing !== null}
-                aria-label={`${account.name}を編集`}
+                aria-label={`${account.name} 편집`}
                 onClick={() => {
                   setEditing(account);
                   setName(account.name);
@@ -216,16 +220,16 @@ export function AccountManager({
                   nameInput.current?.focus();
                 }}
               >
-                編集
+                편집
               </button>
               <button
                 className="secondary"
                 type="button"
                 disabled={busy || editing !== null}
-                aria-label={`${account.name}を${account.isActive ? "休止" : "再開"}`}
+                aria-label={`${account.name} ${account.isActive ? "사용 중지" : "사용 재개"}`}
                 onClick={() => void toggle(account)}
               >
-                {account.isActive ? "休止" : "再開"}
+                {account.isActive ? "사용 중지" : "사용 재개"}
               </button>
             </div>
           </li>

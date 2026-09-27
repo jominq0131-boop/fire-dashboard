@@ -1,9 +1,9 @@
 import type { FireProjection } from "../../domain/fire";
 export function arrivalText(result: FireProjection): string {
-  if (result.reachedMonth === 0) return "開始時点で目標に到達";
+  if (result.reachedMonth === 0) return "시작 시점에 목표 달성";
   if (result.reachedMonth !== null)
-    return `最初の目標到達：${Math.floor(result.reachedMonth / 12)}年${result.reachedMonth % 12}か月後`;
+    return `최초 목표 달성: ${Math.floor(result.reachedMonth / 12)}년${result.reachedMonth % 12}개월 후`;
   return result.overflowMonth !== null
-    ? "計算上限のため到達時期を判定できません"
-    : "この仮定では100年以内に目標に届きません";
+    ? "계산 한도로 인해 달성 시점을 판단할 수 없습니다"
+    : "이 가정으로는 100년 이내에 목표에 도달하지 않습니다";
 }

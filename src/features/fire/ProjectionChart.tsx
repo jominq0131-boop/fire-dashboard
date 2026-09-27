@@ -12,35 +12,36 @@ export function ProjectionChart({
 }) {
   const [years, setYears] = useState(30),
     [selected, setSelected] = useState(0);
-  const labels = Array.from({ length: years + 1 }, (_, i) => `${i}年後`);
+  const labels = Array.from({ length: years + 1 }, (_, i) => `${i}년 후`);
   return (
     <section className="projection-chart" aria-label={title}>
       <h3>{title}</h3>
       <p className="field-hint">
-        同じ色がひとつのシナリオです。資産と目標の距離を比較し、気になる期間を拡大できます。
+        같은 색은 같은 시나리오입니다. 자산과 목표의 차이를 비교하고 관심 있는 기간을 확대할 수
+        있습니다.
       </p>
       <div className="forecast-outcomes">
         {items.map((item, i) => (
           <div key={item.id} style={{ borderTopColor: chartColors[i] }}>
             <span>{item.label}</span>
             <strong>{arrivalText(item.result)}</strong>
-            <small>一定の仮定による最初の到達</small>
+            <small>일정한 가정에 따른 최초 달성</small>
           </div>
         ))}
       </div>
       <label>
-        予測グラフの期間
+        예측 그래프 기간
         <select
-          aria-label="予測グラフの期間"
+          aria-label="예측 그래프 기간"
           value={years}
           onChange={(e) => {
             setYears(Number(e.target.value));
             setSelected(0);
           }}
         >
-          <option value="10">10年</option>
-          <option value="30">30年</option>
-          <option value="100">100年</option>
+          <option value="10">10년</option>
+          <option value="30">30년</option>
+          <option value="100">100년</option>
         </select>
       </label>
       <InteractiveLineChart
@@ -52,7 +53,7 @@ export function ProjectionChart({
         series={items.flatMap((item, i) => [
           {
             id: item.id + "-assets",
-            label: item.label + " 資産",
+            label: item.label + " 자산",
             color: chartColors[i],
             kind: "area",
             values: labels.map(
@@ -61,7 +62,7 @@ export function ProjectionChart({
           },
           {
             id: item.id + "-target",
-            label: item.label + " 目標",
+            label: item.label + " 목표",
             dashed: true,
             color: chartColors[i],
             values: labels.map(
@@ -71,7 +72,8 @@ export function ProjectionChart({
         ])}
       />
       <p className="field-hint">
-        実線は予測資産、破線は物価調整した目標です。仮定ごとに開始資産や目標が異なる場合があります。計算範囲外は線を延長しません。
+        실선은 예측 자산, 파선은 물가를 반영한 목표입니다. 가정마다 시작 자산과 목표가 다를 수
+        있습니다. 계산 범위를 벗어나면 선을 연장하지 않습니다.
       </p>
     </section>
   );

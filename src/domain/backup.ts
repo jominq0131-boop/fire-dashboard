@@ -6,7 +6,7 @@ import { normalizeFirePlan, sameFirePlan, type FirePlan } from "./fire-plan";
 
 export const MAX_BACKUP_BYTES = 32 * 1024 * 1024;
 export interface Backup {
-  schemaVersion: 1 | 2 | 3 | 4 | 5 | 6;
+  schemaVersion: 1 | 2 | 3 | 4 | 5 | 6 | 7;
   accounts: AssetAccount[];
   monthlyCashFlows: MonthlyCashFlowRecord[];
   accountBalanceSnapshots: AccountBalanceSnapshot[];
@@ -14,7 +14,7 @@ export interface Backup {
   firePlan?: FirePlan | null;
 }
 export interface CurrentBackup extends Backup {
-  schemaVersion: 6;
+  schemaVersion: 7;
   goalPlan: GoalPlan | null;
   firePlan: FirePlan | null;
 }
@@ -32,8 +32,8 @@ export function canonical(value: object): string {
   );
 }
 const invalid = () =>
-  new Error("バックアップの形式・件数・参照・重複を確認してください。元の記録は変更していません。");
-/** Older backups preserve records; v4 goals gain an unknown cost and an explicit example tax rate. */
+  new Error("백업 형식·개수·참조·중복을 확인해 주세요. 기존 기록은 변경하지 않았습니다.");
+/** Older backups preserve records; missing goal assumptions receive versioned defaults in memory. */
 export function normalizeBackup(value: unknown): CurrentBackup {
   if (!value || typeof value !== "object") throw invalid();
   const v = value as Record<string, unknown>;
@@ -43,7 +43,8 @@ export function normalizeBackup(value: unknown): CurrentBackup {
       v.schemaVersion !== 3 &&
       v.schemaVersion !== 4 &&
       v.schemaVersion !== 5 &&
-      v.schemaVersion !== 6) ||
+      v.schemaVersion !== 6 &&
+      v.schemaVersion !== 7) ||
     Object.keys(v).length !== (Number(v.schemaVersion) >= 4 ? 6 : v.schemaVersion === 3 ? 5 : 4) ||
     !["schemaVersion", "accounts", "monthlyCashFlows", "accountBalanceSnapshots"].every((k) =>
       Object.hasOwn(v, k),
@@ -81,7 +82,7 @@ export function normalizeBackup(value: unknown): CurrentBackup {
   let firePlan: FirePlan | null = null;
   if (Number(v.schemaVersion) >= 3 && v.firePlan !== null) firePlan = normalizeFirePlan(v.firePlan);
   const result: CurrentBackup = {
-    schemaVersion: 6,
+    schemaVersion: 7,
     accounts: [...accounts].sort((a, b) => compare(a.id, b.id)),
     monthlyCashFlows: [...cash].sort((a, b) => compare(a.month, b.month)),
     accountBalanceSnapshots: [...balances].sort(
@@ -92,18 +93,32 @@ export function normalizeBackup(value: unknown): CurrentBackup {
       Number(v.schemaVersion) >= 4 && v.goalPlan !== null
         ? normalizeGoalPlan(
             v.goalPlan,
-            v.schemaVersion === 4 ? "legacy" : v.schemaVersion === 5 ? "tax" : "current",
+            v.schemaVersion === 4
+              ? "legacy"
+              : v.schemaVersion === 5
+                ? "tax"
+                : v.schemaVersion === 6
+                  ? "drawdown"
+                  : "current",
           )
         : null,
   };
   if (backupBytes(canonical(result)) > MAX_BACKUP_BYTES)
-    throw new Error("バックアップは32 MiB以内で扱えます。記録は削除していません。");
+    throw new Error("백업은 32 MiB까지 처리할 수 있습니다. 기록은 삭제하지 않았습니다.");
   return result;
 }
 export function parseBackup(text: string) {
   if (text.length > MAX_BACKUP_BYTES || backupBytes(text) > MAX_BACKUP_BYTES)
-    throw new Error("ファイルは32 MiB以内にしてください。");
-  return normalizeBackup(JSON.parse(text));
+    throw new Error("파일 크기는 32 MiB 이하여야 합니다.");
+  let value: unknown;
+  try {
+    value = JSON.parse(text);
+  } catch {
+    throw new Error(
+      "JSON 파일을 읽을 수 없습니다. 파일 형식을 확인해 주세요. 기존 기록은 변경하지 않았습니다.",
+    );
+  }
+  return normalizeBackup(value);
 }
 export function mergeBackup(current: Backup, incoming: Backup) {
   const left = normalizeBackup(current),
@@ -116,7 +131,7 @@ export function mergeBackup(current: Backup, incoming: Backup) {
       if (previous) {
         if (canonical(previous) !== canonical(record))
           throw new Error(
-            "既存の記録と競合しています。別の空のブラウザーへ復元するか、バックアップを確認してください。変更は適用していません。",
+            "기존 기록과 충돌합니다. 비어 있는 다른 브라우저에 복원하거나 백업을 확인해 주세요. 변경은 적용하지 않았습니다.",
           );
       } else {
         map.set(record.id, record);
@@ -132,7 +147,7 @@ export function mergeBackup(current: Backup, incoming: Backup) {
       added++;
     } else if (!sameFirePlan(firePlan, right.firePlan)) {
       throw new Error(
-        "既存のFIRE計画と競合しています。変更は適用していません。必要な計画をJSONで別に保管してください。",
+        "기존 FIRE 계획과 충돌합니다. 변경은 적용하지 않았습니다. 필요한 계획은 JSON으로 따로 보관해 주세요.",
       );
     }
   }
@@ -142,10 +157,10 @@ export function mergeBackup(current: Backup, incoming: Backup) {
       goalPlan = right.goalPlan;
       added++;
     } else if (!sameGoalPlan(goalPlan, right.goalPlan))
-      throw new Error("既存の目標計画と競合しています。変更は適用していません。");
+      throw new Error("기존 목표 계획과 충돌합니다. 변경은 적용하지 않았습니다.");
   }
   const backup = normalizeBackup({
-    schemaVersion: 6,
+    schemaVersion: 7,
     accounts: merge(left.accounts, right.accounts),
     monthlyCashFlows: merge(left.monthlyCashFlows, right.monthlyCashFlows),
     accountBalanceSnapshots: merge(left.accountBalanceSnapshots, right.accountBalanceSnapshots),

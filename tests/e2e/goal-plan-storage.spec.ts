@@ -80,12 +80,12 @@ test("legacy goal read/export leaves original bytes intact and tax edits use con
   }, values);
   expect(result.raw).toEqual(result.old);
   expect(result.loaded?.draft).toEqual(values);
-  expect(result.exported.schemaVersion).toBe(6);
+  expect(result.exported.schemaVersion).toBe(7);
   expect(result.exported.goalPlan).toEqual(result.loaded);
   expect(result.conflict).toBe(true);
   expect(result.restoredCount).toBe(1);
   expect(result.restored).toEqual(result.exported);
-  expect(result.restoreConflict).toContain("目標計画と競合");
+  expect(result.restoreConflict).toContain("목표 계획과 충돌");
   expect(result.preserved).toEqual(result.saved);
 });
 test("Goal plan writes reject stale tabs and malformed stored values without overwriting", async ({
@@ -169,11 +169,11 @@ test("Goal plan writes reject stale tabs and malformed stored values without ove
     countDb.close();
     return { conflict, afterConflict, corrupt, stored, excess, count };
   }, values);
-  expect(result.conflict).toContain("別のタブ");
+  expect(result.conflict).toContain("다른 탭");
   expect(result.afterConflict?.draft.target).toBe("2200");
-  expect(result.corrupt).toContain("検証できません");
+  expect(result.corrupt).toContain("검증할 수 없습니다");
   expect(result.stored).toEqual({ id: "unexpected", invalid: true });
-  expect(result.excess).toContain("上限を超えています");
+  expect(result.excess).toContain("한도를 초과");
   expect(result.count).toBe(2);
 });
 
@@ -190,7 +190,7 @@ test("v4 upgrade preserves both existing records and plans and rolls back failed
     );
     const account = {
       id: "synthetic",
-      name: "保持",
+      name: "보존",
       category: "cash",
       isActive: true,
       sortOrder: 0,
@@ -306,7 +306,7 @@ test("a goal conflict cancels all backup additions and old backups preserve the 
     try {
       await backup.importBackup({
         ...current,
-        accounts: [{ id: "new", name: "合成", category: "cash", isActive: true, sortOrder: 0 }],
+        accounts: [{ id: "new", name: "합성", category: "cash", isActive: true, sortOrder: 0 }],
         goalPlan: { ...saved, draft: { ...draft, cash: "123" } },
       });
     } catch {

@@ -6,44 +6,44 @@ test("three immutable comparison snapshots, cap, removal, overflow and reload", 
 }) => {
   await page.goto("/");
   const fire = page.locator("#fire"),
-    comparison = page.getByRole("region", { name: "仮定を並べて比較", exact: true });
-  const add = comparison.getByRole("button", { name: "この結果を比較に追加" });
+    comparison = page.getByRole("region", { name: "가정 나란히 비교", exact: true });
+  const add = comparison.getByRole("button", { name: "이 결과를 비교에 추가" });
   await expect(add).toBeDisabled();
   for (const [label, value] of [
-    ["開始資産（円）", "0"],
-    ["目標資産・今日の価値（円）", "1200"],
-    ["毎月の積立額（円）", "100"],
-    ["想定年利（%）", "0"],
-    ["想定インフレ率（%）", "0"],
+    ["시작 자산(엔)", "0"],
+    ["목표 자산·현재 가치(엔)", "1200"],
+    ["월 적립액(엔)", "100"],
+    ["가정 연 수익률(%)", "0"],
+    ["가정 물가상승률(%)", "0"],
   ])
     await fire.getByLabel(label, { exact: true }).fill(value);
-  await fire.getByRole("button", { name: "シミュレーションする" }).click();
+  await fire.getByRole("button", { name: "시뮬레이션 실행" }).click();
   await add.click();
-  await fire.getByLabel("毎月の積立額（円）", { exact: true }).fill("200");
+  await fire.getByLabel("월 적립액(엔)", { exact: true }).fill("200");
   await expect(add).toBeDisabled();
-  await expect(comparison).toContainText("1年0か月後");
-  await fire.getByRole("button", { name: "シミュレーションする" }).click();
+  await expect(comparison).toContainText("1년0개월 후");
+  await fire.getByRole("button", { name: "시뮬레이션 실행" }).click();
   await add.click();
-  await expect(comparison).toContainText("0年6か月後");
+  await expect(comparison).toContainText("0년6개월 후");
   const contribution = comparison
     .getByRole("row")
-    .filter({ has: page.getByRole("rowheader", { name: "月の積立額", exact: true }) });
-  await expect(contribution.getByRole("cell")).toHaveText(["100 円", "200 円"]);
-  await fire.getByLabel("毎月の積立額（円）", { exact: true }).fill("0");
-  await fire.getByRole("button", { name: "シミュレーションする" }).click();
+    .filter({ has: page.getByRole("rowheader", { name: "월 적립액", exact: true }) });
+  await expect(contribution.getByRole("cell")).toHaveText(["100 엔", "200 엔"]);
+  await fire.getByLabel("월 적립액(엔)", { exact: true }).fill("0");
+  await fire.getByRole("button", { name: "시뮬레이션 실행" }).click();
   await add.click();
   await expect(add).toBeDisabled();
-  await expect(comparison).toContainText("100年以内に目標に届きません");
-  await comparison.getByRole("button", { name: "シナリオ2を比較から外す" }).click();
+  await expect(comparison).toContainText("100년 이내에 목표에 도달하지 않습니다");
+  await comparison.getByRole("button", { name: "시나리오2 비교에서 제외" }).click();
   await fire
-    .getByLabel("目標資産・今日の価値（円）", { exact: true })
+    .getByLabel("목표 자산·현재 가치(엔)", { exact: true })
     .fill(String(Number.MAX_SAFE_INTEGER));
-  await fire.getByLabel("想定インフレ率（%）", { exact: true }).fill("100");
-  await fire.getByRole("button", { name: "シミュレーションする" }).click();
+  await fire.getByLabel("가정 물가상승률(%)", { exact: true }).fill("100");
+  await fire.getByRole("button", { name: "시뮬레이션 실행" }).click();
   await add.click();
-  await expect(comparison).toContainText("計算上限のため到達時期を判定できません");
-  await fire.getByRole("button", { name: "仮定をクリア" }).click();
-  await expect(comparison.getByRole("button", { name: /比較から外す/ })).toHaveCount(3);
+  await expect(comparison).toContainText("계산 한도로 인해 달성 시점을 판단할 수 없습니다");
+  await fire.getByRole("button", { name: "가정 초기화" }).click();
+  await expect(comparison.getByRole("button", { name: /비교에서 제외/ })).toHaveCount(3);
   await page.setViewportSize({ width: 320, height: 844 });
   await expect
     .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))
@@ -63,13 +63,13 @@ test("three immutable comparison snapshots, cap, removal, overflow and reload", 
       throw new Error("synthetic-error-".repeat(80));
     };
   });
-  await fire.getByRole("button", { name: "記録した総資産を使う" }).click();
+  await fire.getByRole("button", { name: "기록한 총자산 사용" }).click();
   await expect(fire.getByRole("alert")).toBeVisible();
   await page.setViewportSize({ width: 320, height: 844 });
   await expect
     .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))
     .toBe(true);
-  await expect(comparison.getByRole("button", { name: /比較から外す/ })).toHaveCount(3);
+  await expect(comparison.getByRole("button", { name: /비교에서 제외/ })).toHaveCount(3);
   await expect
     .poll(() =>
       page.evaluate(async () => {
@@ -81,7 +81,7 @@ test("three immutable comparison snapshots, cap, removal, overflow and reload", 
     )
     .toBe(3);
   await page.reload();
-  await expect(comparison.getByRole("button", { name: /比較から外す/ })).toHaveCount(3);
+  await expect(comparison.getByRole("button", { name: /비교에서 제외/ })).toHaveCount(3);
 });
 
 test("long names and maximum yen keep cards, actions and fields within their tracks", async ({
@@ -99,8 +99,8 @@ test("long names and maximum yen keep cards, actions and fields within their tra
     b.balance = Number.MAX_SAFE_INTEGER;
   });
   backup.accounts.push(
-    { ...backup.accounts[0], id: "zero", name: "ゼロ", sortOrder: 1 },
-    { ...backup.accounts[0], id: "missing", name: "未記録", sortOrder: 2 },
+    { ...backup.accounts[0], id: "zero", name: "제로", sortOrder: 1 },
+    { ...backup.accounts[0], id: "missing", name: "미기록", sortOrder: 2 },
   );
   backup.accountBalanceSnapshots.push({
     ...backup.accountBalanceSnapshots[1],
@@ -117,8 +117,8 @@ test("long names and maximum yen keep cards, actions and fields within their tra
   await page.reload();
   await expect(card.locator(".asset-value")).toContainText("9,007,199,254,740,991");
   expect(Math.abs((await card.boundingBox())!.width - emptyWidth)).toBeLessThan(1);
-  await card.getByRole("button", { name: `${name}を更新`, exact: true }).click();
-  await expect(page.getByLabel(`${name}の残高`, { exact: true })).toHaveValue(
+  await card.getByRole("button", { name: `${name} 갱신`, exact: true }).click();
+  await expect(page.getByLabel(`${name} 잔액`, { exact: true })).toHaveValue(
     String(Number.MAX_SAFE_INTEGER),
   );
   for (const width of [1440, 1024, 768, 390, 320]) {

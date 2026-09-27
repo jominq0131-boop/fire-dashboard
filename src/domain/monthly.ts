@@ -6,19 +6,19 @@ export const MAX_BALANCES = 360000;
 export class MonthlyError extends Error {}
 export function assertMonth(month: unknown): asserts month is string {
   if (!isMonthKey(month) || month < "1900-01" || month > "2199-12")
-    throw new MonthlyError("対象月は1900-01〜2199-12で入力してください。");
+    throw new MonthlyError("대상 월은 1900-01~2199-12로 입력해 주세요.");
 }
 export function parseYen(input: string): number {
   if (!/^[0-9]{1,16}$/.test(input) || !isNonNegativeYen(Number(input)))
     throw new MonthlyError(
-      "金額は0以上の安全な整数の円で入力してください。空欄・小数・指数表記は使えません。",
+      "금액은 0 이상의 안전한 정수 엔으로 입력해 주세요. 빈칸·소수·지수 표기는 사용할 수 없습니다.",
     );
   return Number(input);
 }
 export function assertCapacity(count: number, limit: number, adding = false) {
   if (!Number.isSafeInteger(count) || count < 0 || count > limit || (adding && count === limit))
     throw new MonthlyError(
-      "記録数が安全に処理できる上限を超えています。データは削除していません。",
+      "기록 수가 안전하게 처리할 수 있는 한도를 초과합니다. 데이터는 삭제하지 않았습니다.",
     );
 }
 export type CashDetails = Pick<
@@ -30,7 +30,7 @@ export function validateCash(value: CashDetails): CashDetails {
     ![value.income, value.expenses, value.investmentContribution].every(isNonNegativeYen) ||
     (value.note !== undefined && (typeof value.note !== "string" || value.note.length > 1000))
   )
-    throw new MonthlyError("金額とメモ（1000文字以内）を確認してください。");
+    throw new MonthlyError("금액과 메모(1,000자 이내)를 확인해 주세요.");
   return {
     income: value.income,
     expenses: value.expenses,

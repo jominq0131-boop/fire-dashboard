@@ -18,7 +18,7 @@ import {
 export const DATABASE_NAME = "fire-dashboard";
 const storageError = () =>
   new AccountError(
-    "端末の保存領域を利用できません。ブラウザーの設定や空き容量を確認し、再読み込みしてください。データは削除しないでください。",
+    "기기의 저장 공간을 사용할 수 없습니다. 브라우저 설정과 여유 공간을 확인한 뒤 새로고침해 주세요. 데이터는 삭제하지 마세요.",
   );
 
 export function openAccountDatabase(name = DATABASE_NAME): Promise<IDBDatabase> {
@@ -35,7 +35,7 @@ export function openAccountDatabase(name = DATABASE_NAME): Promise<IDBDatabase> 
       finished = true;
       reject(
         new AccountError(
-          "別のタブが保存領域を使用しています。他のタブを閉じて再読み込みしてください。",
+          "다른 탭에서 저장 공간을 사용 중입니다. 다른 탭을 닫고 새로고침해 주세요.",
         ),
       );
     };
@@ -77,7 +77,7 @@ function readAccounts(values: unknown[]): AssetAccount[] {
   assertAccountCapacity(values.length);
   if (!values.every(isAssetAccount)) {
     throw new AccountError(
-      "保存済みの口座データを読み取れません。データは削除せず、復旧を依頼してください。",
+      "저장된 계좌 데이터를 읽을 수 없습니다. 데이터를 삭제하지 말고 복구를 요청해 주세요.",
     );
   }
   return values.sort(
@@ -175,7 +175,7 @@ export class IndexedDbAccountRepository implements AccountRepository {
         (accounts) => {
           const sortOrder = accounts.length ? accounts[accounts.length - 1].sortOrder + 1 : 0;
           if (!Number.isSafeInteger(sortOrder))
-            throw new AccountError("口座の表示順が上限に達しました。");
+            throw new AccountError("계좌 표시 순서가 한도에 도달했습니다.");
           const account = { ...valid, id: crypto.randomUUID(), sortOrder };
           store.add(account);
           done(account);
@@ -187,14 +187,14 @@ export class IndexedDbAccountRepository implements AccountRepository {
 
   async update(expected: AssetAccount, details: AccountDetails): Promise<AssetAccount> {
     const valid = validateAccountDetails(details);
-    if (!isAssetAccount(expected)) throw new AccountError("更新対象の口座を確認してください。");
+    if (!isAssetAccount(expected)) throw new AccountError("수정할 계좌를 확인해 주세요.");
     return this.transaction("readwrite", (store, done, fail) => {
       const request = store.get(expected.id);
       request.onsuccess = () => {
         try {
           if (!isAssetAccount(request.result) || !sameAccount(request.result, expected)) {
             throw new AccountError(
-              "口座が別のタブで変更されています。入力内容を控えて再読み込みしてください。",
+              "다른 탭에서 계좌가 변경되었습니다. 입력 내용을 따로 보관한 뒤 새로고침해 주세요.",
             );
           }
           const account = { id: expected.id, sortOrder: expected.sortOrder, ...valid };

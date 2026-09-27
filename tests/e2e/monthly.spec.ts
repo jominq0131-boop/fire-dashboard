@@ -8,7 +8,7 @@ test("v1 migration preserves accounts and rollback preserves v1 before retry", a
     );
     const account = {
       id: "synthetic-old",
-      name: "旧口座",
+      name: "이전계좌",
       category: "cash",
       isActive: false,
       sortOrder: 7,
@@ -85,7 +85,11 @@ test("monthly repository enforces references, concurrent uniqueness, stale edits
     const name = "synthetic-monthly-contract",
       accounts = new IndexedDbAccountRepository(name),
       repo = new IndexedDbMonthlyRepository(name);
-    const a = await accounts.create({ name: "合成休止口座", category: "cash", isActive: false });
+    const a = await accounts.create({
+      name: "합성사용 중지계좌",
+      category: "cash",
+      isActive: false,
+    });
     const cash = { income: 10, expenses: 2, investmentContribution: 3 };
     const race = await Promise.allSettled([
       repo.saveCash("2026-09", cash, null),
@@ -193,7 +197,7 @@ test("monthly reads use bounded indexes; oversized counts and malformed records 
         await repo.readMonth("2026-09");
         blocked.push(false);
       } catch (e) {
-        blocked.push((e as Error).message.includes("上限"));
+        blocked.push((e as Error).message.includes("한도"));
       } finally {
         IDBObjectStore.prototype.count = countOriginal;
         IDBIndex.prototype.getAll = original;
@@ -238,49 +242,49 @@ test("monthly UI saves separate amounts, zero balances and restores after reload
   page,
 }) => {
   await page.goto("/");
-  await page.getByLabel("口座名", { exact: true }).fill("合成月末口座");
-  await page.getByRole("button", { name: "口座を追加", exact: true }).click();
-  await expect(page.getByRole("listitem")).toContainText("合成月末口座");
-  const panel = page.getByRole("region", { name: "月別記録" });
-  await panel.getByLabel("対象月").fill("2026-09");
-  await panel.getByRole("button", { name: "記録を読み込む" }).click();
-  await expect(panel.getByLabel("収入", { exact: true })).toHaveValue("");
-  await panel.getByLabel("収入", { exact: true }).fill("100");
-  await panel.getByLabel("消費支出", { exact: true }).fill("20");
-  await panel.getByLabel("投資への拠出", { exact: true }).fill("30");
-  await panel.getByRole("button", { name: "現金収支を保存" }).click();
-  await expect(panel.getByRole("status")).toContainText("保存しました");
-  await expect(panel.getByLabel("合成月末口座の残高", { exact: true })).toHaveValue("");
-  await panel.getByLabel("合成月末口座の残高", { exact: true }).fill("0");
-  await panel.getByRole("button", { name: "合成月末口座の残高を保存" }).click();
-  await expect(panel.getByText("保存済み", { exact: true })).toBeVisible();
+  await page.getByLabel("계좌명", { exact: true }).fill("합성월말계좌");
+  await page.getByRole("button", { name: "계좌 추가", exact: true }).click();
+  await expect(page.getByRole("listitem")).toContainText("합성월말계좌");
+  const panel = page.getByRole("region", { name: "월별 기록" });
+  await panel.getByLabel("대상 월").fill("2026-09");
+  await panel.getByRole("button", { name: "기록 불러오기" }).click();
+  await expect(panel.getByLabel("수입", { exact: true })).toHaveValue("");
+  await panel.getByLabel("수입", { exact: true }).fill("100");
+  await panel.getByLabel("소비 지출", { exact: true }).fill("20");
+  await panel.getByLabel("투자 납입", { exact: true }).fill("30");
+  await panel.getByRole("button", { name: "현금 수입·지출 저장" }).click();
+  await expect(panel.getByRole("status")).toContainText("저장했습니다");
+  await expect(panel.getByLabel("합성월말계좌 잔액", { exact: true })).toHaveValue("");
+  await panel.getByLabel("합성월말계좌 잔액", { exact: true }).fill("0");
+  await panel.getByRole("button", { name: "합성월말계좌 잔액 저장" }).click();
+  await expect(panel.getByText("저장됨", { exact: true })).toBeVisible();
   await page.reload();
-  await panel.getByLabel("対象月").fill("2026-09");
-  await panel.getByRole("button", { name: "記録を読み込む" }).click();
-  await expect(panel.getByLabel("収入", { exact: true })).toHaveValue("100");
-  await expect(panel.getByLabel("消費支出", { exact: true })).toHaveValue("20");
-  await expect(panel.getByLabel("投資への拠出", { exact: true })).toHaveValue("30");
-  await expect(panel.getByLabel("合成月末口座の残高", { exact: true })).toHaveValue("0");
+  await panel.getByLabel("대상 월").fill("2026-09");
+  await panel.getByRole("button", { name: "기록 불러오기" }).click();
+  await expect(panel.getByLabel("수입", { exact: true })).toHaveValue("100");
+  await expect(panel.getByLabel("소비 지출", { exact: true })).toHaveValue("20");
+  await expect(panel.getByLabel("투자 납입", { exact: true })).toHaveValue("30");
+  await expect(panel.getByLabel("합성월말계좌 잔액", { exact: true })).toHaveValue("0");
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.screenshot({ path: "test-results/monthly-desktop.png", fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(panel.getByLabel("合成月末口座の残高", { exact: true })).toBeVisible();
+  await expect(panel.getByLabel("합성월말계좌 잔액", { exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.screenshot({ path: "test-results/monthly-mobile.png", fullPage: true });
-  await panel.getByLabel("収入", { exact: true }).fill("1e3");
-  await panel.getByRole("button", { name: "現金収支を保存" }).click();
-  await expect(panel.getByRole("alert")).toContainText("整数");
-  await expect(panel.getByLabel("収入", { exact: true })).toHaveValue("1e3");
+  await panel.getByLabel("수입", { exact: true }).fill("1e3");
+  await panel.getByRole("button", { name: "현금 수입·지출 저장" }).click();
+  await expect(panel.getByRole("alert")).toContainText("정수");
+  await expect(panel.getByLabel("수입", { exact: true })).toHaveValue("1e3");
   page.once("dialog", (d) => d.dismiss());
-  await panel.getByLabel("対象月").fill("2026-10");
-  await expect(panel.getByLabel("対象月")).toHaveValue("2026-09");
+  await panel.getByLabel("대상 월").fill("2026-10");
+  await expect(panel.getByLabel("대상 월")).toHaveValue("2026-09");
   page.once("dialog", (d) => d.accept());
-  await panel.getByLabel("対象月").fill("2026-10");
-  await panel.getByRole("button", { name: "記録を読み込む" }).click();
-  await expect(panel.getByLabel("収入", { exact: true })).toHaveValue("");
+  await panel.getByLabel("대상 월").fill("2026-10");
+  await panel.getByRole("button", { name: "기록 불러오기" }).click();
+  await expect(panel.getByLabel("수입", { exact: true })).toHaveValue("");
 });
 
 test("failed monthly save and stale tab retain draft without overwriting", async ({
@@ -288,10 +292,10 @@ test("failed monthly save and stale tab retain draft without overwriting", async
   context,
 }) => {
   await page.goto("/");
-  const panel = page.getByRole("region", { name: "月別記録" });
-  await panel.getByLabel("対象月").fill("2026-09");
-  await panel.getByRole("button", { name: "記録を読み込む" }).click();
-  for (const label of ["収入", "消費支出", "投資への拠出"])
+  const panel = page.getByRole("region", { name: "월별 기록" });
+  await panel.getByLabel("대상 월").fill("2026-09");
+  await panel.getByRole("button", { name: "기록 불러오기" }).click();
+  for (const label of ["수입", "소비 지출", "투자 납입"])
     await panel.getByLabel(label, { exact: true }).fill("1");
   await page.evaluate(() => {
     const original = IDBObjectStore.prototype.add;
@@ -301,36 +305,36 @@ test("failed monthly save and stale tab retain draft without overwriting", async
       return key === undefined ? original.call(this, value) : original.call(this, value, key);
     };
   });
-  await panel.getByRole("button", { name: "現金収支を保存" }).click();
+  await panel.getByRole("button", { name: "현금 수입·지출 저장" }).click();
   await expect(panel.getByRole("alert")).toBeVisible();
-  await expect(panel.getByLabel("収入", { exact: true })).toHaveValue("1");
+  await expect(panel.getByLabel("수입", { exact: true })).toHaveValue("1");
   await expect(panel.getByRole("status")).toHaveCount(0);
   page.once("dialog", (d) => d.accept());
   await page.reload();
-  await panel.getByLabel("対象月").fill("2026-09");
-  await panel.getByRole("button", { name: "記録を読み込む" }).click();
-  await expect(panel.getByLabel("収入", { exact: true })).toHaveValue("");
+  await panel.getByLabel("대상 월").fill("2026-09");
+  await panel.getByRole("button", { name: "기록 불러오기" }).click();
+  await expect(panel.getByLabel("수입", { exact: true })).toHaveValue("");
   const second = await context.newPage();
   await second.goto("/");
-  const other = second.getByRole("region", { name: "月別記録" });
-  await other.getByLabel("対象月").fill("2026-09");
-  await other.getByRole("button", { name: "記録を読み込む" }).click();
-  for (const label of ["収入", "消費支出", "投資への拠出"]) {
+  const other = second.getByRole("region", { name: "월별 기록" });
+  await other.getByLabel("대상 월").fill("2026-09");
+  await other.getByRole("button", { name: "기록 불러오기" }).click();
+  for (const label of ["수입", "소비 지출", "투자 납입"]) {
     await panel.getByLabel(label, { exact: true }).fill("2");
     await other.getByLabel(label, { exact: true }).fill("3");
   }
-  await panel.getByRole("button", { name: "現金収支を保存" }).click();
+  await panel.getByRole("button", { name: "현금 수입·지출 저장" }).click();
   await expect(panel.getByRole("status")).toBeVisible();
-  await other.getByRole("button", { name: "現金収支を保存" }).click();
+  await other.getByRole("button", { name: "현금 수입·지출 저장" }).click();
   await expect(other.getByRole("alert")).toBeVisible();
-  await expect(other.getByLabel("収入", { exact: true })).toHaveValue("3");
+  await expect(other.getByLabel("수입", { exact: true })).toHaveValue("3");
 });
 
 test("100 monthly balance rows remain editable and global capacity blocks only new rows", async ({
   page,
 }) => {
   await page.goto("/");
-  await expect(page.getByRole("button", { name: "口座を追加", exact: true })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "계좌 추가", exact: true })).toBeEnabled();
   await page.evaluate(async () => {
     const r = indexedDB.open("fire-dashboard", 5);
     await new Promise<void>((resolve, reject) => {
@@ -342,7 +346,7 @@ test("100 monthly balance rows remain editable and global capacity blocks only n
           const id = i === 0 ? "cash" : `synthetic-${i}`;
           tx.objectStore("accounts").add({
             id,
-            name: `合成${i}`,
+            name: `합성${i}`,
             category: "cash",
             isActive: false,
             sortOrder: i,
@@ -364,12 +368,12 @@ test("100 monthly balance rows remain editable and global capacity blocks only n
       };
     });
   });
-  const panel = page.getByRole("region", { name: "月別記録" });
-  await panel.getByLabel("対象月").fill("2026-09");
-  await panel.getByRole("button", { name: "記録を読み込む" }).click();
+  const panel = page.getByRole("region", { name: "월별 기록" });
+  await panel.getByLabel("대상 월").fill("2026-09");
+  await panel.getByRole("button", { name: "기록 불러오기" }).click();
   await expect(panel.locator(".monthly-balances form")).toHaveCount(100);
-  await panel.getByLabel("合成0の残高", { exact: true }).fill("999");
-  await panel.getByRole("button", { name: "合成0の残高を保存", exact: true }).click();
+  await panel.getByLabel("합성0 잔액", { exact: true }).fill("999");
+  await panel.getByRole("button", { name: "합성0 잔액 저장", exact: true }).click();
   await expect(panel.getByRole("status")).toBeVisible();
   const result = await page.evaluate(async () => {
     const { IndexedDbMonthlyRepository } = await import(

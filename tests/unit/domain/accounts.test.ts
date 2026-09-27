@@ -9,7 +9,7 @@ import {
 import type { AccountDetails } from "../../../src/domain/accounts";
 import { storageMigrationPlan } from "../../../src/domain/storage-migrations";
 
-const details: AccountDetails = { name: "テスト口座", category: "cash", isActive: true };
+const details: AccountDetails = { name: "테스트계좌", category: "cash", isActive: true };
 const account = { ...details, id: "synthetic-account", sortOrder: 0 };
 
 describe("account validation", () => {
@@ -19,9 +19,9 @@ describe("account validation", () => {
     expect(isAssetAccount({ ...account, unexpectedPayload: "not an account field" })).toBe(false);
   });
   it("trims names without changing the input", () => {
-    const input = { ...details, name: "  テスト口座　" };
+    const input = { ...details, name: "  테스트계좌　" };
     expect(validateAccountDetails(input)).toEqual(details);
-    expect(input.name).toBe("  テスト口座　");
+    expect(input.name).toBe("  테스트계좌　");
   });
   it.each(["", " \t\n　", "a".repeat(101)])("rejects invalid name %j", (name) => {
     expect(() => validateAccountDetails({ ...details, name })).toThrow();
@@ -59,7 +59,7 @@ describe("account validation", () => {
   it("detects changes to every persisted field for optimistic concurrency", () => {
     expect(sameAccount(account, { ...account })).toBe(true);
     for (const changed of [
-      { ...account, name: "別名" },
+      { ...account, name: "다른 이름" },
       { ...account, id: "other" },
       { ...account, category: "other" as const },
       { ...account, isActive: false },
@@ -77,8 +77,8 @@ describe("bounded account capacity", () => {
     expect(() => assertAccountCapacity(0, true)).not.toThrow();
   });
   it("blocks another creation at capacity and oversized reads", () => {
-    expect(() => assertAccountCapacity(MAX_ACCOUNTS, true)).toThrow("100件");
-    expect(() => assertAccountCapacity(MAX_ACCOUNTS + 1)).toThrow("削除していません");
+    expect(() => assertAccountCapacity(MAX_ACCOUNTS, true)).toThrow("100개");
+    expect(() => assertAccountCapacity(MAX_ACCOUNTS + 1)).toThrow("삭제하지 않았습니다");
   });
   it.each([-1, 0.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1])(
     "rejects invalid counts %s",

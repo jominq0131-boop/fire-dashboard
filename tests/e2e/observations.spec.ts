@@ -12,8 +12,8 @@ test("resume today, retain last-known accounts, show actual dates and preserve f
     );
     backup.schemaVersion = 2;
     backup.accounts.push(
-      { ...backup.accounts[0], id: "old", name: "合成古い口座", sortOrder: 1 },
-      { ...backup.accounts[0], id: "missing", name: "合成未記録", sortOrder: 2 },
+      { ...backup.accounts[0], id: "old", name: "합성오래된계좌", sortOrder: 1 },
+      { ...backup.accounts[0], id: "missing", name: "합성미기록", sortOrder: 2 },
     );
     backup.accountBalanceSnapshots.push({
       ...backup.accountBalanceSnapshots[0],
@@ -26,32 +26,32 @@ test("resume today, retain last-known accounts, show actual dates and preserve f
     await new IndexedDbPortfolioRepository().importBackup(backup);
   }, syntheticBackup());
   await page.reload();
-  const overview = page.getByRole("region", { name: "資産の全体像" }),
-    monthly = page.getByRole("region", { name: "月別記録" });
-  await expect(overview.locator(".asset-value")).toHaveText("420 円");
-  await expect(overview).toContainText("更新から32日以上");
-  await expect(overview).toContainText("未記録");
-  await overview.getByRole("button", { name: "合成古い口座を更新" }).click();
-  await expect(monthly.getByLabel("合成古い口座の残高", { exact: true })).toBeFocused();
-  await expect(monthly.getByLabel("合成古い口座の確認日")).toHaveValue("2026-09-04");
-  await monthly.getByLabel("合成古い口座の残高", { exact: true }).fill("350");
-  await monthly.getByRole("button", { name: "合成古い口座の残高を保存" }).click();
-  await expect(overview.locator(".asset-value")).toHaveText("470 円");
-  await expect(overview).toContainText("2026-09-04 確認");
-  await expect(monthly.getByLabel("収入", { exact: true })).toHaveValue("100");
+  const overview = page.getByRole("region", { name: "전체 자산 현황" }),
+    monthly = page.getByRole("region", { name: "월별 기록" });
+  await expect(overview.locator(".asset-value")).toHaveText("420 엔");
+  await expect(overview).toContainText("갱신 후 32일 이상");
+  await expect(overview).toContainText("미기록");
+  await overview.getByRole("button", { name: "합성오래된계좌 갱신" }).click();
+  await expect(monthly.getByLabel("합성오래된계좌 잔액", { exact: true })).toBeFocused();
+  await expect(monthly.getByLabel("합성오래된계좌 확인일")).toHaveValue("2026-09-04");
+  await monthly.getByLabel("합성오래된계좌 잔액", { exact: true }).fill("350");
+  await monthly.getByRole("button", { name: "합성오래된계좌 잔액 저장" }).click();
+  await expect(overview.locator(".asset-value")).toHaveText("470 엔");
+  await expect(overview).toContainText("2026-09-04 확인");
+  await expect(monthly.getByLabel("수입", { exact: true })).toHaveValue("100");
   await page.evaluate(() => {
     IDBObjectStore.prototype.put = function () {
       throw new DOMException("synthetic", "QuotaExceededError");
     };
   });
-  await monthly.getByLabel("合成古い口座の残高", { exact: true }).fill("999");
-  await monthly.getByRole("button", { name: "合成古い口座の残高を保存" }).click();
+  await monthly.getByLabel("합성오래된계좌 잔액", { exact: true }).fill("999");
+  await monthly.getByRole("button", { name: "합성오래된계좌 잔액 저장" }).click();
   await expect(monthly.getByRole("alert")).toBeVisible();
-  await expect(overview.locator(".asset-value")).toHaveText("470 円");
-  await expect(monthly.getByLabel("合成古い口座の残高", { exact: true })).toHaveValue("999");
+  await expect(overview.locator(".asset-value")).toHaveText("470 엔");
+  await expect(monthly.getByLabel("합성오래된계좌 잔액", { exact: true })).toHaveValue("999");
   page.once("dialog", (dialog) => dialog.accept());
   await page.reload();
-  await expect(overview.locator(".asset-value")).toHaveText("470 円");
+  await expect(overview.locator(".asset-value")).toHaveText("470 엔");
   await page.screenshot({ path: "test-results/everyday-desktop.png", fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -143,7 +143,7 @@ test("v2 to v4 migration rolls back on failure and preserves legacy records", as
   expect(result.firePlanKey).toBe("id");
   expect(result.exported).toEqual({
     ...syntheticBackup(),
-    schemaVersion: 6,
+    schemaVersion: 7,
     firePlan: null,
     goalPlan: null,
   });

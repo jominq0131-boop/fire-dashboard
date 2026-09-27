@@ -28,7 +28,7 @@ export function BackupManager({
     try {
       await action();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "バックアップ処理に失敗しました。");
+      setError(e instanceof Error ? e.message : "백업 처리에 실패했습니다.");
     } finally {
       running.current = false;
       setBusy(false);
@@ -41,9 +41,10 @@ export function BackupManager({
       aria-labelledby="backup-heading"
       aria-busy={busy}
     >
-      <h2 id="backup-heading">バックアップと復元</h2>
+      <h2 id="backup-heading">백업과 복원</h2>
       <p>
-        記録をJSONファイルとして保存し、別のブラウザーへ移せます。ファイルには金融記録が含まれます。安全な場所に保管してください。
+        기록을 JSON 파일로 저장하고 다른 브라우저로 옮길 수 있습니다. 파일에는 금융 기록이
+        포함되므로 안전한 곳에 보관해 주세요.
       </p>
       <button
         disabled={busy}
@@ -58,16 +59,14 @@ export function BackupManager({
             link.download = "fire-dashboard-backup-v4.json";
             link.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
-            setMessage(
-              "バックアップのダウンロードを開始しました。保存先でファイルを確認してください。",
-            );
+            setMessage("백업 다운로드를 시작했습니다. 저장 위치에서 파일을 확인해 주세요.");
           })
         }
       >
-        JSONバックアップを保存
+        JSON 백업 저장
       </button>
       <label>
-        復元するJSONファイル
+        복원할 JSON 파일
         <input
           type="file"
           accept=".json,application/json"
@@ -79,7 +78,7 @@ export function BackupManager({
             if (file)
               void run(async () => {
                 if (file.size > MAX_BACKUP_BYTES)
-                  throw new Error("ファイルは32 MiB以内にしてください。");
+                  throw new Error("파일 크기는 32 MiB 이하여야 합니다.");
                 const backup = parseBackup(await file.text());
                 setPreview(backup);
               });
@@ -87,19 +86,21 @@ export function BackupManager({
         />
       </label>
       <p className="field-hint">
-        最大32
-        MiB。既存の記録は削除・上書きしません。同一の記録は重複登録せず、異なる値や月の重複があれば全体を取り消します。完全な復元には空のブラウザーを使ってください。
+        최대 32 MiB. 기존 기록은 삭제하거나 덮어쓰지 않습니다. 같은 기록은 중복 등록하지 않으며,
+        값이 다르거나 월이 중복되면 전체 복원을 취소합니다. 전체 복원에는 비어 있는 브라우저를
+        사용해 주세요.
       </p>
       {preview && (
         <div className="backup-preview">
-          <h3>復元内容の確認</h3>
+          <h3>복원 내용 확인</h3>
           <p>
-            口座 {preview.accounts.length} 件 / 現金収支 {preview.monthlyCashFlows.length} 件 / 残高{" "}
-            {preview.accountBalanceSnapshots.length} 件 / FIRE計画{" "}
-            {preview.firePlan ? "1 件" : "なし"} / 目標計画 {preview.goalPlan ? "1 件" : "なし"}
+            계좌 {preview.accounts.length}개 / 현금 수입·지출 {preview.monthlyCashFlows.length}개 /
+            잔액 {preview.accountBalanceSnapshots.length}개 / FIRE 계획{" "}
+            {preview.firePlan ? "1개" : "없음"} / 목표 계획 {preview.goalPlan ? "1개" : "없음"}
           </p>
           <p>
-            FIRE計画の入力と比較、目標計画の入力も含みます。復元後は月別記録とFIRE画面を読み込み直します。
+            FIRE 계획 입력과 비교, 목표 계획 입력도 포함합니다. 복원 후 월별 기록과 FIRE 화면을 다시
+            불러옵니다.
           </p>
           <button
             disabled={busy}
@@ -107,15 +108,15 @@ export function BackupManager({
               void run(async () => {
                 const added = await repository.importBackup(preview);
                 setPreview(null);
-                setMessage(`${added} 件を追加しました。既存の記録は保持されています。`);
+                setMessage(`${added}개를 추가했습니다. 기존 기록은 보존됩니다.`);
                 onImported();
               })
             }
           >
-            確認した記録を取り込む
+            확인한 기록 가져오기
           </button>
           <button disabled={busy} onClick={() => setPreview(null)}>
-            取り込みをキャンセル
+            가져오기 취소
           </button>
         </div>
       )}

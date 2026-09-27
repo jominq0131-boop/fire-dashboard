@@ -93,7 +93,7 @@ describe("persistent FIRE plan", () => {
       schemaVersion: 3,
       firePlan: plan(),
     });
-    expect(current.schemaVersion).toBe(6);
+    expect(current.schemaVersion).toBe(7);
     expect(current.firePlan).toEqual(plan());
     expect(normalizeBackup(structuredClone(current))).toEqual(current);
   });
@@ -111,7 +111,7 @@ describe("persistent FIRE plan", () => {
     expect(mergeBackup(merged.backup, incoming).added).toBe(0);
     const conflict = structuredClone(incoming);
     conflict.firePlan!.draft.target = "9999";
-    expect(() => mergeBackup(merged.backup, conflict)).toThrow("FIRE計画と競合");
+    expect(() => mergeBackup(merged.backup, conflict)).toThrow("FIRE 계획과 충돌");
     expect(current.firePlan).toBeNull();
   });
 });

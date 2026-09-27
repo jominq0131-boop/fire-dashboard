@@ -21,12 +21,12 @@ export function isObservationDate(value: unknown): value is string {
   }
 }
 export function observationStatus(balance: AccountBalanceSnapshot | undefined, today: string) {
-  if (!balance) return "未記録";
-  if (!balance.asOfDate) return `${balance.month} 月末として入力・確認日未記録`;
+  if (!balance) return "미기록";
+  if (!balance.asOfDate) return `${balance.month} 월말 기준 입력·확인일 미기록`;
   const days = Math.floor(
     (Date.parse(`${today}T00:00:00Z`) - Date.parse(`${balance.asOfDate}T00:00:00Z`)) / 86400000,
   );
-  return `${balance.asOfDate} 確認${days < 0 ? "・未来日" : days > 31 ? "・更新から32日以上" : ""}`;
+  return `${balance.asOfDate} 확인${days < 0 ? "·미래 날짜" : days > 31 ? "·갱신 후 32일 이상" : ""}`;
 }
 export interface CurrentAssets {
   accounts: AssetAccount[];

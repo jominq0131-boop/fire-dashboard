@@ -25,7 +25,7 @@ export interface ChartSeries {
   missing?: string[];
 }
 const compact = (n: number) =>
-  Intl.NumberFormat("ja-JP", { notation: "compact", maximumFractionDigits: 1 }).format(n);
+  Intl.NumberFormat("ko-KR", { notation: "compact", maximumFractionDigits: 1 }).format(n);
 export default function FinancialChart({
   title,
   labels,
@@ -55,8 +55,8 @@ export default function FinancialChart({
     visible.every((s) => s.values.slice(start, end + 1).filter((n) => n !== null).length <= 1);
   const amount = (s: ChartSeries, i: number) =>
     s.values[i] == null
-      ? (s.missing?.[i] ?? "記録なし・計算範囲外")
-      : `${s.values[i]!.toLocaleString("ja-JP")} 円`;
+      ? (s.missing?.[i] ?? "기록 없음·계산 범위 초과")
+      : `${s.values[i]!.toLocaleString("ko-KR")} 엔`;
   function inspect(i: number, tooltip = false) {
     return (
       <div className={tooltip ? "financial-tooltip" : "chart-inspector"}>
@@ -84,12 +84,12 @@ export default function FinancialChart({
     <div className="interactive-chart" aria-label={title}>
       <div className="chart-heading">
         <div>
-          <span className="chart-eyebrow">ASSET INTELLIGENCE</span>
+          <span className="chart-eyebrow">자산 분석</span>
           <h4>{title}</h4>
         </div>
-        <span className="chart-unit">JPY · 円</span>
+        <span className="chart-unit">JPY · 엔</span>
       </div>
-      <div className="chart-legend" aria-label={`${title}の表示項目`}>
+      <div className="chart-legend" aria-label={`${title} 표시 항목`}>
         {series.map((s) => (
           <button
             type="button"
@@ -107,11 +107,11 @@ export default function FinancialChart({
           >
             <span aria-hidden="true" style={{ background: color(s) }} />
             {s.label}
-            {s.dashed ? "（破線）" : ""}
+            {s.dashed ? "(파선)" : ""}
           </button>
         ))}
       </div>
-      <p className="chart-help">ポインターで確認 · タップで選択 · 下のスライダーでキーボード操作</p>
+      <p className="chart-help">마우스로 확인 · 터치로 선택 · 아래 슬라이더에서 키보드 조작</p>
       <div className="financial-plot" role="img" aria-label={title}>
         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <ComposedChart
@@ -247,20 +247,21 @@ export default function FinancialChart({
         </ResponsiveContainer>
         {!hasValues && (
           <div className="chart-empty">
-            表示できる記録はありません。<small>記録した月から推移を確認できます。</small>
+            표시할 기록이 없습니다.<small>기록한 월부터 변화를 확인할 수 있습니다.</small>
           </div>
         )}
       </div>
       {hasSingleObservation && (
         <p className="chart-help">
-          この範囲では推移を比較できません。同じ項目の2時点以上の値があると、点が線でつながります。
+          이 범위에서는 변화를 비교할 수 없습니다. 같은 항목에 두 시점 이상의 값이 있으면 점이
+          선으로 연결됩니다.
         </p>
       )}
-      <div className="chart-range" aria-label={`${title}の拡大範囲`}>
+      <div className="chart-range" aria-label={`${title} 확대 범위`}>
         <label>
-          開始
+          시작
           <select
-            aria-label={`${title}の拡大開始`}
+            aria-label={`${title} 확대 시작`}
             value={start}
             onChange={(e) => {
               const n = Number(e.target.value);
@@ -279,9 +280,9 @@ export default function FinancialChart({
           </select>
         </label>
         <label>
-          終了
+          종료
           <select
-            aria-label={`${title}の拡大終了`}
+            aria-label={`${title} 확대 종료`}
             value={end}
             onChange={(e) => {
               const n = Number(e.target.value);
@@ -304,11 +305,11 @@ export default function FinancialChart({
           disabled={start === 0 && end === labels.length - 1}
           onClick={() => setWindow([0, labels.length - 1])}
         >
-          全期間に戻す
+          전체 기간으로 돌아가기
         </button>
       </div>
       <label className="chart-slider">
-        {title}の選択位置
+        {title} 선택 위치
         <input
           type="range"
           min={start}

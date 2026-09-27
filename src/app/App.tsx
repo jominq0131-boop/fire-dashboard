@@ -51,10 +51,10 @@ export function App({
   return (
     <div className="app-layout">
       <a className="skip-link" href="#main-content">
-        本文へ移動
+        본문으로 이동
       </a>
       <aside className="sidebar">
-        <a className="brand" href="#overview" aria-label="FIRE ホーム">
+        <a className="brand" href="#overview" aria-label="FIRE 홈">
           <span className="brand-mark">
             <Icon name="mark" />
           </span>
@@ -62,54 +62,54 @@ export function App({
             fire<span className="brand-dot">.</span>
           </span>
         </a>
-        <div className="sidebar-label">PERSONAL FINANCE</div>
-        <nav aria-label="メインナビゲーション">
+        <div className="sidebar-label">개인 자산 관리</div>
+        <nav aria-label="주 메뉴">
           <a href="#overview" aria-current={active === "#overview" ? "location" : undefined}>
             <Icon name="home" />
-            概要
+            개요
           </a>
           <a href="#monthly" aria-current={active === "#monthly" ? "location" : undefined}>
             <Icon name="calendar" />
-            月別記録
+            월별 기록
           </a>
           <a href="#accounts" aria-current={active === "#accounts" ? "location" : undefined}>
             <Icon name="wallet" />
-            口座管理
+            계좌 관리
           </a>
           <a href="#backup" aria-current={active === "#backup" ? "location" : undefined}>
             <Icon name="lock" />
-            バックアップ
+            백업
           </a>
           <a href="#fire" aria-current={active === "#fire" ? "location" : undefined}>
-            <Icon name="spark" /> FIRE試算
+            <Icon name="spark" /> FIRE 계산
           </a>
         </nav>
         <div className="sidebar-bottom">
           <Icon name="lock" />
           <div>
-            あなたの端末に保存<span>プライベートな資産ノート</span>
+            내 기기에 저장<span>나만의 자산 노트</span>
           </div>
         </div>
       </aside>
       <main id="main-content" className="dashboard-shell">
         <header className="dashboard-header">
           <div>
-            <p className="page-kicker">YOUR FINANCIAL COMPASS</p>
-            <h1 aria-label="FIRE Dashboard">資産を、もっと自分らしく。</h1>
+            <p className="page-kicker">나의 자산 나침반</p>
+            <h1 aria-label="FIRE 대시보드">나에게 맞는 자산 관리.</h1>
           </div>
           <span className="status-badge">
             <span />
-            端末内保存<span className="trial-label">試用版</span>
+            기기 내 저장<span className="trial-label">시험 버전</span>
           </span>
         </header>
         <section id="overview" aria-labelledby="overview-heading" className="overview-section">
           <div className="page-heading">
             <div>
-              <h2 id="overview-heading">資産と、これから。</h2>
-              <p>毎月の記録を、ひとつの場所に。</p>
+              <h2 id="overview-heading">자산과 앞으로의 삶.</h2>
+              <p>매달의 기록을 한곳에.</p>
             </div>
             <a className="text-link" href="#monthly">
-              今月を記録する <Icon name="arrow" />
+              이번 달 기록하기 <Icon name="arrow" />
             </a>
           </div>
           <div className="overview-grid">
@@ -129,28 +129,28 @@ export function App({
               }}
             />
             <article className="start-card">
-              <span className="step-indicator">記録を忘れても、ここから再開</span>
-              <h2 aria-label="金融記録を月ごとに残しましょう">
-                <span>金融記録を</span>
-                <span>月ごとに残しましょう</span>
+              <span className="step-indicator">기록을 놓쳤어도 여기서 다시 시작</span>
+              <h2 aria-label="금융 기록을 월별로 남겨 보세요">
+                <span>금융 기록을</span>
+                <span>월별로 남겨 보세요</span>
               </h2>
               <p>
-                過去の残高を思い出せなくても大丈夫。
+                과거 잔액이 기억나지 않아도 괜찮아요.
                 <br />
-                確認できる日の残高から続けられます。
+                확인할 수 있는 날의 잔액부터 이어 가세요.
               </p>
               <a className="primary-link" href="#monthly">
-                今日から記録を続ける <Icon name="arrow" />
+                오늘부터 기록 이어가기 <Icon name="arrow" />
               </a>
               <a className="start-footnote" href="#fire">
-                目標までの期間を試算する
+                목표까지 걸리는 기간 계산
               </a>
             </article>
           </div>
         </section>
         <div className="workspace-heading">
-          <h2>記録する</h2>
-          <span>金額はすべて日本円</span>
+          <h2>기록하기</h2>
+          <span>모든 금액은 일본 엔화</span>
         </div>
         <div className="workspace-grid">
           <div id="monthly">
@@ -187,12 +187,13 @@ export function App({
         <footer id="storage-info" className="page-footer">
           <Icon name="lock" />
           <div>
-            <strong>あなたの記録は、この端末に。</strong>
+            <strong>내 기록은 이 기기에 저장됩니다.</strong>
             <p>
-              自動同期はありません。ブラウザーのデータを削除すると記録も失われます。JSONバックアップを定期的に保存してください。
+              자동 동기화는 지원하지 않습니다. 브라우저 데이터를 삭제하면 기록도 사라집니다. JSON
+              백업을 주기적으로 저장해 주세요.
             </p>
           </div>
-          <span>FIRE / PERSONAL FINANCE</span>
+          <span>FIRE / 개인 자산 관리</span>
         </footer>
       </main>
     </div>

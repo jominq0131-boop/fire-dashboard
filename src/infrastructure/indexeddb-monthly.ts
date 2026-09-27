@@ -19,7 +19,7 @@ import { ACCOUNT_STORE, CASH_STORE, BALANCE_STORE } from "../domain/storage-migr
 import { DATABASE_NAME, openAccountDatabase } from "./indexeddb-accounts";
 type RecordValue = MonthlyCashFlowRecord | AccountBalanceSnapshot;
 const failureMessage =
-  "月別記録を保存・読込できません。保存済みデータは削除せず、入力を控えて再読み込みしてください。";
+  "월별 기록을 저장하거나 불러올 수 없습니다. 저장된 데이터를 삭제하지 말고 입력을 따로 보관한 뒤 새로고침해 주세요.";
 type Read = <T>(request: IDBRequest<T>, next: (value: T) => void) => void;
 export class IndexedDbMonthlyRepository implements MonthlyRepository {
   constructor(private readonly databaseName = DATABASE_NAME) {}
@@ -104,7 +104,7 @@ export class IndexedDbMonthlyRepository implements MonthlyRepository {
                       read(accounts.get(balance.accountId), (account) => {
                         if (!isAssetAccount(account))
                           throw new MonthlyError(
-                            "残高の参照口座を確認できません。データは削除していません。",
+                            "잔액이 참조하는 계좌를 확인할 수 없습니다. 데이터는 삭제하지 않았습니다.",
                           );
                         if (--remaining === 0) done(result);
                       });
@@ -135,7 +135,7 @@ export class IndexedDbMonthlyRepository implements MonthlyRepository {
   ): Promise<AccountBalanceSnapshot> {
     assertMonth(month);
     if (!validId(accountId) || !isNonNegativeYen(balance))
-      throw new MonthlyError("口座と整数の残高を確認してください。");
+      throw new MonthlyError("계좌와 정수 잔액을 확인해 주세요.");
     return this.save(
       month,
       false,
@@ -165,7 +165,7 @@ export class IndexedDbMonthlyRepository implements MonthlyRepository {
           (expected as AccountBalanceSnapshot).accountId !==
             (details as AccountBalanceSnapshot).accountId))
     )
-      return Promise.reject(new MonthlyError("更新対象を確認してください。"));
+      return Promise.reject(new MonthlyError("수정할 대상을 확인해 주세요."));
     return this.run("readwrite", (tx, read, done) => {
       const store = tx.objectStore(cash ? CASH_STORE : BALANCE_STORE),
         accounts = tx.objectStore(ACCOUNT_STORE);
@@ -183,7 +183,7 @@ export class IndexedDbMonthlyRepository implements MonthlyRepository {
                   : !isMonthlyRecord(current, cash) || !sameRecord(current, expected)
               )
                 throw new MonthlyError(
-                  "同じ月の記録が存在するか、別のタブで変更されています。入力を控えて再読み込みしてください。",
+                  "같은 월의 기록이 있거나 다른 탭에서 변경되었습니다. 입력을 따로 보관한 뒤 새로고침해 주세요.",
                 );
               const write = () => {
                 const now = new Date().toISOString();
@@ -203,7 +203,7 @@ export class IndexedDbMonthlyRepository implements MonthlyRepository {
               else
                 read(accounts.get((details as AccountBalanceSnapshot).accountId), (account) => {
                   if (!isAssetAccount(account))
-                    throw new MonthlyError("保存先の口座が見つかりません。");
+                    throw new MonthlyError("저장할 계좌를 찾을 수 없습니다.");
                   write();
                 });
             });

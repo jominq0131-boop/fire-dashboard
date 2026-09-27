@@ -2,10 +2,12 @@ import { expect, test } from "@playwright/test";
 
 test("brand metadata and install icons ship from the app base", async ({ page, request }) => {
   await page.goto("/");
-  await expect(page).toHaveTitle("fire. | 資産記録とFIRE試算");
+  await expect(page.locator("html")).toHaveAttribute("lang", "ko");
+  expect(await page.locator("body").innerText()).not.toMatch(/[ぁ-んァ-ヶ一-龯]/);
+  await expect(page).toHaveTitle("fire. | 자산 기록과 FIRE 계산");
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
     "content",
-    /端末内で安全に管理/,
+    /기기 안에서 관리/,
   );
   await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#0b1420");
 
@@ -28,6 +30,7 @@ test("brand metadata and install icons ship from the app base", async ({ page, r
   const manifestHref = await page.locator('link[rel="manifest"]').getAttribute("href");
   const manifest = await (await request.get(publicAssetUrl(manifestHref!))).json();
   expect(manifest).toMatchObject({
+    lang: "ko",
     short_name: "fire.",
     display: "standalone",
     theme_color: "#0b1420",
@@ -109,7 +112,7 @@ test("reduced-motion preference removes product transitions", async ({ page }) =
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const duration = await page
-    .getByRole("button", { name: "口座を追加", exact: true })
+    .getByRole("button", { name: "계좌 추가", exact: true })
     .evaluate((node) => getComputedStyle(node).transitionDuration);
   expect(duration.split(",").every((value) => Number.parseFloat(value) <= 0.01)).toBe(true);
 });

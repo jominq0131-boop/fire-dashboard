@@ -2,26 +2,26 @@ import { expect, test, type Page } from "@playwright/test";
 import { syntheticBackup } from "../fixtures/portfolio";
 
 async function fillGoal(page: Page, overrides: Record<string, string> = {}) {
-  const goal = page.getByRole("region", { name: "今のペースで、目標に届くのはいつ？" });
+  const goal = page.getByRole("region", { name: "지금 속도라면 언제 목표에 도달할까요?" });
   const values = {
-    "現金・預金（円）": "10000000",
-    "NISA・つみたて（円）": "0",
-    "NISA・成長（円）": "0",
-    "特定・一般口座の株式（円）": "39000000",
-    "毎月の現金貯蓄（マイナス可）（円）": "100000",
-    "毎月の株式・投信積立（円）": "100000",
-    "目標金額（額面）（円）": "50000000",
-    "株式の想定年利（%）": "0",
-    "到達時の年間取り崩し率（%）": "3",
-    "新NISAの保有取得額・合計（円）": "0",
-    "うち成長投資枠の保有取得額（円）": "0",
-    "今年のつみたて枠・買付済額（円）": "0",
-    "今年の成長枠・買付済額（円）": "0",
+    "현금·예금(엔)": "10000000",
+    "NISA·적립(엔)": "0",
+    "NISA·성장(엔)": "0",
+    "특정·일반 계좌 주식(엔)": "39000000",
+    "월 현금 저축(음수 가능)(엔)": "100000",
+    "월 주식·펀드 적립(엔)": "100000",
+    "목표 금액(명목)(엔)": "50000000",
+    "주식 가정 연 수익률(%)": "0",
+    "목표 달성 시 연 인출률(%)": "3",
+    "신 NISA 보유 취득원가·합계(엔)": "0",
+    "그중 성장투자 한도의 보유 취득원가(엔)": "0",
+    "올해 적립투자 한도·매수액(엔)": "0",
+    "올해 성장투자 한도·매수액(엔)": "0",
     ...overrides,
   };
   for (const [label, value] of Object.entries(values))
     await goal.getByLabel(label, { exact: true }).fill(value);
-  await goal.getByRole("button", { name: "目標到達を計算する" }).click();
+  await goal.getByRole("button", { name: "목표 달성 계산" }).click();
   return goal;
 }
 
@@ -32,15 +32,15 @@ test("net withdrawal shows profit tax, unknown basis and responsive persisted as
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
   const goal = await fillGoal(page, {
-    "現金・預金（円）": "0",
-    "特定・一般口座の株式（円）": "10000000",
-    "目標金額（額面）（円）": "1",
-    "課税口座の保有取得額（不明なら空欄）（円）": "5000000",
+    "현금·예금(엔)": "0",
+    "특정·일반 계좌 주식(엔)": "10000000",
+    "목표 금액(명목)(엔)": "1",
+    "과세 계좌 보유 취득원가(모르면 빈칸)(엔)": "5000000",
   });
-  const estimate = goal.getByRole("region", { name: "税引後の取り崩し見積もり" });
-  await expect(estimate).toContainText("269,527 円");
-  await expect(estimate).toContainText("30,473 円");
-  await expect(estimate).toContainText("22,461 円");
+  const estimate = goal.getByRole("region", { name: "세후 인출액 추정" });
+  await expect(estimate).toContainText("269,527 엔");
+  await expect(estimate).toContainText("30,473 엔");
+  await expect(estimate).toContainText("22,461 엔");
   for (const width of [320, 390, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await expect
@@ -48,14 +48,14 @@ test("net withdrawal shows profit tax, unknown basis and responsive persisted as
       .toBe(true);
     await estimate.screenshot({ path: `test-results/net-withdrawal-${width}.png` });
   }
-  await goal.getByLabel("課税口座の保有取得額（不明なら空欄）（円）", { exact: true }).fill("");
+  await goal.getByLabel("과세 계좌 보유 취득원가(모르면 빈칸)(엔)", { exact: true }).fill("");
   await expect(estimate).toHaveCount(0);
-  await goal.getByRole("button", { name: "目標到達を計算する" }).click();
-  await expect(estimate).toContainText("取得額が不明");
-  await expect(goal.getByRole("status")).toContainText("年間 300,000 円");
-  await goal.getByLabel("売却益の想定税率（%）", { exact: true }).fill("100.001");
-  await goal.getByRole("button", { name: "目標到達を計算する" }).click();
-  await expect(goal.getByRole("alert")).toContainText("0〜100%");
+  await goal.getByRole("button", { name: "목표 달성 계산" }).click();
+  await expect(estimate).toContainText("취득원가를 알 수 없어");
+  await expect(goal.getByRole("status")).toContainText("연간 300,000 엔");
+  await goal.getByLabel("매도차익 가정 세율(%)", { exact: true }).fill("100.001");
+  await goal.getByRole("button", { name: "목표 달성 계산" }).click();
+  await expect(goal.getByRole("alert")).toContainText("0~100%");
   expect(errors).toEqual([]);
 });
 
@@ -65,20 +65,20 @@ test("exact goal arrival, composition, self-withdrawals and mobile chart", async
   await page.clock.setFixedTime(new Date("2026-09-05T03:00:00Z"));
   await page.goto("/");
   const goal = await fillGoal(page);
-  await expect(goal.getByRole("status")).toContainText("2027年2月 に到達");
-  await expect(goal.getByRole("status")).toContainText("月 98,750 円");
-  await expect(goal.getByRole("status")).toContainText("年間 1,185,000 円");
-  await expect(goal.getByRole("region", { name: "目標到達時の資産構成" })).toContainText(
-    "10,500,000 円",
+  await expect(goal.getByRole("status")).toContainText("2027년2월 에 달성");
+  await expect(goal.getByRole("status")).toContainText("월 98,750 엔");
+  await expect(goal.getByRole("status")).toContainText("연간 1,185,000 엔");
+  await expect(goal.getByRole("region", { name: "목표 달성 시 자산 구성" })).toContainText(
+    "10,500,000 엔",
   );
   await expect(
-    goal.getByRole("region", { name: "目標到達時の資産構成" }).locator(".goal-breakdown"),
+    goal.getByRole("region", { name: "목표 달성 시 자산 구성" }).locator(".goal-breakdown"),
   ).toContainText("21.0%");
   await expect(goal.locator(".recharts-line-curve").first()).toBeVisible();
   const slider = goal.getByRole("slider");
   await slider.focus();
   await slider.press("End");
-  await expect(goal.locator(".chart-inspector")).toContainText("50,000,000 円");
+  await expect(goal.locator(".chart-inspector")).toContainText("50,000,000 엔");
   for (const width of [390, 320, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await expect
@@ -87,7 +87,7 @@ test("exact goal arrival, composition, self-withdrawals and mobile chart", async
   }
   await page.setViewportSize({ width: 390, height: 844 });
   await goal.locator(".goal-result").screenshot({ path: "test-results/goal-fire-mobile.png" });
-  await goal.getByLabel("目標金額（額面）（円）", { exact: true }).fill("60000000");
+  await goal.getByLabel("목표 금액(명목)(엔)", { exact: true }).fill("60000000");
   await expect(goal.locator(".goal-result")).toHaveCount(0);
   expect(errors).toEqual([]);
 });
@@ -112,28 +112,26 @@ test("bounded record seed uses completed-month cash savings without doubling inv
     );
     await new IndexedDbPortfolioRepository().importBackup(data);
   }, backup);
-  const goal = page.getByRole("region", { name: "今のペースで、目標に届くのはいつ？" });
-  await goal.getByRole("button", { name: "現在の資産・貯蓄ペースを読み込む" }).click();
-  await expect(goal.getByLabel("現金・預金（円）", { exact: true })).toHaveValue("120");
-  await expect(goal.getByLabel("毎月の現金貯蓄（マイナス可）（円）", { exact: true })).toHaveValue(
-    "500",
-  );
-  await expect(goal.getByLabel("毎月の株式・投信積立（円）", { exact: true })).toHaveValue("300");
-  await expect(goal).toContainText("2026-08 の1件平均");
-  await expect(goal.getByLabel("新NISAの保有取得額・合計（円）", { exact: true })).toHaveValue("");
+  const goal = page.getByRole("region", { name: "지금 속도라면 언제 목표에 도달할까요?" });
+  await goal.getByRole("button", { name: "현재 자산·저축 속도 불러오기" }).click();
+  await expect(goal.getByLabel("현금·예금(엔)", { exact: true })).toHaveValue("120");
+  await expect(goal.getByLabel("월 현금 저축(음수 가능)(엔)", { exact: true })).toHaveValue("500");
+  await expect(goal.getByLabel("월 주식·펀드 적립(엔)", { exact: true })).toHaveValue("300");
+  await expect(goal).toContainText("2026-08 의 1개 평균");
+  await expect(goal.getByLabel("신 NISA 보유 취득원가·합계(엔)", { exact: true })).toHaveValue("");
 });
 
 test("nonarrival, shortfall, invalid limits and initial arrival are explicit", async ({ page }) => {
   await page.goto("/");
   let goal = await fillGoal(page, {
-    "毎月の現金貯蓄（マイナス可）（円）": "0",
-    "毎月の株式・投信積立（円）": "0",
+    "월 현금 저축(음수 가능)(엔)": "0",
+    "월 주식·펀드 적립(엔)": "0",
   });
-  await expect(goal.getByRole("status")).toContainText("100年以内には未到達");
-  goal = await fillGoal(page, { "毎月の現金貯蓄（マイナス可）（円）": "-10000001" });
-  await expect(goal.getByRole("alert")).toContainText("現金が不足");
-  goal = await fillGoal(page, { "新NISAの保有取得額・合計（円）": "18000001" });
-  await expect(goal.getByRole("alert")).toContainText("制度上限");
-  goal = await fillGoal(page, { "目標金額（額面）（円）": "1" });
-  await expect(goal.getByRole("status")).toContainText("すでに目標に到達");
+  await expect(goal.getByRole("status")).toContainText("100년 이내 미달성");
+  goal = await fillGoal(page, { "월 현금 저축(음수 가능)(엔)": "-10000001" });
+  await expect(goal.getByRole("alert")).toContainText("현금이 부족");
+  goal = await fillGoal(page, { "신 NISA 보유 취득원가·합계(엔)": "18000001" });
+  await expect(goal.getByRole("alert")).toContainText("제도상 한도");
+  goal = await fillGoal(page, { "목표 금액(명목)(엔)": "1" });
+  await expect(goal.getByRole("status")).toContainText("이미 목표 달성");
 });

@@ -17,9 +17,9 @@ export interface FireProjection {
 }
 export function parseRate(value: string): number {
   if (!/^-?\d{1,3}(\.\d{1,2})?$/.test(value))
-    throw new Error("率は-99〜100%の小数2桁以内で入力してください。");
+    throw new Error("비율은 -99~100%, 소수 둘째 자리까지 입력해 주세요.");
   const bps = Math.round(Number(value) * 100);
-  if (bps < -9900 || bps > 10000) throw new Error("率は-99〜100%で入力してください。");
+  if (bps < -9900 || bps > 10000) throw new Error("비율은 -99~100%로 입력해 주세요.");
   return bps;
 }
 // Annual nominal rates / 12. Positive balances rounded to nearest yen, ties up.
@@ -34,7 +34,7 @@ export function projectFire(s: FireScenario): FireProjection {
     s.target === 0 ||
     ![s.returnBps, s.inflationBps].every((n) => Number.isInteger(n) && n >= -9900 && n <= 10000)
   )
-    throw new Error("金額・目標・率を確認してください。目標は1円以上です。");
+    throw new Error("금액·목표·비율을 확인해 주세요. 목표는 1엔 이상이어야 합니다.");
   let assets = BigInt(s.startingAssets),
     target = BigInt(s.target);
   const result: FireProjection = {
