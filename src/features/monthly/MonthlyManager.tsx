@@ -70,7 +70,7 @@ export function MonthlyManager({
   }));
   async function load(targetMonth = month, recordToday = false) {
     if (running.current) return;
-    if (dirty && !window.confirm("未保存の入力を破棄して読み込みますか？")) return;
+    if (dirty && !window.confirm("저장하지 않은 입력을 버리고 불러올까요?")) return;
     running.current = true;
     setBusy(true);
     setError("");
@@ -109,7 +109,7 @@ export function MonthlyManager({
       setDirtyBalances(new Set());
       return true;
     } catch (e) {
-      setError(e instanceof Error ? e.message : "読込に失敗しました。");
+      setError(e instanceof Error ? e.message : "불러오기에 실패했습니다.");
     } finally {
       running.current = false;
       setBusy(false);
@@ -153,9 +153,9 @@ export function MonthlyManager({
           return next;
         });
       }
-      setMessage("月別記録を保存しました。");
+      setMessage("월별 기록을 저장했습니다.");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "保存に失敗しました。入力は保持しています。");
+      setError(e instanceof Error ? e.message : "저장에 실패했습니다. 입력은 보존됩니다.");
     } finally {
       running.current = false;
       setBusy(false);
@@ -165,17 +165,18 @@ export function MonthlyManager({
     <section className="account-panel monthly-panel" aria-labelledby="monthly-heading">
       <div className="section-heading">
         <div>
-          <p className="section-kicker">MONTHLY NOTE</p>
-          <h2 id="monthly-heading">月別記録</h2>
+          <p className="section-kicker">월별 기록</p>
+          <h2 id="monthly-heading">월별 기록</h2>
         </div>
-        <span className="subtle-badge">{loaded === month ? "編集中の月" : "月を選択"}</span>
+        <span className="subtle-badge">{loaded === month ? "편집 중인 월" : "월 선택"}</span>
       </div>
       <p className="storage-note">
-        思い出せない月は空欄のままで大丈夫です。確認できた日の残高から続けましょう。0円と未記録は区別します。
+        기억나지 않는 월은 빈칸으로 두어도 괜찮습니다. 확인한 날의 잔액부터 이어 가세요. 0엔과
+        미기록은 구별합니다.
       </p>
       <div className="month-toolbar">
         <label>
-          対象月
+          대상 월
           <input
             type="month"
             min="1900-01"
@@ -183,7 +184,7 @@ export function MonthlyManager({
             value={month}
             disabled={busy}
             onChange={(e) => {
-              if (dirty && !window.confirm("未保存の入力を破棄して月を変更しますか？")) return;
+              if (dirty && !window.confirm("저장하지 않은 입력을 버리고 월을 바꿀까요?")) return;
               setMonth(e.target.value);
               setLoaded(null);
               setDirtyCash(false);
@@ -194,7 +195,7 @@ export function MonthlyManager({
           />
         </label>
         <button type="button" disabled={busy} onClick={() => void load()}>
-          {busy ? "処理中…" : "記録を読み込む"}
+          {busy ? "처리 중…" : "기록 불러오기"}
         </button>
       </div>
       {error && (
@@ -206,28 +207,30 @@ export function MonthlyManager({
       {loaded !== month && (
         <div className="month-empty">
           <div className="calendar-art" aria-hidden="true">
-            <span>MONTHLY NOTE</span>
+            <span>월별 기록</span>
             <strong>{month.slice(-2) || "—"}</strong>
             <i />
           </div>
-          <h3>ひと月の記録をひらく</h3>
+          <h3>한 달의 기록 열기</h3>
           <p>
-            対象月を選んで「記録を読み込む」を押すと、
+            대상 월을 선택하고 ‘기록 불러오기’를 누르면
             <br />
-            収支と口座ごとの残高を入力できます。
+            수입·지출과 계좌별 잔액을 입력할 수 있습니다.
           </p>
         </div>
       )}
       {loaded === month && (
         <>
           <div className="balance-heading">
-            <h3>確認した残高（円）</h3>
-            <span>口座ごとに保存</span>
+            <h3>확인한 잔액(엔)</h3>
+            <span>계좌별 저장</span>
           </div>
           <p className="field-hint">
-            銀行・証券アプリで確認した日と金額を入力します。月末を忘れたときは履歴・明細を確認するか、過去は空欄のまま今日から再開できます。1口座につき月1件を保存し、同じ月の再入力は更新になります。
+            은행·증권 앱에서 확인한 날짜와 금액을 입력하세요. 월말 기록을 놓쳤다면 거래 내역을
+            확인하거나, 과거는 빈칸으로 두고 오늘부터 다시 시작해도 됩니다. 계좌당 월 1건을 저장하며
+            같은 월에 다시 입력하면 갱신됩니다.
           </p>
-          {accounts.length === 0 && <p>先に口座を登録してください。</p>}
+          {accounts.length === 0 && <p>먼저 계좌를 등록해 주세요.</p>}
           <div className="monthly-balances">
             {accounts.map((account) => (
               <form
@@ -240,14 +243,14 @@ export function MonthlyManager({
                 <fieldset disabled={busy}>
                   <legend>
                     {account.name}
-                    {!account.isActive && "（休止中）"}
+                    {!account.isActive && "(사용 중지)"}
                   </legend>
                   <label>
-                    残高
+                    잔액
                     <input
-                      aria-label={`${account.name}の残高`}
+                      aria-label={`${account.name} 잔액`}
                       id={"balance-" + account.id}
-                      placeholder="未入力"
+                      placeholder="미입력"
                       inputMode="numeric"
                       maxLength={16}
                       required
@@ -259,9 +262,9 @@ export function MonthlyManager({
                     />
                   </label>
                   <label>
-                    確認日
+                    확인일
                     <input
-                      aria-label={`${account.name}の確認日`}
+                      aria-label={`${account.name} 확인일`}
                       type="date"
                       min={month + "-01"}
                       max={monthEnd(month) < localDate() ? monthEnd(month) : localDate()}
@@ -282,13 +285,11 @@ export function MonthlyManager({
                     )}
                   </p>
                   <span>
-                    {records.balances.some((b) => b.accountId === account.id)
-                      ? "保存済み"
-                      : "未記録"}
-                    {dirtyBalances.has(account.id) ? "・未保存の変更" : ""}
+                    {records.balances.some((b) => b.accountId === account.id) ? "저장됨" : "미기록"}
+                    {dirtyBalances.has(account.id) ? "·저장하지 않은 변경" : ""}
                   </span>
-                  <button type="submit" aria-label={`${account.name}の残高を保存`}>
-                    残高を保存
+                  <button type="submit" aria-label={`${account.name} 잔액 저장`}>
+                    잔액 저장
                   </button>
                 </fieldset>
               </form>
@@ -301,20 +302,20 @@ export function MonthlyManager({
             }}
           >
             <fieldset disabled={busy}>
-              <legend>月の現金収支（円）</legend>
-              <p className="field-hint">投資への拠出は、消費支出と分けて記録します。</p>
+              <legend>월 현금 수입·지출(엔)</legend>
+              <p className="field-hint">투자 납입은 소비 지출과 나누어 기록합니다.</p>
               <div className="account-fields cash-fields">
                 {(
                   [
-                    ["income", "収入"],
-                    ["expenses", "消費支出"],
-                    ["investmentContribution", "投資への拠出"],
+                    ["income", "수입"],
+                    ["expenses", "소비 지출"],
+                    ["investmentContribution", "투자 납입"],
                   ] as const
                 ).map(([key, label]) => (
                   <label key={key}>
                     {label}
                     <input
-                      placeholder="未入力"
+                      placeholder="미입력"
                       inputMode="numeric"
                       maxLength={16}
                       required
@@ -327,9 +328,9 @@ export function MonthlyManager({
                   </label>
                 ))}
                 <label className="note-field">
-                  メモ
+                  메모
                   <textarea
-                    placeholder="今月、残しておきたいこと（任意）"
+                    placeholder="이번 달 기억할 내용(선택)"
                     rows={2}
                     maxLength={1000}
                     value={cash.note}
@@ -340,7 +341,7 @@ export function MonthlyManager({
                   />
                 </label>
               </div>
-              <button type="submit">現金収支を保存</button>
+              <button type="submit">현금 수입·지출 저장</button>
             </fieldset>
           </form>
         </>

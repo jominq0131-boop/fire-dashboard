@@ -3,7 +3,7 @@ import { projectFireValues, type SavedFireScenario } from "../../domain/fire-pla
 import { arrivalText } from "./fire-format";
 import { ProjectionChart } from "./ProjectionChart";
 
-const yen = (value: string | number) => `${Number(value).toLocaleString("ja-JP")} 円`;
+const yen = (value: string | number) => `${Number(value).toLocaleString("ko-KR")} 엔`;
 export function ScenarioComparison({
   result,
   items,
@@ -19,25 +19,26 @@ export function ScenarioComparison({
   return (
     <section className="scenario-comparison" aria-labelledby="comparison-heading">
       <div className="section-heading">
-        <h3 id="comparison-heading">仮定を並べて比較</h3>
-        <span>{items.length} / 3 件</span>
+        <h3 id="comparison-heading">가정 나란히 비교</h3>
+        <span>{items.length} / 3개</span>
       </div>
       <p className="field-hint">
-        計算した仮定を最大3件まで追加できます。入力を変えて再計算しても、追加済みの比較は変わらず、この端末とJSONバックアップに保存されます。
+        계산한 가정을 최대 3개까지 추가할 수 있습니다. 입력을 바꿔 다시 계산해도 추가한 비교는
+        그대로이며 이 기기와 JSON 백업에 저장됩니다.
       </p>
       <button type="button" disabled={!result || items.length >= 3} onClick={onAdd}>
-        この結果を比較に追加
+        이 결과를 비교에 추가
       </button>
-      {!result && <p className="field-hint">追加するには、入力した仮定で計算してください。</p>}
+      {!result && <p className="field-hint">추가하려면 입력한 가정으로 계산해 주세요.</p>}
       {items.length === 3 && (
-        <p className="field-hint">3件を比較中です。新しく追加するには1件外してください。</p>
+        <p className="field-hint">3개를 비교 중입니다. 새로 추가하려면 1개를 제외해 주세요.</p>
       )}
       {items.length > 0 && (
         <ProjectionChart
-          title="シナリオ比較チャート"
+          title="시나리오 비교 차트"
           items={scenarios.map((item) => ({
             id: String(item.id),
-            label: `シナリオ${item.id}`,
+            label: `시나리오${item.id}`,
             result: item.result,
           }))}
         />
@@ -46,24 +47,24 @@ export function ScenarioComparison({
         <div
           className="history-table comparison-table"
           role="region"
-          aria-label="シナリオ比較表・横にスクロールできます"
+          aria-label="시나리오 비교표·가로로 스크롤할 수 있습니다"
           tabIndex={0}
         >
           <table>
-            <caption>仮定と結果の比較（将来の成果を保証するものではありません）</caption>
+            <caption>가정과 결과 비교(미래 성과를 보장하지 않습니다)</caption>
             <thead>
               <tr>
-                <th scope="col">比較項目</th>
+                <th scope="col">비교 항목</th>
                 {scenarios.map((item) => (
                   <th scope="col" key={item.id}>
-                    シナリオ{item.id}
+                    시나리오{item.id}
                     <br />
                     <button
                       type="button"
-                      aria-label={`シナリオ${item.id}を比較から外す`}
+                      aria-label={`시나리오${item.id} 비교에서 제외`}
                       onClick={() => onRemove(item.id)}
                     >
-                      比較から外す
+                      비교에서 제외
                     </button>
                   </th>
                 ))}
@@ -72,11 +73,11 @@ export function ScenarioComparison({
             <tbody>
               {(
                 [
-                  ["startingAssets", "開始資産"],
-                  ["target", "目標・今日の価値"],
-                  ["monthlyContribution", "月の積立額"],
-                  ["returnBps", "想定年利"],
-                  ["inflationBps", "インフレ率"],
+                  ["startingAssets", "시작 자산"],
+                  ["target", "목표·현재 가치"],
+                  ["monthlyContribution", "월 적립액"],
+                  ["returnBps", "가정 연 수익률"],
+                  ["inflationBps", "물가상승률"],
                 ] as const
               ).map(([key, label]) => (
                 <tr key={key}>
@@ -89,22 +90,22 @@ export function ScenarioComparison({
                 </tr>
               ))}
               <tr>
-                <th scope="row">最初の到達</th>
+                <th scope="row">최초 달성</th>
                 {scenarios.map((item) => (
                   <td className="comparison-outcome" key={item.id}>
                     {arrivalText(item.result)}
                     {item.result.overflowMonth !== null && (
-                      <small>{item.result.overflowMonth}か月目以降は計算範囲外</small>
+                      <small>{item.result.overflowMonth}개월째부터 계산 범위 초과</small>
                     )}
                   </td>
                 ))}
               </tr>
               {[10, 20, 30].map((year) => (
                 <tr key={year}>
-                  <th scope="row">{year}年後の資産</th>
+                  <th scope="row">{year}년 후 자산</th>
                   {scenarios.map((item) => {
                     const point = item.result.points.find((p) => p.month === year * 12);
-                    return <td key={item.id}>{point ? yen(point.assets) : "計算範囲外"}</td>;
+                    return <td key={item.id}>{point ? yen(point.assets) : "계산 범위 초과"}</td>;
                   })}
                 </tr>
               ))}

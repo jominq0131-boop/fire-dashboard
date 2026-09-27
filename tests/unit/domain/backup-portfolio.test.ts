@@ -14,7 +14,7 @@ describe("versioned portable backup", () => {
   it("round trips every field including inactive, zero, note and timestamps deterministically", () => {
     const data = syntheticBackup();
     data.accounts[0].isActive = false;
-    data.monthlyCashFlows[0].note = "合成メモ";
+    data.monthlyCashFlows[0].note = "합성메모";
     data.accountBalanceSnapshots[0].balance = 0;
     const before = structuredClone(data);
     expect(parseBackup(canonical(data))).toEqual(normalizeBackup(data));
@@ -69,7 +69,7 @@ describe("versioned portable backup", () => {
     expect(mergeBackup(empty, data).added).toBe(4);
     const changed = structuredClone(data);
     changed.accountBalanceSnapshots[0].balance++;
-    expect(() => mergeBackup(data, changed)).toThrow("競合");
+    expect(() => mergeBackup(data, changed)).toThrow("충돌");
     const collision = structuredClone(data);
     collision.monthlyCashFlows[0].id = "different-id";
     expect(() => mergeBackup(data, collision)).toThrow();

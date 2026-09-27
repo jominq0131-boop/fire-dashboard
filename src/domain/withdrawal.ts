@@ -2,10 +2,10 @@
 export const DEFAULT_TAX_RATE = "20.315";
 export function parseTaxRate(text: string): number {
   if (!/^\d{1,3}(\.\d{1,3})?$/.test(text))
-    throw new Error("想定税率は0〜100%、小数3桁以内で入力してください。");
+    throw new Error("가정 세율은 0~100%, 소수 셋째 자리까지 입력해 주세요.");
   const [whole, fraction = ""] = text.split(".");
   const rate = Number(whole) * 1000 + Number(fraction.padEnd(3, "0"));
-  if (rate > 100000) throw new Error("想定税率は0〜100%で入力してください。");
+  if (rate > 100000) throw new Error("가정 세율은 0~100%로 입력해 주세요.");
   return rate;
 }
 export interface WithdrawalEstimate {

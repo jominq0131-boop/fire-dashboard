@@ -10,6 +10,37 @@ const plan = () => ({
   referenceMonth: "2026-09",
   updatedAt: "2026-09-13T00:00:00.000Z",
 });
+it("migrates v6 income defaults without changing original text, timestamps or draft bytes", () => {
+  const current = plan();
+  const draft = Object.fromEntries(
+    Object.entries(current.draft).filter(
+      ([key]) => key !== "drawdownIncome" && key !== "drawdownIncomeStart",
+    ),
+  );
+  const previous = { ...current, draft };
+  const old = { ...syntheticBackup(), schemaVersion: 6, firePlan: null, goalPlan: previous };
+  old.accounts[0].name = "日本の口座・한글";
+  old.monthlyCashFlows[0].note = "以前のメモ・예전 메모";
+  const bytes = JSON.stringify(old);
+  const next = normalizeBackup(old);
+  expect(next.schemaVersion).toBe(7);
+  expect(next.goalPlan).toEqual(current);
+  expect(next.accounts).toEqual(old.accounts);
+  expect(next.monthlyCashFlows).toEqual(old.monthlyCashFlows);
+  expect(JSON.stringify(old)).toBe(bytes);
+  expect(normalizeGoalPlan(previous)).toEqual(current);
+  expect(() => normalizeBackup({ ...old, schemaVersion: 7 })).toThrow();
+  expect(() => normalizeBackup({ ...old, goalPlan: current })).toThrow();
+  const edited = {
+    ...next,
+    goalPlan: {
+      ...current,
+      draft: { ...current.draft, drawdownIncome: "100000", drawdownIncomeStart: "121" },
+    },
+  };
+  expect(normalizeBackup(JSON.parse(JSON.stringify(edited)))).toEqual(edited);
+  expect(() => mergeBackup(edited, next)).toThrow("목표 계획과 충돌");
+});
 it("preserves v5 tax settings and adds only empty retirement spending and example assumptions", () => {
   const current = plan();
   const draft = Object.fromEntries(
@@ -21,13 +52,13 @@ it("preserves v5 tax settings and adds only empty retirement spending and exampl
   const before = structuredClone(taxPlan);
   const input = { ...syntheticBackup(), schemaVersion: 5, firePlan: null, goalPlan: taxPlan };
   const migrated = normalizeBackup(input);
-  expect(migrated.schemaVersion).toBe(6);
+  expect(migrated.schemaVersion).toBe(7);
   expect(migrated.goalPlan).toEqual({
     ...current,
     draft: { ...current.draft, taxableCost: "123456", taxRate: "15" },
   });
   expect(taxPlan).toEqual(before);
-  expect(() => normalizeBackup({ ...input, schemaVersion: 6 })).toThrow();
+  expect(() => normalizeBackup({ ...input, schemaVersion: 7 })).toThrow();
   expect(() => normalizeBackup({ ...input, goalPlan: current })).toThrow();
   const edited = {
     ...migrated,
@@ -37,7 +68,7 @@ it("preserves v5 tax settings and adds only empty retirement spending and exampl
     },
   };
   expect(normalizeBackup(JSON.parse(JSON.stringify(edited)))).toEqual(edited);
-  expect(() => mergeBackup(edited, migrated)).toThrow("目標計画と競合");
+  expect(() => mergeBackup(edited, migrated)).toThrow("목표 계획과 충돌");
 });
 it("migrates exactly the legacy draft without mutation and rejects mixed version fields", () => {
   const current = plan();
@@ -62,7 +93,7 @@ it("migrates exactly the legacy draft without mutation and rejects mixed version
   };
   const newer = { ...normalizeBackup(oldBackup), goalPlan: configured };
   expect(normalizeBackup(JSON.parse(JSON.stringify(newer)))).toEqual(newer);
-  expect(() => mergeBackup(newer, normalizeBackup(oldBackup))).toThrow("目標計画と競合");
+  expect(() => mergeBackup(newer, normalizeBackup(oldBackup))).toThrow("목표 계획과 충돌");
   expect(newer.goalPlan).toEqual(configured);
 });
 it("preserves bounded incomplete drafts without interpreting them as valid calculations", () => {
@@ -102,7 +133,7 @@ it("migrates v1-v3 without losing records or the legacy plan", () => {
     const input = { ...old, schemaVersion: version, ...(version === 3 ? { firePlan: null } : {}) };
     expect(normalizeBackup(input)).toEqual({
       ...old,
-      schemaVersion: 6,
+      schemaVersion: 7,
       firePlan: null,
       goalPlan: null,
     });
@@ -117,7 +148,7 @@ it("round trips and merges goals idempotently while preserving them on old impor
   expect(mergeBackup(incoming, syntheticBackup()).backup.goalPlan).toEqual(incoming.goalPlan);
   const conflict = structuredClone(incoming);
   conflict.goalPlan.draft.cash = "999";
-  expect(() => mergeBackup(incoming, conflict)).toThrow("目標計画と競合");
+  expect(() => mergeBackup(incoming, conflict)).toThrow("목표 계획과 충돌");
   expect(incoming.goalPlan.draft.cash).toBe("");
   expect(() => normalizeBackup({ ...incoming, schemaVersion: 3 })).toThrow();
 });

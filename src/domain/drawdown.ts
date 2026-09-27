@@ -8,6 +8,8 @@ export interface DrawdownStart {
 }
 export interface DrawdownAssumptions {
   monthlySpending: number;
+  monthlyIncome: number;
+  incomeStartMonth: number;
   years: number;
   returnBps: number;
   inflationBps: number;
@@ -22,6 +24,7 @@ export interface DrawdownPoint {
   spending: number;
   taxPaid: number;
   spendingPaid: number;
+  incomeReceived: number;
 }
 export interface DrawdownResult {
   status: "funded" | "shortfall" | "unknown-cost" | "overflow";
@@ -33,10 +36,13 @@ const max = BigInt(Number.MAX_SAFE_INTEGER);
 const round = (n: bigint, d: bigint) => (n + d / 2n) / d;
 const money = (n: number) => Number.isSafeInteger(n) && n >= 0;
 
-/** Monthly cash-first spending, then proportional stock sales. No contributions or reinvestment. */
+/** Fixed net income joins cash before spending, then proportional stock sales cover any gap. */
 export function projectDrawdown(start: DrawdownStart, s: DrawdownAssumptions): DrawdownResult {
   if (
-    ![start.cash, start.nisa, start.taxable, s.monthlySpending].every(money) ||
+    ![start.cash, start.nisa, start.taxable, s.monthlySpending, s.monthlyIncome].every(money) ||
+    !Number.isInteger(s.incomeStartMonth) ||
+    s.incomeStartMonth < 1 ||
+    s.incomeStartMonth > 1200 ||
     (start.taxableCost !== null &&
       (typeof start.taxableCost !== "bigint" ||
         start.taxableCost < 0n ||
@@ -49,15 +55,16 @@ export function projectDrawdown(start: DrawdownStart, s: DrawdownAssumptions): D
     s.taxRate < 0 ||
     s.taxRate > 100000
   )
-    throw new Error("取り崩しの金額・期間（1〜100年）・率を確認してください。");
+    throw new Error("인출 금액·소득·지급 시작 월(1~1200)·기간(1~100년)·비율을 확인해 주세요.");
   let cash = BigInt(start.cash),
     nisa = BigInt(start.nisa),
     taxable = BigInt(start.taxable);
-  if (cash + nisa + taxable > max) throw new Error("開始資産が計算範囲を超えています。");
+  if (cash + nisa + taxable > max) throw new Error("시작 자산이 계산 범위를 초과합니다.");
   let cost = start.taxableCost;
   let spending = BigInt(s.monthlySpending),
     taxPaid = 0n,
-    spendingPaid = 0n;
+    spendingPaid = 0n,
+    incomeReceived = 0n;
   const point = (month: number): DrawdownPoint => ({
     month,
     cash: Number(cash),
@@ -67,6 +74,7 @@ export function projectDrawdown(start: DrawdownStart, s: DrawdownAssumptions): D
     spending: Number(spending),
     taxPaid: Number(taxPaid),
     spendingPaid: Number(spendingPaid),
+    incomeReceived: Number(incomeReceived),
   });
   let last = point(0);
   const result: DrawdownResult = {
@@ -87,8 +95,11 @@ export function projectDrawdown(start: DrawdownStart, s: DrawdownAssumptions): D
     const grownNisa = round(nisa * BigInt(120000 + s.returnBps), 120000n);
     const grownTaxable = round(taxable * BigInt(120000 + s.returnBps), 120000n);
     const stocks = grownNisa + grownTaxable;
-    if (need > max || cash + stocks > max) return stop("overflow", month);
-    const fromCash = cash < need ? cash : need;
+    const income = month >= s.incomeStartMonth ? BigInt(s.monthlyIncome) : 0n;
+    const availableCash = cash + income;
+    if (need > max || availableCash + stocks > max || incomeReceived + income > max)
+      return stop("overflow", month);
+    const fromCash = availableCash < need ? availableCash : need;
     const remaining = need - fromCash;
     let gross = 0n,
       tax = 0n,
@@ -119,7 +130,8 @@ export function projectDrawdown(start: DrawdownStart, s: DrawdownAssumptions): D
     }
     const paid = fromCash + received;
     if (taxPaid + tax > max || spendingPaid + paid > max) return stop("overflow", month);
-    cash -= fromCash;
+    cash = availableCash - fromCash;
+    incomeReceived += income;
     nisa = grownNisa - (gross - soldTaxable);
     taxable = grownTaxable - soldTaxable;
     if (soldTaxable > 0n && cost !== null) cost -= round(cost * soldTaxable, grownTaxable);

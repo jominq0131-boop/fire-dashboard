@@ -2,17 +2,17 @@ import { monthlyMetrics, type MetricAmount, type MetricsSource } from "../../dom
 
 const format = (value: MetricAmount) =>
   value === null
-    ? "未入力"
+    ? "미입력"
     : value === "overflow"
-      ? "計算範囲超過"
-      : `${value.toLocaleString("ja-JP")} 円`;
+      ? "계산 범위 초과"
+      : `${value.toLocaleString("ko-KR")} 엔`;
 export function MonthlyOverview({ source }: { source: MetricsSource | null }) {
   if (!source)
     return (
       <article className="asset-card">
-        <h2>この月に記録した資産</h2>
-        <p>月別記録で対象月を読み込むと、保存済みの金額を集計します。</p>
-        <strong aria-label="金融資産: データなし">—</strong>
+        <h2>이달에 기록한 자산</h2>
+        <p>월별 기록에서 대상 월을 불러오면 저장된 금액을 집계합니다.</p>
+        <strong aria-label="금융자산: 데이터 없음">—</strong>
       </article>
     );
   let metrics;
@@ -21,32 +21,32 @@ export function MonthlyOverview({ source }: { source: MetricsSource | null }) {
   } catch {
     return (
       <article className="asset-card">
-        <h2>金融資産</h2>
-        <p role="alert">集計できません。月別記録を再読み込みしてください。</p>
+        <h2>금융자산</h2>
+        <p role="alert">집계할 수 없습니다. 월별 기록을 다시 불러와 주세요.</p>
       </article>
     );
   }
   return (
-    <article className="asset-card" aria-label="月別サマリー">
-      <h2>金融資産</h2>
-      <p>{source.month} · 保存済みの記録</p>
+    <article className="asset-card" aria-label="월별 요약">
+      <h2>금융자산</h2>
+      <p>{source.month} · 저장된 기록</p>
       <div className="asset-value">
         <strong>{format(metrics.assets)}</strong>
       </div>
       <p>
-        残高入力 {metrics.recordedAccounts} / {metrics.totalAccounts} 口座（休止中を含む）
+        잔액 입력 {metrics.recordedAccounts} / {metrics.totalAccounts}개 계좌(사용 중지 포함)
       </p>
       <p className="field-hint">
-        入力済み口座の合計です。未入力は0円とみなしません。負債を差し引いた純資産ではありません。
+        입력한 계좌의 합계입니다. 미입력을 0엔으로 취급하지 않습니다. 부채를 뺀 순자산이 아닙니다.
       </p>
       <dl className="metrics-list">
         {(
           [
-            ["収入", metrics.income],
-            ["消費支出", metrics.expenses],
-            ["投資への拠出", metrics.investmentContribution],
-            ["消費後の余剰", metrics.surplus],
-            ["投資後の現金余剰", metrics.remainingCash],
+            ["수입", metrics.income],
+            ["소비 지출", metrics.expenses],
+            ["투자 납입", metrics.investmentContribution],
+            ["소비 후 잉여", metrics.surplus],
+            ["투자 후 현금 잉여", metrics.remainingCash],
           ] as const
         ).map(([label, value]) => (
           <div key={label}>
@@ -56,11 +56,12 @@ export function MonthlyOverview({ source }: { source: MetricsSource | null }) {
         ))}
       </dl>
       <p className="field-hint">
-        消費後の余剰 = 収入 −
-        消費支出。投資後の現金余剰は、さらに投資への拠出を引いた値です。月末残高の増減や運用益ではありません。
+        소비 후 잉여 = 수입 − 소비 지출. 투자 후 현금 잉여는 여기서 투자 납입을 뺀 값입니다. 월말
+        잔액 증감이나 운용수익이 아닙니다.
       </p>
       <p className="field-hint">
-        未保存の入力は反映しません。他のタブや口座の変更は「記録を読み込む」で更新してください。計算範囲超過の場合も元の記録は保持されます。
+        저장하지 않은 입력은 반영하지 않습니다. 다른 탭이나 계좌의 변경은 ‘기록 불러오기’로 갱신해
+        주세요. 계산 범위를 초과해도 원본 기록은 보존됩니다.
       </p>
     </article>
   );

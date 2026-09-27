@@ -22,7 +22,7 @@ test("v3 to current adds an empty FIRE plan store without rewriting existing rec
     const name = "synthetic-v3-fire-plan";
     const account = {
       id: "preserved",
-      name: "保持口座",
+      name: "보존계좌",
       category: "cash",
       isActive: true,
       sortOrder: 0,
@@ -69,7 +69,7 @@ test("v3 to current adds an empty FIRE plan store without rewriting existing rec
     stores: ["accountBalanceSnapshots", "accounts", "firePlans", "goalPlans", "monthlyCashFlows"],
     account: {
       id: "preserved",
-      name: "保持口座",
+      name: "보존계좌",
       category: "cash",
       isActive: true,
       sortOrder: 0,
@@ -161,10 +161,10 @@ test("FIRE plan writes reject stale tabs and malformed stored values without ove
     countDb.close();
     return { conflict, afterConflict, corrupt, stored, excess, count };
   }, values);
-  expect(result.conflict).toContain("別のタブ");
+  expect(result.conflict).toContain("다른 탭");
   expect(result.afterConflict?.draft.target).toBe("2200");
-  expect(result.corrupt).toContain("検証できません");
+  expect(result.corrupt).toContain("검증할 수 없습니다");
   expect(result.stored).toEqual({ id: "unexpected", invalid: true });
-  expect(result.excess).toContain("上限を超えています");
+  expect(result.excess).toContain("한도를 초과");
   expect(result.count).toBe(2);
 });

@@ -55,9 +55,9 @@ export function projectGoal(s: GoalAssumptions): GoalResult {
     taxRate < 0 ||
     taxRate > 100000
   )
-    throw new Error("課税口座の取得額・想定税率を確認してください。");
+    throw new Error("과세 계좌의 취득원가·가정 세율을 확인해 주세요.");
   if (s.taxable === 0 && s.taxableCost != null && s.taxableCost !== 0)
-    throw new Error("課税口座の評価額が0円の場合、取得額は0円または空欄にしてください。");
+    throw new Error("과세 계좌 평가액이 0엔이면 취득원가는 0엔 또는 빈칸으로 입력해 주세요.");
   const amounts = [
     s.cash,
     s.tsumitate,
@@ -81,7 +81,7 @@ export function projectGoal(s: GoalAssumptions): GoalResult {
     s.withdrawalBps < 0 ||
     s.withdrawalBps > 10000
   )
-    throw new Error("金額・目標・率を確認してください。");
+    throw new Error("금액·목표·비율을 확인해 주세요.");
   if (
     s.usedTotal > 18000000 ||
     s.usedGrowth > 12000000 ||
@@ -90,14 +90,14 @@ export function projectGoal(s: GoalAssumptions): GoalResult {
     s.usedYearGrowth > 2400000
   )
     throw new Error(
-      "NISAの利用額が制度上限を超えています。取得額と今年の買付額を確認してください。",
+      "NISA 사용액이 제도상 한도를 초과합니다. 취득원가와 올해 매수액을 확인해 주세요.",
     );
   let cash = BigInt(s.cash),
     tsumitate = BigInt(s.tsumitate),
     growth = BigInt(s.growth),
     taxable = BigInt(s.taxable);
   if (cash + tsumitate + growth + taxable > max)
-    throw new Error("開始資産が安全な整数範囲を超えています。");
+    throw new Error("시작 자산이 안전한 정수 범위를 초과합니다.");
   let usedTotal = s.usedTotal,
     usedGrowth = s.usedGrowth;
   let yearT = s.usedYearTsumitate,
@@ -187,8 +187,8 @@ export function goalSeed(overview: PortfolioOverview, currentMonth: string) {
   assertMonth(currentMonth);
   const total = currentTotal(overview.current);
   if (typeof total !== "number")
-    throw new Error("利用できる残高がありません。現在の資産を入力してください。");
-  if (overview.months.length > 12) throw new Error("参照月数の上限を超えています。");
+    throw new Error("사용할 수 있는 잔액이 없습니다. 현재 자산을 입력해 주세요.");
+  if (overview.months.length > 12) throw new Error("참조할 수 있는개월 수를 초과합니다.");
   const balances = { cash: 0, tsumitate: 0, growth: 0, taxable: 0 };
   let other = 0;
   for (const b of overview.current.balances) {
@@ -212,7 +212,7 @@ export function goalSeed(overview: PortfolioOverview, currentMonth: string) {
       typeof metrics.remainingCash !== "number" ||
       typeof metrics.investmentContribution !== "number"
     )
-      throw new Error("月別収支の計算範囲を超えています。");
+      throw new Error("월별 수입·지출 계산 범위를 초과합니다.");
     cash += BigInt(metrics.remainingCash);
     investment += BigInt(metrics.investmentContribution);
   }

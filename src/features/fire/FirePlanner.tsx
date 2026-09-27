@@ -19,13 +19,13 @@ import { currentTotal, localDate } from "../../domain/observations";
 import type { PortfolioRepository } from "../../domain/portfolio";
 
 const fields = [
-  ["startingAssets", "開始資産（円）"],
-  ["target", "目標資産・今日の価値（円）"],
-  ["monthlyContribution", "毎月の積立額（円）"],
-  ["returnBps", "想定年利（%）"],
-  ["inflationBps", "想定インフレ率（%）"],
+  ["startingAssets", "시작 자산(엔)"],
+  ["target", "목표 자산·현재 가치(엔)"],
+  ["monthlyContribution", "월 적립액(엔)"],
+  ["returnBps", "가정 연 수익률(%)"],
+  ["inflationBps", "가정 물가상승률(%)"],
 ] as const;
-const yen = (n: number) => `${n.toLocaleString("ja-JP")} 円`;
+const yen = (n: number) => `${n.toLocaleString("ko-KR")} 엔`;
 export function FirePlanner({
   repository,
   firePlanRepository,
@@ -80,7 +80,7 @@ export function FirePlanner({
       })
       .catch((reason: unknown) => {
         if (cancelled) return;
-        setSaveError(reason instanceof Error ? reason.message : "FIRE計画を読み込めません。");
+        setSaveError(reason instanceof Error ? reason.message : "FIRE 계획을 불러올 수 없습니다.");
         setSaveState("idle");
       });
     return () => {
@@ -131,7 +131,7 @@ export function FirePlanner({
         setSaveError(
           reason instanceof Error
             ? reason.message
-            : "FIRE計画を保存できません。入力は残しています。",
+            : "FIRE 계획을 저장할 수 없습니다. 입력은 남겨 두었습니다.",
         );
       });
   }, [comparisons, currentValues, firePlanRepository, planReady, values]);
@@ -141,7 +141,7 @@ export function FirePlanner({
       if (
         Object.values(values).some((v) => v !== "") &&
         !window.confirm(
-          "入力中の開始資産を選択した記録額に置き換えますか？ほかの仮定と比較は保持します。",
+          "입력 중인 시작 자산을 선택한 기록 금액으로 바꿀까요? 다른 가정과 비교는 유지합니다.",
         )
       )
         return false;
@@ -161,34 +161,35 @@ export function FirePlanner({
       const { current } = await repository.readOverview(today.slice(0, 7), undefined, today);
       const total = currentTotal(current);
       if (typeof total !== "number")
-        throw new Error("利用できる残高がありません。開始資産を入力してください。");
+        throw new Error("사용할 수 있는 잔액이 없습니다. 시작 자산을 입력해 주세요.");
       setValues((v) => ({ ...v, startingAssets: String(total) }));
       setSource(
-        `${today} 読込：${current.balances.length}/${current.accounts.length}口座の最後の記録。確認日が異なる・古い・未記録の口座を概要で確認し、必要に応じて金額を修正してください。`,
+        `${today} 불러옴: ${current.balances.length}/${current.accounts.length}개 계좌의 마지막 기록입니다. 확인일이 다르거나 오래된 계좌, 미기록 계좌를개요에서 확인하고 필요하면 금액을 수정해 주세요.`,
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "読込に失敗しました。");
+      setError(e instanceof Error ? e.message : "불러오기에 실패했습니다.");
     } finally {
       setBusy(false);
     }
   }
   return (
     <section id="fire" className="asset-card fire-planner" aria-labelledby="fire-heading">
-      <h2 id="fire-heading">FIREシミュレーション</h2>
+      <h2 id="fire-heading">FIRE 시뮬레이션</h2>
       <GoalPlanner
         repository={repository}
         goalPlanRepository={goalPlanRepository}
         revision={revision}
       />
-      <h3>従来の一括資産プラン・比較</h3>
-      <p>目標まで、あとどのくらい？ ご自身の仮定で計算できます。</p>
+      <h3>전체 자산 계획·비교</h3>
+      <p>목표까지 얼마나 남았을까요? 직접 정한 가정으로 계산해 보세요.</p>
       <p className="field-hint">
-        入力と比較はこの端末に自動保存し、JSONバックアップにも含めます。計算結果は保存した仮定から再現します。記録済みの残高は変更しません。
+        입력과 비교는 이 기기에 자동 저장되며 JSON 백업에도 포함됩니다. 계산 결과는 저장한 가정으로
+        다시 계산합니다. 기록된 잔액은 변경하지 않습니다.
       </p>
       <p className="fire-save-state" aria-live="polite">
-        {saveState === "loading" && "保存済みのFIRE計画を読み込んでいます…"}
-        {saveState === "saving" && "FIRE計画を保存しています…"}
-        {saveState === "saved" && "FIRE計画をこの端末に保存しました"}
+        {saveState === "loading" && "저장된 FIRE 계획을 불러오는 중…"}
+        {saveState === "saving" && "FIRE 계획을 저장하는 중…"}
+        {saveState === "saved" && "FIRE 계획을 이 기기에 저장했습니다"}
       </p>
       {saveError && <p role="alert">{saveError}</p>}
       <form
@@ -200,14 +201,14 @@ export function FirePlanner({
             projectFireValues(values);
             setCurrentValues({ ...values });
           } catch (e) {
-            setError(e instanceof Error ? e.message : "入力を確認してください。");
+            setError(e instanceof Error ? e.message : "입력을 확인해 주세요.");
           }
         }}
       >
         <fieldset disabled={busy || !planReady}>
-          <legend>計算の前提</legend>
+          <legend>계산 가정</legend>
           <button type="button" onClick={() => void loadRecorded()}>
-            記録した総資産を使う
+            기록한 총자산 사용
           </button>
           {source && <p className="field-hint">{source}</p>}
           <div className="fire-fields">
@@ -229,7 +230,7 @@ export function FirePlanner({
               </label>
             ))}
           </div>
-          <button type="submit">シミュレーションする</button>
+          <button type="submit">시뮬레이션 실행</button>
           <button
             type="button"
             onClick={() => {
@@ -239,38 +240,38 @@ export function FirePlanner({
               setError("");
             }}
           >
-            仮定をクリア
+            가정 초기화
           </button>
         </fieldset>
       </form>
-      {busy && <p role="status">記録を読み込んでいます…</p>}
+      {busy && <p role="status">기록을 불러오는 중…</p>}
       {error && <p role="alert">{error}</p>}
       {result && (
         <div role="status">
           <h3>{arrivalText(result)}</h3>
           <p>
-            開始資産 {yen(result.points[0].assets)} ／ 目標 {yen(result.points[0].target)}
+            시작 자산 {yen(result.points[0].assets)} / 목표 {yen(result.points[0].target)}
           </p>
           {result.overflowMonth !== null && (
             <p>
-              {result.overflowMonth}か月目で安全な整数の計算範囲を超えたため、以降は表示しません。
+              {result.overflowMonth}개월째 안전한 정수 계산 범위를 초과해 이후는 표시하지 않습니다.
             </p>
           )}
           <details>
-            <summary>年ごとの資産と目標を見る</summary>
+            <summary>연도별 자산과 목표 보기</summary>
             <div
               className="history-table"
               role="region"
-              aria-label="年別試算表・横にスクロールできます"
+              aria-label="연도별 계산표·가로로 스크롤할 수 있습니다"
               tabIndex={0}
             >
               <table>
-                <caption>積立期間の試算（将来の額面）</caption>
+                <caption>적립 기간 계산(미래 명목 금액)</caption>
                 <thead>
                   <tr>
-                    <th>経過年</th>
-                    <th>資産</th>
-                    <th>物価調整後の目標</th>
+                    <th>경과 연수</th>
+                    <th>자산</th>
+                    <th>물가 반영 목표</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -289,8 +290,8 @@ export function FirePlanner({
       )}
       {result && (
         <ProjectionChart
-          title="今回の予測チャート"
-          items={[{ id: "draft", label: "今回の試算", result }]}
+          title="현재 예측 차트"
+          items={[{ id: "draft", label: "현재 계산", result }]}
         />
       )}
       <ScenarioComparison
@@ -304,12 +305,16 @@ export function FirePlanner({
         onRemove={(id) => setComparisons(comparisons.filter((item) => item.id !== id))}
       />
       <details>
-        <summary>計算方法と結果の読み方</summary>
+        <summary>계산 방법과 결과 해석</summary>
         <p>
-          年率は名目年率です。年率÷12で毎月複利計算し、月末に一定額を積み立てます。目標も同じ方法でインフレ率に合わせて変化します。各月の資産・目標は1円単位で四捨五入します。年率は実効年率とは異なります。
+          수익률은 명목 연율입니다. 연율÷12로 매월 복리 계산하고 월말에 일정액을 적립합니다. 목표도
+          같은 방식으로 물가상승률을 반영합니다. 매월 자산·목표는 1엔 단위로 반올림합니다. 명목
+          연율은 실효 연율과 다릅니다.
         </p>
         <p>
-          最大100年、最初の到達を表示します。到達後も維持できることを意味しません。税金・手数料・負債・取り崩し・相場の変動は計算しません。入力する年利は必要に応じて費用を考慮してください。これは一定の仮定の試算であり、将来の成果や退職可能性を保証しません。
+          최대 100년 동안 최초 달성 시점을 표시합니다. 달성 후에도 유지할 수 있다는 뜻은 아닙니다.
+          세금·수수료·부채·인출·시장 변동은 계산하지 않습니다. 필요하면 비용을 반영한 수익률을
+          입력하세요. 일정한 가정에 따른 계산이며 미래 성과나 은퇴 가능성을 보장하지 않습니다.
         </p>
       </details>
     </section>

@@ -22,7 +22,7 @@ export function monthlyMetrics({ month, accounts, records }: MetricsSource) {
     ids.size !== accounts.length ||
     records.balances.length > MAX_ACCOUNTS
   )
-    throw new Error("集計対象の口座を確認してください。");
+    throw new Error("집계할 계좌를 확인해 주세요.");
   const seen = new Set<string>();
   for (const balance of records.balances) {
     if (
@@ -31,12 +31,12 @@ export function monthlyMetrics({ month, accounts, records }: MetricsSource) {
       !ids.has(balance.accountId) ||
       seen.has(balance.accountId)
     )
-      throw new Error("集計対象の残高を確認してください。");
+      throw new Error("집계할 잔액을 확인해 주세요.");
     seen.add(balance.accountId);
   }
   const cash = records.cash;
   if (cash && (!isMonthlyRecord(cash, true) || cash.month !== month))
-    throw new Error("集計対象の収支を確認してください。");
+    throw new Error("집계할 수입·지출을 확인해 주세요.");
   const surplus = cash ? BigInt(cash.income) - BigInt(cash.expenses) : null;
   return {
     assets: records.balances.length

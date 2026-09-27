@@ -9,7 +9,7 @@ import { DATABASE_NAME, openAccountDatabase } from "./indexeddb-accounts";
 
 const conflict = () =>
   new Error(
-    "別のタブでFIRE計画が変更されました。入力は残しています。再読み込みして最新の計画を確認してください。",
+    "다른 탭에서 FIRE 계획이 변경되었습니다. 입력은 남겨 두었습니다. 새로고침해 최신 계획을 확인해 주세요.",
   );
 
 export class IndexedDbFirePlanRepository implements FirePlanRepository {
@@ -30,7 +30,7 @@ export class IndexedDbFirePlanRepository implements FirePlanRepository {
       count.onsuccess = () => {
         try {
           if (count.result > 1) {
-            fail(new Error("保存済みのFIRE計画が上限を超えています。データは削除していません。"));
+            fail(new Error("저장된 FIRE 계획이 한도를 초과합니다. 데이터는 삭제하지 않았습니다."));
             return;
           }
           const request = store.getAll(undefined, 1);
@@ -51,7 +51,9 @@ export class IndexedDbFirePlanRepository implements FirePlanRepository {
       };
       tx.onabort = () => {
         db.close();
-        reject(failure ?? new Error("FIRE計画を読み込めません。データは変更していません。"));
+        reject(
+          failure ?? new Error("FIRE 계획을 불러올 수 없습니다. 데이터는 변경하지 않았습니다."),
+        );
       };
       tx.onerror = () => {
         failure ??= tx.error;
@@ -75,7 +77,7 @@ export class IndexedDbFirePlanRepository implements FirePlanRepository {
       count.onsuccess = () => {
         try {
           if (count.result > 1) {
-            fail(new Error("保存済みのFIRE計画が上限を超えています。データは削除していません。"));
+            fail(new Error("저장된 FIRE 계획이 한도를 초과합니다. 데이터는 삭제하지 않았습니다."));
             return;
           }
           const request = store.getAll(undefined, 1);
@@ -102,7 +104,7 @@ export class IndexedDbFirePlanRepository implements FirePlanRepository {
       };
       tx.onabort = () => {
         db.close();
-        reject(failure ?? new Error("FIRE計画を保存できません。入力は残しています。"));
+        reject(failure ?? new Error("FIRE 계획을 저장할 수 없습니다. 입력은 남겨 두었습니다."));
       };
       tx.onerror = () => {
         failure ??= tx.error;

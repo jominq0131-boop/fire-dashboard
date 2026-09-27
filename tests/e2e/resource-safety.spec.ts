@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 // Only this test's isolated context receives these synthetic records.
 async function seed(page: Page, count: number) {
   await page.goto("/");
-  await expect(page.getByRole("button", { name: "口座を追加", exact: true })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "계좌 추가", exact: true })).toBeEnabled();
   await page.evaluate(async (total) => {
     await new Promise<void>((resolve, reject) => {
       const open = indexedDB.open("fire-dashboard", 5);
@@ -14,7 +14,7 @@ async function seed(page: Page, count: number) {
         for (let index = 0; index < total; index++) {
           tx.objectStore("accounts").add({
             id: `synthetic-${index}`,
-            name: `上限テスト${index}`,
+            name: `한도테스트${index}`,
             category: "cash",
             isActive: index % 2 === 0,
             sortOrder: index,
@@ -50,8 +50,8 @@ test("concurrent creates respect the total cap, with bounded reads and editing a
     };
     try {
       const results = await Promise.allSettled([
-        repository.create({ name: "最後の候補A", category: "cash", isActive: true }),
-        repository.create({ name: "最後の候補B", category: "cash", isActive: true }),
+        repository.create({ name: "마지막 후보A", category: "cash", isActive: true }),
+        repository.create({ name: "마지막 후보B", category: "cash", isActive: true }),
       ]);
       const accounts = await repository.list();
       return {
@@ -69,22 +69,22 @@ test("concurrent creates respect the total cap, with bounded reads and editing a
   });
   expect(result.success).toBe(1);
   expect(result.failures).toHaveLength(1);
-  expect(result.failures[0]).toContain("100件");
+  expect(result.failures[0]).toContain("100개");
   expect(result.total).toBe(100);
   expect(result.inactiveIncluded).toBe(true);
   expect(result.limits.length).toBeGreaterThan(0);
   expect(result.limits.every((limit) => limit === 100)).toBe(true);
   await page.reload();
   await expect(page.getByRole("listitem")).toHaveCount(100);
-  await expect(page.getByRole("button", { name: "口座を追加", exact: true })).toBeDisabled();
-  await page.getByRole("button", { name: "上限テスト0を編集", exact: true }).click();
-  await page.getByLabel("口座名", { exact: true }).fill("上限でも編集可能");
-  await page.getByRole("button", { name: "変更を保存", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText("保存しました");
+  await expect(page.getByRole("button", { name: "계좌 추가", exact: true })).toBeDisabled();
+  await page.getByRole("button", { name: "한도테스트0 편집", exact: true }).click();
+  await page.getByLabel("계좌명", { exact: true }).fill("한도에서도 편집 가능");
+  await page.getByRole("button", { name: "변경 저장", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("저장했습니다");
   await page.reload();
   await expect(page.getByRole("listitem")).toHaveCount(100);
   await expect(
-    page.getByRole("button", { name: "上限でも編集可能を編集", exact: true }),
+    page.getByRole("button", { name: "한도에서도 편집 가능 편집", exact: true }),
   ).toBeVisible();
 });
 
@@ -99,10 +99,10 @@ test("oversized existing stores are preserved and rejected before materializing 
   });
   await page.reload();
   const accountAlert = page.locator("#accounts").getByRole("alert");
-  await expect(accountAlert).toContainText("100件");
-  await expect(accountAlert).toContainText("削除していません");
+  await expect(accountAlert).toContainText("100개");
+  await expect(accountAlert).toContainText("삭제하지 않았습니다");
   await expect(page.getByRole("listitem")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "口座を追加", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "계좌 추가", exact: true })).toBeDisabled();
   const preserved = await page.evaluate(async () => {
     return new Promise((resolve, reject) => {
       const open = indexedDB.open("fire-dashboard", 5);
@@ -125,7 +125,7 @@ test("oversized existing stores are preserved and rejected before materializing 
       };
     });
   });
-  expect(preserved).toEqual({ count: 101, first: "上限テスト0", last: "上限テスト100" });
+  expect(preserved).toEqual({ count: 101, first: "한도테스트0", last: "한도테스트100" });
 });
 
 test("repeated reads and edits keep row counts and payloads bounded without using Web Storage", async ({
@@ -145,7 +145,7 @@ test("repeated reads and edits keep row counts and payloads bounded without usin
     for (let index = 0; index < 20; index++) {
       const accounts = await repository.list();
       largestRead = Math.max(largestRead, accounts.length);
-      await repository.update(accounts[0], { ...accounts[0], name: `反復テスト${index}` });
+      await repository.update(accounts[0], { ...accounts[0], name: `반복테스트${index}` });
     }
     const final = await repository.list();
     return {
@@ -159,11 +159,11 @@ test("repeated reads and edits keep row counts and payloads bounded without usin
     largestRead: 100,
     total: 100,
     fieldCounts: [5],
-    latest: "反復テスト19",
+    latest: "반복테스트19",
   });
   await page.reload();
   await expect(page.getByRole("listitem")).toHaveCount(100);
-  await page.getByRole("button", { name: "反復テスト19を休止", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText("休止しました");
+  await page.getByRole("button", { name: "반복테스트19 사용 중지", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("계좌 사용을 중지했습니다");
   await expect(page.getByRole("listitem")).toHaveCount(100);
 });

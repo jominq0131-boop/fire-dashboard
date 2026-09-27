@@ -25,7 +25,7 @@ it("migrates JSON v1 without inventing dates and round-trips v3", () => {
   const v1 = syntheticBackup(),
     before = canonical(v1);
   const v2 = normalizeBackup(v1);
-  expect(v2).toEqual({ ...v1, schemaVersion: 6, firePlan: null, goalPlan: null });
+  expect(v2).toEqual({ ...v1, schemaVersion: 7, firePlan: null, goalPlan: null });
   expect(canonical(v1)).toBe(before);
   v2.accountBalanceSnapshots = v2.accountBalanceSnapshots.map((b) => ({
     ...b,
@@ -57,12 +57,12 @@ it("adds the account/month index in v3 and empty FIRE store in v4", () => {
 });
 it("distinguishes missing, unknown-date, fresh and stale records", () => {
   const b = syntheticBackup().accountBalanceSnapshots[0];
-  expect(observationStatus(undefined, "2026-09-04")).toBe("未記録");
-  expect(observationStatus(b, "2026-09-04")).toContain("確認日未記録");
+  expect(observationStatus(undefined, "2026-09-04")).toBe("미기록");
+  expect(observationStatus(b, "2026-09-04")).toContain("확인일 미기록");
   expect(observationStatus({ ...b, asOfDate: "2026-08-04" }, "2026-09-04")).not.toContain(
-    "32日以上",
+    "32일 이상",
   );
-  expect(observationStatus({ ...b, asOfDate: "2026-08-03" }, "2026-09-04")).toContain("32日以上");
+  expect(observationStatus({ ...b, asOfDate: "2026-08-03" }, "2026-09-04")).toContain("32일 이상");
 });
 it("sums the last observation once per account with missing and overflow protection", () => {
   const b = syntheticBackup();

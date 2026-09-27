@@ -5,10 +5,10 @@ import { monthChange, type PortfolioOverview } from "../../domain/portfolio";
 import { observationStatus, localDate } from "../../domain/observations";
 const yen = (n: MetricAmount) =>
   typeof n === "number"
-    ? `${n.toLocaleString("ja-JP")} 円`
+    ? `${n.toLocaleString("ko-KR")} 엔`
     : n === "overflow"
-      ? "計算範囲超過"
-      : "未入力";
+      ? "계산 범위 초과"
+      : "미입력";
 export function HistoryExplorer({
   data,
   onSelectMonth,
@@ -55,41 +55,43 @@ export function HistoryExplorer({
   const assetSeries: ChartSeries[] = [
     {
       id: account || "total",
-      label: chosen?.name ?? "記録した資産合計",
+      label: chosen?.name ?? "기록한 자산 합계",
       values,
       kind: "area",
       connect: rows.map((r, i) =>
         account ? true : monthChange(months[i - 1], r.source).delta !== null,
       ),
       hollow: rows.map((r) => !account && r.metrics.recordedAccounts !== r.metrics.totalAccounts),
-      missing: rows.map((r) => (r.metrics.assets === "overflow" ? "計算範囲超過" : "残高未記録")),
+      missing: rows.map((r) =>
+        r.metrics.assets === "overflow" ? "계산 범위 초과" : "잔액 미기록",
+      ),
     },
   ];
   if (!account && hasInvestments)
     assetSeries.push({
       id: "investments",
-      label: "うちNISA・課税投資",
+      label: "그중 NISA·과세 투자",
       kind: "bar",
       connect: investmentSources.map(
         (source, i) => monthChange(investmentSources[i - 1], source).delta !== null,
       ),
       values: investmentValues.map((n) => (typeof n === "number" ? n : null)),
       missing: investmentValues.map((n) =>
-        n === "overflow" ? "計算範囲超過" : "投資口座の残高未記録",
+        n === "overflow" ? "계산 범위 초과" : "투자 계좌 잔액 미기록",
       ),
     });
   const cashSeries: ChartSeries[] = [
-    { id: "income", label: "収入", values: rows.map((r) => r.metrics.income), kind: "bar" },
+    { id: "income", label: "수입", values: rows.map((r) => r.metrics.income), kind: "bar" },
     {
       id: "expenses",
-      label: "消費支出",
+      label: "소비 지출",
       values: rows.map((r) => r.metrics.expenses),
       kind: "bar",
       color: "#ff94b5",
     },
     {
       id: "contribution",
-      label: "投資への拠出",
+      label: "투자 납입",
       values: rows.map((r) => r.metrics.investmentContribution),
       kind: "line",
       color: "#ffc779",
@@ -100,14 +102,14 @@ export function HistoryExplorer({
     <div className="history-explorer">
       <div className="analysis-heading">
         <div>
-          <span className="analysis-eyebrow">HISTORY & CASH FLOW</span>
-          <h3>資産の動きを、ひとつの画面で。</h3>
-          <p>残高の推移と毎月の収支を切り替え、気になる月を詳しく確認。</p>
+          <span className="analysis-eyebrow">자산 기록과 현금흐름</span>
+          <h3>자산의 흐름을 한 화면에서.</h3>
+          <p>잔액 변화와 월별 수입·지출을 전환하며 관심 있는 월을 자세히 확인하세요.</p>
         </div>
       </div>
-      <div className="analysis-tabs" role="group" aria-label="分析の表示">
+      <div className="analysis-tabs" role="group" aria-label="분석 보기">
         <button type="button" aria-pressed={view === "assets"} onClick={() => setView("assets")}>
-          資産推移
+          자산 변화
         </button>
         <button
           type="button"
@@ -117,19 +119,19 @@ export function HistoryExplorer({
             setAccount("");
           }}
         >
-          収支・投資比較
+          수입·지출·투자 비교
         </button>
       </div>
       <div className="chart-controls">
         <label>
-          表示する口座
+          표시할 계좌
           <select
             disabled={view === "cash"}
-            aria-label="表示する口座"
+            aria-label="표시할 계좌"
             value={account}
             onChange={(e) => setAccount(e.target.value)}
           >
-            <option value="">すべての口座</option>
+            <option value="">모든 계좌</option>
             {data.current.accounts.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.name}
@@ -138,46 +140,46 @@ export function HistoryExplorer({
           </select>
         </label>
         <label>
-          表示期間
+          표시 기간
           <select
-            aria-label="表示期間"
+            aria-label="표시 기간"
             value={period}
             onChange={(e) => {
               setPeriod(Number(e.target.value));
               setSelected(Number(e.target.value) - 1);
             }}
           >
-            <option value="6">6か月</option>
-            <option value="12">12か月</option>
+            <option value="6">6개월</option>
+            <option value="12">12개월</option>
           </select>
         </label>
       </div>
       <div className="analysis-summary">
         <div>
-          <span>{row.source.month} · 記録した資産合計</span>
+          <span>{row.source.month} · 기록한 자산 합계</span>
           <strong>{yen(row.metrics.assets)}</strong>
         </div>
         <div>
-          <span>同じ口座の前月差</span>
+          <span>같은 계좌의 전월 차이</span>
           <strong>{yen(change.delta)}</strong>
           <small>
             {change.percent === null
-              ? "比較可能な連続月が必要です"
-              : `${change.percent > 0 ? "+" : ""}${change.percent.toLocaleString("ja-JP")}%`}
+              ? "비교 가능한 연속 월이 필요합니다"
+              : `${change.percent > 0 ? "+" : ""}${change.percent.toLocaleString("ko-KR")}%`}
           </small>
         </div>
         <div>
-          <span>この月の記録状況</span>
+          <span>이달 기록 상태</span>
           <strong>
             {row.metrics.recordedAccounts} / {row.metrics.totalAccounts}
-            <small>口座</small>
+            <small>계좌</small>
           </strong>
-          <small>月中の確認額を含みます</small>
+          <small>월중 확인액 포함</small>
         </div>
       </div>
       <InteractiveLineChart
         key={`${period}-${view}-${account}`}
-        title={view === "assets" ? "月別資産チャート" : "月別収支チャート"}
+        title={view === "assets" ? "월별 자산 차트" : "월별 수입·지출 차트"}
         labels={rows.map((r) => r.source.month)}
         selected={index}
         onSelect={setSelected}
@@ -185,39 +187,39 @@ export function HistoryExplorer({
       />
       <p className="field-hint">
         {view === "assets"
-          ? "線は記録した残高の推移、面は合計、棒はそのうちNISA・課税投資の残高です。破線は未記録の月や口座構成の変更をまたぐ参考線です。中間の金額は未確定です。"
-          : "収支は月全体の金額です。棒と線で金額と推移を比較できます。破線の中間は未記録です。投資への拠出は消費支出に含まず、資産の増減は運用損益ではありません。"}
+          ? "선은 기록한 잔액 변화, 면은 합계, 막대는 그중 NISA·과세 투자 잔액입니다. 파선은 미기록 월이나 계좌 구성 변경을 가로지르는 참고선입니다. 중간 금액은 확정되지 않았습니다."
+          : "수입·지출은 월 전체 금액입니다. 막대와 선으로 금액과 변화를 비교할 수 있습니다. 파선의 중간은 미기록 상태입니다. 투자 납입은 소비 지출에 포함하지 않으며 자산 증감은 운용손익이 아닙니다."}
       </p>
-      <section className="month-inspector" aria-label="選択月の詳細">
-        <h3>{row.source.month} の記録を確認</h3>
+      <section className="month-inspector" aria-label="선택 월 상세">
+        <h3>{row.source.month} 기록 확인</h3>
         <p>
-          {account ? "選択口座の確認残高" : "記録した資産合計"}：
+          {account ? "선택 계좌의 확인 잔액" : "기록한 자산 합계"}：
           {yen(account ? values[index] : row.metrics.assets)}
         </p>
         <p className="field-hint">
-          入力 {row.metrics.recordedAccounts}/{row.metrics.totalAccounts}
-          口座。月中確認を含む記録額です。未記録の口座は含めません。
+          입력 {row.metrics.recordedAccounts}/{row.metrics.totalAccounts}개 계좌. 월중 확인을 포함한
+          기록액이며 미기록 계좌는 제외합니다.
         </p>
         <p>
-          {account ? "全口座合計の前月差" : "前月の記録との差"}：{yen(change.delta)}
-          {change.delta === null ? "（同じ口座の連続月が必要です）" : ""}
+          {account ? "전체 계좌 합계의 전월 차이" : "전월 기록과의 차이"}：{yen(change.delta)}
+          {change.delta === null ? "(같은 계좌의 연속 월이 필요합니다)" : ""}
         </p>
         <dl className="metrics-list">
           <div>
-            <dt>月全体の収入</dt>
+            <dt>월 전체 수입</dt>
             <dd>{yen(row.metrics.income)}</dd>
           </div>
           <div>
-            <dt>月全体の消費支出</dt>
+            <dt>월 전체 소비 지출</dt>
             <dd>{yen(row.metrics.expenses)}</dd>
           </div>
           <div>
-            <dt>月全体の投資への拠出</dt>
+            <dt>월 전체 투자 납입</dt>
             <dd>{yen(row.metrics.investmentContribution)}</dd>
           </div>
         </dl>
         <details>
-          <summary>この月の口座別内訳（{balances.length}件）</summary>
+          <summary>이달 계좌별 내역({balances.length}개)</summary>
           <ul className="chart-breakdown">
             {balances.map((b) => (
               <li key={b.id}>
@@ -227,11 +229,11 @@ export function HistoryExplorer({
               </li>
             ))}
           </ul>
-          {!balances.length && <p>この月の残高は未記録です。</p>}
+          {!balances.length && <p>이달 잔액은 기록하지 않았습니다.</p>}
         </details>
         <div className="chart-controls">
           <button type="button" onClick={() => onSelectMonth(row.source.month)}>
-            選択月の入力・編集へ
+            선택 월 입력·편집으로
           </button>
           <button
             type="button"
@@ -241,11 +243,11 @@ export function HistoryExplorer({
               if (value !== null)
                 onForecast(
                   value,
-                  `${row.source.month} · ${chosen?.name ?? "記録した資産合計"}（${row.metrics.recordedAccounts}/${row.metrics.totalAccounts}口座、現在の評価額ではありません）`,
+                  `${row.source.month} · ${chosen?.name ?? "기록한 자산 합계"}（${row.metrics.recordedAccounts}/${row.metrics.totalAccounts}개 계좌, 현재 평가액이 아닙니다)`,
                 );
             }}
           >
-            この記録額からFIREを試算
+            이 기록액으로 FIRE 계산
           </button>
         </div>
       </section>

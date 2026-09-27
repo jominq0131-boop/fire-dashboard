@@ -109,7 +109,7 @@ const copyValues = (values: FireScenarioValues): FireScenarioValues => ({ ...val
 
 export function normalizeFirePlan(value: unknown): FirePlan {
   if (!value || typeof value !== "object")
-    throw new Error("保存済みのFIRE計画を検証できません。元のデータは変更していません。");
+    throw new Error("저장된 FIRE 계획을 검증할 수 없습니다. 원본 데이터는 변경하지 않았습니다.");
   const plan = value as Record<string, unknown>;
   if (
     !exactKeys(plan, ["id", "draft", "current", "comparisons", "updatedAt"]) ||
@@ -120,11 +120,11 @@ export function normalizeFirePlan(value: unknown): FirePlan {
     plan.comparisons.length > MAX_FIRE_COMPARISONS ||
     !validIsoTime(plan.updatedAt)
   )
-    throw new Error("保存済みのFIRE計画を検証できません。元のデータは変更していません。");
+    throw new Error("저장된 FIRE 계획을 검증할 수 없습니다. 원본 데이터는 변경하지 않았습니다.");
   const comparisons = plan.comparisons as unknown[];
   const normalized = comparisons.map((item) => {
     if (!item || typeof item !== "object")
-      throw new Error("保存済みのFIRE計画を検証できません。元のデータは変更していません。");
+      throw new Error("저장된 FIRE 계획을 검증할 수 없습니다. 원본 데이터는 변경하지 않았습니다.");
     const record = item as Record<string, unknown>;
     if (
       !exactKeys(record, ["id", "values"]) ||
@@ -132,11 +132,11 @@ export function normalizeFirePlan(value: unknown): FirePlan {
       Number(record.id) < 1 ||
       !isFireScenarioValues(record.values, true)
     )
-      throw new Error("保存済みのFIRE計画を検証できません。元のデータは変更していません。");
+      throw new Error("저장된 FIRE 계획을 검증할 수 없습니다. 원본 데이터는 변경하지 않았습니다.");
     return { id: Number(record.id), values: copyValues(record.values) };
   });
   if (new Set(normalized.map((item) => item.id)).size !== normalized.length)
-    throw new Error("保存済みのFIRE計画を検証できません。元のデータは変更していません。");
+    throw new Error("저장된 FIRE 계획을 검증할 수 없습니다. 원본 데이터는 변경하지 않았습니다.");
   return {
     id: FIRE_PLAN_ID,
     draft: copyValues(plan.draft),

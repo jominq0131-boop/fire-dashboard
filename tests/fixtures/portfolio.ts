@@ -4,7 +4,7 @@ export function syntheticBackup(): Backup {
   return {
     schemaVersion: 1,
     accounts: [
-      { id: "synthetic-a", name: "合成資産口座", category: "cash", isActive: true, sortOrder: 0 },
+      { id: "synthetic-a", name: "합성자산계좌", category: "cash", isActive: true, sortOrder: 0 },
     ],
     monthlyCashFlows: [
       {

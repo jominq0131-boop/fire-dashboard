@@ -87,7 +87,7 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
       tx.onabort = () => {
         db.close();
         reject(
-          failure ?? new Error("保存領域の処理に失敗しました。既存の記録は変更していません。"),
+          failure ?? new Error("저장 공간 처리에 실패했습니다. 기존 기록은 변경하지 않았습니다."),
         );
       };
       try {
@@ -117,7 +117,7 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
     if (end) assertMonth(end);
     return this.run("readonly", (tx, read, done) => {
       read(tx.objectStore(ACCOUNT_STORE).getAll(undefined, MAX_ACCOUNTS), (accounts) => {
-        if (!accounts.every(isAssetAccount)) throw new Error("口座を読み込めません。");
+        if (!accounts.every(isAssetAccount)) throw new Error("계좌를 불러올 수 없습니다.");
         const index = tx.objectStore(BALANCE_STORE).index("month");
         read(index.openKeyCursor(IDBKeyRange.bound("1900-01", asOf), "prev"), (cursor) => {
           const latestMonth = cursor ? String(cursor.key) : null;
@@ -128,7 +128,7 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
             assertCapacity(count, months.length * MAX_ACCOUNTS);
             read(index.getAll(range, months.length * MAX_ACCOUNTS), (balances) => {
               if (!balances.every((b) => isMonthlyRecord(b, false) && months.includes(b.month)))
-                throw new Error("残高を読み込めません。");
+                throw new Error("잔액을 불러올 수 없습니다.");
               const sources: MetricsSource[] = months.map((month) => ({
                 month,
                 accounts,
@@ -148,7 +148,7 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
                       if (
                         !cashRows.every((c) => isMonthlyRecord(c, true) && months.includes(c.month))
                       )
-                        throw new Error("収支を読み込めません。");
+                        throw new Error("수입·지출을 불러올 수 없습니다.");
                       for (const source of sources) {
                         source.records.cash =
                           (cashRows as MonthlyCashFlowRecord[]).find(
@@ -230,7 +230,7 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
           if (--remaining === 0)
             done(
               normalizeBackup({
-                schemaVersion: 6,
+                schemaVersion: 7,
                 accounts: values[0],
                 monthlyCashFlows: values[1],
                 accountBalanceSnapshots: values[2],
@@ -243,10 +243,10 @@ export class IndexedDbPortfolioRepository implements PortfolioRepository, Backup
         assertCapacity(values[i].length, limits[i], true);
         const value: unknown = cursor.value;
         if (!validSnapshotRecord(value, i))
-          throw new Error("保存済み記録を検証できません。元のデータを保持しています。");
+          throw new Error("저장된 기록을 검증할 수 없습니다. 원본 데이터는 보존됩니다.");
         bytes += backupBytes(canonical(value as object)) + 1;
         if (bytes > MAX_BACKUP_BYTES)
-          throw new Error("バックアップは32 MiB以内で扱えます。記録は削除していません。");
+          throw new Error("백업은 32 MiB까지 처리할 수 있습니다. 기록은 삭제하지 않았습니다.");
         values[i].push(value);
         cursor.continue();
       });

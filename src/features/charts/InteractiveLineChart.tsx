@@ -8,9 +8,7 @@ class ChartBoundary extends Component<{ children: ReactNode }, { failed: boolean
   }
   render() {
     return this.state.failed ? (
-      <p role="alert">
-        チャートを表示できません。入力内容を保存してからページを再読み込みしてください。
-      </p>
+      <p role="alert">차트를 표시할 수 없습니다. 입력 내용을 저장한 뒤 새로고침해 주세요.</p>
     ) : (
       this.props.children
     );
@@ -22,7 +20,7 @@ export function InteractiveLineChart(props: ComponentProps<typeof FinancialChart
       <Suspense
         fallback={
           <div className="chart-loading" aria-busy="true">
-            チャートを準備しています…
+            차트를 준비하는 중…
           </div>
         }
       >

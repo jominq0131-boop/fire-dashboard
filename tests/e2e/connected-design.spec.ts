@@ -9,7 +9,7 @@ test("sparse rising and falling observations connect, with a unified design acro
   backup.accounts.push({
     ...backup.accounts[0],
     id: "synthetic-investment",
-    name: "合成投資口座",
+    name: "합성투자계좌",
     category: "nisa_growth",
     sortOrder: 1,
   });
@@ -51,23 +51,23 @@ test("sparse rising and falling observations connect, with a unified design acro
   expect(directPaths.some((d) => /L/.test(d))).toBe(true);
   await chart.getByRole("slider").fill("4");
   await expect(chart.locator(".chart-inspector")).toContainText("2026-02");
-  await expect(chart.locator(".chart-inspector")).toContainText("残高未記録");
+  await expect(chart.locator(".chart-inspector")).toContainText("잔액 미기록");
   await chart.getByRole("slider").fill("11");
   await chart.screenshot({ path: "test-results/connected-sparse-desktop.png" });
   const fire = page.locator("#fire");
   for (const [label, value] of [
-    ["開始資産（円）", "4000000"],
-    ["目標資産・今日の価値（円）", "30000000"],
-    ["毎月の積立額（円）", "100000"],
-    ["想定年利（%）", "4"],
-    ["想定インフレ率（%）", "2"],
+    ["시작 자산(엔)", "4000000"],
+    ["목표 자산·현재 가치(엔)", "30000000"],
+    ["월 적립액(엔)", "100000"],
+    ["가정 연 수익률(%)", "4"],
+    ["가정 물가상승률(%)", "2"],
   ])
     await fire.getByLabel(label, { exact: true }).fill(value);
-  await fire.getByRole("button", { name: "シミュレーションする" }).click();
+  await fire.getByRole("button", { name: "시뮬레이션 실행" }).click();
   await expect(fire.locator(".recharts-line-curve")).toHaveCount(2);
-  await page.getByRole("navigation").getByRole("link", { name: "月別記録", exact: true }).click();
-  await page.getByLabel("対象月", { exact: true }).fill("2026-09");
-  await page.getByRole("button", { name: "記録を読み込む", exact: true }).click();
+  await page.getByRole("navigation").getByRole("link", { name: "월별 기록", exact: true }).click();
+  await page.getByLabel("대상 월", { exact: true }).fill("2026-09");
+  await page.getByRole("button", { name: "기록 불러오기", exact: true }).click();
   for (const [name, locator] of [
     ["records", page.locator("#monthly")],
     ["accounts", page.locator("#accounts")],

@@ -25,19 +25,20 @@ export function validateAccountDetails(value: AccountDetails): AccountDetails {
     value.name.length > MAX_ACCOUNT_NAME_LENGTH ||
     !value.name.trim()
   ) {
-    throw new AccountError("口座名は空白以外の1〜100文字で入力してください。");
+    throw new AccountError("계좌명은 공백을 제외한 1~100자로 입력해 주세요.");
   }
   if (!isAccountCategory(value.category) || typeof value.isActive !== "boolean") {
-    throw new AccountError("口座の種類と利用状態を確認してください。");
+    throw new AccountError("계좌 종류와 사용 상태를 확인해 주세요.");
   }
   return { name: value.name.trim(), category: value.category, isActive: value.isActive };
 }
 
 export function assertAccountCapacity(count: number, adding = false): void {
-  if (!Number.isSafeInteger(count) || count < 0) throw new AccountError("口座数を確認できません。");
+  if (!Number.isSafeInteger(count) || count < 0)
+    throw new AccountError("계좌 수를 확인할 수 없습니다.");
   if (count > MAX_ACCOUNTS || (adding && count === MAX_ACCOUNTS)) {
     throw new AccountError(
-      `安全に処理できる口座は休止中を含め${MAX_ACCOUNTS}件までです。保存済みデータは削除していません。追加せず、対応を依頼してください。`,
+      `안전하게 처리할 수 있는 계좌는 중지한 계좌를 포함해 최대 ${MAX_ACCOUNTS}개입니다. 저장된 데이터는 삭제하지 않았습니다. 추가하지 말고 지원을 요청해 주세요.`,
     );
   }
 }

@@ -7,6 +7,8 @@ export const initialDrawdownValues = () => ({
   drawdownYears: "30",
   drawdownReturnBps: "3",
   drawdownInflationBps: "2",
+  drawdownIncome: "0",
+  drawdownIncomeStart: "1",
 });
 export type DrawdownValues = ReturnType<typeof initialDrawdownValues>;
 export type GoalValues = Record<Exclude<keyof GoalAssumptions, "startMonth">, string> &
@@ -41,10 +43,10 @@ export interface GoalPlanRepository {
 }
 export function normalizeGoalPlan(
   value: unknown,
-  format: "stored" | "legacy" | "tax" | "current" = "stored",
+  format: "stored" | "legacy" | "tax" | "drawdown" | "current" = "stored",
 ): GoalPlan {
   const invalid = () =>
-    new Error("保存済みの目標計画を検証できません。元のデータは変更していません。");
+    new Error("저장된 목표 계획을 검증할 수 없습니다. 원본 데이터는 변경하지 않았습니다.");
   if (!value || typeof value !== "object") throw invalid();
   const plan = value as Record<string, unknown>;
   if (
@@ -62,12 +64,28 @@ export function normalizeGoalPlan(
   assertMonth(plan.referenceMonth);
   const draft = plan.draft as Record<string, unknown>;
   const keys = Object.keys(initialGoalValues());
+  const drawdownKeys = keys.filter(
+    (key) => key !== "drawdownIncome" && key !== "drawdownIncomeStart",
+  );
   const taxKeys = keys.filter((key) => !key.startsWith("drawdown"));
   const legacyKeys = taxKeys.filter((key) => key !== "taxableCost" && key !== "taxRate");
   const count = Object.keys(draft).length;
   const detected =
-    count === legacyKeys.length ? "legacy" : count === taxKeys.length ? "tax" : "current";
-  const expected = detected === "legacy" ? legacyKeys : detected === "tax" ? taxKeys : keys;
+    count === legacyKeys.length
+      ? "legacy"
+      : count === taxKeys.length
+        ? "tax"
+        : count === drawdownKeys.length
+          ? "drawdown"
+          : "current";
+  const expected =
+    detected === "legacy"
+      ? legacyKeys
+      : detected === "tax"
+        ? taxKeys
+        : detected === "drawdown"
+          ? drawdownKeys
+          : keys;
   if (
     (format !== "stored" && format !== detected) ||
     Object.keys(draft).length !== expected.length ||
